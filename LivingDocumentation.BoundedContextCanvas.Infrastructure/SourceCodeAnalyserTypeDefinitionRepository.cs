@@ -33,7 +33,7 @@ public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionReposit
 
             var typeDefinitions = new List<TypeDefinition>();
 
-            new SourceAnalyser(semanticModel, typeDefinitions).Visit(await tree.GetRootAsync());
+            new SourceCodeVisitor(semanticModel, typeDefinitions).Visit(await tree.GetRootAsync());
 
             foreach (var typeDefinition in typeDefinitions) {
                 yield return typeDefinition;

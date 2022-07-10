@@ -5,12 +5,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace LivingDocumentation.BoundedContextCanvas.Infrastructure;
 
-public class SourceAnalyser : CSharpSyntaxWalker
+public class SourceCodeVisitor : CSharpSyntaxWalker
 {
     private readonly SemanticModel _semanticModel;
     private readonly List<TypeDefinition> _typeDefinitions;
 
-    public SourceAnalyser(SemanticModel semanticModel, List<TypeDefinition> typeDefinitions)
+    public SourceCodeVisitor(SemanticModel semanticModel, List<TypeDefinition> typeDefinitions)
     {
         this._semanticModel = semanticModel;
         _typeDefinitions = typeDefinitions;

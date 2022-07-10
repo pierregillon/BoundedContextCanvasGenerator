@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using FluentAssertions;
 using LivingDocumentation.BoundedContextCanvas.Domain;
 using LivingDocumentation.BoundedContextCanvas.Infrastructure;
@@ -12,10 +11,21 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
 {
     public class SourceCodeVisitorTests
     {
-        [Fact]
-        public void Extract_class_name_from_source_code()
+        private static IEnumerable<object[]> AccessibilityLevels()
         {
-            const string sourceCode = @"public class CreateUser { }";
+            yield return new[] { "public" };
+            yield return new[] { "internal" };
+            yield return new[] { "private" };
+            yield return new[] { "protected" };
+        }
+
+        [Theory]
+        [MemberData(nameof(AccessibilityLevels))]
+        public void Extract_class_name_from_source_code(string accessibility)
+        {
+            var sourceCode = @$"
+                {accessibility} class CreateUser {{ }}
+            ";
 
             var typeDefinitions = Visit(sourceCode);
 
@@ -28,11 +38,10 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
         public void Extract_class_namespace_from_source_code()
         {
             const string sourceCode = @"
-    namespace Test
-    {
-        public class CreateUser { }
-    }
-";
+                namespace Test;
+                public class CreateUser { }
+            ";
+
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new[] {
@@ -44,31 +53,33 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
         public void Extract_class_implemented_interfaces_from_source_code()
         {
             const string sourceCode = @"
-    namespace Test
-    {
-        public interface ICommand { }
-        public interface IDisposable { }
-        public class CreateUser : ICommand, IDisposable { }
-    }
-";
+                namespace Test;
+                public interface ICommand { }
+                public interface IDisposable { }
+                public class CreateUser : ICommand, IDisposable { }
+            ";
+
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(new TypeFullName("Test.CreateUser"), new [] {
+                new TypeDefinition(new TypeFullName("Test.CreateUser"), new[] {
                     new TypeFullName("Test.ICommand"),
                     new TypeFullName("Test.IDisposable")
                 })
             });
         }
 
-        [Fact]
-        public void Extract_record_name_from_source_code()
+        [Theory]
+        [MemberData(nameof(AccessibilityLevels))]
+        public void Extract_record_name_from_source_code(string accessibility)
         {
-            const string sourceCode = @"public record CreateUser;";
+            var sourceCode = @$"
+                {accessibility} record CreateUser;
+            ";
 
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new []{
+            typeDefinitions.Should().BeEquivalentTo(new[] {
                 new TypeDefinition(
                     new TypeFullName("CreateUser"),
                     new[] { new TypeFullName("System.IEquatable<CreateUser>") }
@@ -89,8 +100,8 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
 
             typeDefinitions.Should().BeEquivalentTo(new[] {
                 new TypeDefinition(
-                    new TypeFullName("Test.CreateUser"), 
-                    new [] { new TypeFullName("System.IEquatable<Test.CreateUser>") }
+                    new TypeFullName("Test.CreateUser"),
+                    new[] { new TypeFullName("System.IEquatable<Test.CreateUser>") }
                 )
             });
         }
@@ -109,7 +120,7 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(new TypeFullName("Test.CreateUser"), new [] {
+                new TypeDefinition(new TypeFullName("Test.CreateUser"), new[] {
                     new TypeFullName("System.IEquatable<Test.CreateUser>"),
                     new TypeFullName("Test.ICommand"),
                     new TypeFullName("Test.IDisposable")
@@ -117,14 +128,14 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
             });
         }
 
-        public static IEnumerable<TypeDefinition> Visit(string source, params string[] ignoreErrorCodes)
+        public static IEnumerable<TypeDefinition> Visit(string source)
         {
             source
                 .Should()
                 .NotBeNullOrWhiteSpace("without source code there is nothing to test");
 
             var syntaxTree = CSharpSyntaxTree.ParseText(source.Trim());
-            
+
             var compilation = CSharpCompilation.Create("Test")
                 .WithOptions(
                     new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
@@ -133,19 +144,13 @@ namespace LivingDocumentation.BoundedContextCanvas.Tests
                 .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
                 .AddSyntaxTrees(syntaxTree);
 
-            compilation
-                .GetDiagnostics()
-                .Where(d => !ignoreErrorCodes.Contains(d.Id))
-                .Should()
-                .HaveCount(0, "there shoudn't be any compile errors");
-
             var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
             var types = new List<TypeDefinition>();
             var visitor = new SourceCodeVisitor(semanticModel, types);
-            
+
             visitor.Visit(syntaxTree.GetRoot());
-            
+
             return types;
         }
     }

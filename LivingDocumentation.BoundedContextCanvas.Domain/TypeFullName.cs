@@ -1,0 +1,1 @@
+﻿public record TypeFullName(string Value);

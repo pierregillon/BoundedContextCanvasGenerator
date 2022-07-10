@@ -1,0 +1,1 @@
+﻿public record SolutionName(string Value);

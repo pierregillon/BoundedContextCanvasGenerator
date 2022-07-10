@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\LivingDocumentation.BoundedContextCanvas.Domain\LivingDocumentation.BoundedContextCanvas.Domain.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.BoundedContextCanvas.Infrastructure\LivingDocumentation.BoundedContextCanvas.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -18,30 +18,27 @@ public class SourceAnalyser : CSharpSyntaxWalker
 
     public override void VisitClassDeclaration(ClassDeclarationSyntax node)
     {
-        var type = _semanticModel.GetDeclaredSymbol(node);
-        
-        if (type != null) {
-            _typeDefinitions.Add(new TypeDefinition(
-                new TypeFullName(type.Name), 
-                Enumerable.Select(type.AllInterfaces, i => new TypeFullName(i.Name))
-            ));
-        }
+        AddVisitedType(node);
 
         base.VisitClassDeclaration(node);
     }
 
     public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
     {
-        var type = _semanticModel.GetDeclaredSymbol(node);
-
-        if (type != null)
-        {
-            _typeDefinitions.Add(new TypeDefinition(
-                new TypeFullName(type.Name),
-                Enumerable.Select(type.AllInterfaces, i => new TypeFullName(i.Name))
-            ));
-        }
+        AddVisitedType(node);
 
         base.VisitRecordDeclaration(node);
+    }
+
+    private void AddVisitedType(BaseTypeDeclarationSyntax node)
+    {
+        var type = _semanticModel.GetDeclaredSymbol(node);
+
+        if (type != null) {
+            _typeDefinitions.Add(new TypeDefinition(
+                type.GetFullName(),
+                Enumerable.Select(type.AllInterfaces, i => i.GetFullName()).ToArray()
+            ));
+        }
     }
 }

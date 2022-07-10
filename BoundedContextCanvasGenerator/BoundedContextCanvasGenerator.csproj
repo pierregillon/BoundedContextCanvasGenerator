@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\LivingDocumentation.Domain\LivingDocumentation.Domain.csproj" />
     <ProjectReference Include="..\LivingDocumentation.Infrastructure\LivingDocumentation.Infrastructure.csproj" />
   </ItemGroup>

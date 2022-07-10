@@ -1,4 +1,6 @@
-﻿using LivingDocumentation.Domain;
+﻿using BoundedContextCanvasGenerator;
+using CommandLine;
+using LivingDocumentation.Domain;
 using LivingDocumentation.Infrastructure;
 
 if (!args.Any()) {
@@ -6,15 +8,35 @@ if (!args.Any()) {
     return;
 }
 
-var name = new SolutionName(args[0]);
+var parsedResults = Parser.Default.ParseArguments<Options>(args);
 
-ITypeDefinitionRepository repository = new SourceCodeAnalyserTypeDefinitionRepository();
+await parsedResults.MapResult(
+    RunApplicationAsync,
+    _ => Task.FromResult(1)
+);
 
-await foreach (var typeDefinition in repository.GetAll(name)) {
-    if (typeDefinition.ImplementedInterfaces.Any(x => x.Value.Contains("ICommand"))) {
-        Console.WriteLine($"COMMAND : {typeDefinition.Name.Value}");
-    }
-    if (typeDefinition.ImplementedInterfaces.Any(x => x.Value.Contains("IQuery"))) {
-        Console.WriteLine($"QUERY : {typeDefinition.Name.Value}");
-    }
+
+static async Task RunApplicationAsync(Options options)
+{
+    var solutionName = new SolutionName(options.Solution);
+
+    var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), new DefaultGeneratorConfiguration());
+
+    var readmeContent = await generator.Generate(solutionName);
+
+    await File.AppendAllTextAsync(options.Output, readmeContent);
+}
+
+public class Options
+{
+    [Option("solution", Required = true, HelpText = "The solution to analyze.")]
+    public string? Solution { get; set; }
+
+    [Option("output", Required = true, HelpText = "The output readme file.")]
+    public string? Output { get; set; }
+}
+
+public class DefaultGeneratorConfiguration : IGeneratorConfiguration
+{
+    public IGeneratorDefinition CommandDefinition => new ImplementsInterfaceMatching(".*ICommand");
 }

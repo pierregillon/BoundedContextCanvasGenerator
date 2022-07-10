@@ -2,6 +2,8 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+namespace LivingDocumentation.BoundedContextCanvas.Infrastructure;
+
 public static class SemanticModelExtensions
 {
     public static string? GetTypeDisplayString(this SemanticModel semanticModel, SyntaxNode node)

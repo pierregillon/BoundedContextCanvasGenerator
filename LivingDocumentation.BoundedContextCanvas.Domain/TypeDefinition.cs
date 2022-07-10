@@ -1,1 +1,3 @@
-﻿public record TypeDefinition(TypeFullName Name, IEnumerable<TypeFullName> ImplementedInterfaces);
+﻿namespace LivingDocumentation.BoundedContextCanvas.Domain;
+
+public record TypeDefinition(TypeFullName Name, IEnumerable<TypeFullName> ImplementedInterfaces);

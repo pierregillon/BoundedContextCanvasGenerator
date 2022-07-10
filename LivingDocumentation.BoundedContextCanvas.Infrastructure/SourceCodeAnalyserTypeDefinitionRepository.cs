@@ -1,6 +1,9 @@
 ﻿using Buildalyzer;
 using Buildalyzer.Workspaces;
+using LivingDocumentation.BoundedContextCanvas.Domain;
 using Microsoft.CodeAnalysis;
+
+namespace LivingDocumentation.BoundedContextCanvas.Infrastructure;
 
 public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionRepository
 {

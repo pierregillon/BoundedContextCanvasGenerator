@@ -1,4 +1,7 @@
-﻿var name = new SolutionName(@"C:\Users\gillo\Code\crypto-roi\api\CryptoROI.sln");
+﻿using LivingDocumentation.BoundedContextCanvas.Domain;
+using LivingDocumentation.BoundedContextCanvas.Infrastructure;
+
+var name = new SolutionName(@"C:\Users\gillo\Code\crypto-roi\api\CryptoROI.sln");
 
 ITypeDefinitionRepository repository = new SourceCodeAnalyserTypeDefinitionRepository();
 

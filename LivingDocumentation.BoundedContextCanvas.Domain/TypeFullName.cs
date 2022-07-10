@@ -1,1 +1,3 @@
-﻿public record TypeFullName(string Value);
+﻿namespace LivingDocumentation.BoundedContextCanvas.Domain;
+
+public record TypeFullName(string Value);

@@ -1,6 +1,9 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using LivingDocumentation.BoundedContextCanvas.Domain;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace LivingDocumentation.BoundedContextCanvas.Infrastructure;
 
 public class SourceAnalyser : CSharpSyntaxWalker
 {

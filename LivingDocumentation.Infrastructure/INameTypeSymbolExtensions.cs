@@ -1,7 +1,7 @@
-﻿using LivingDocumentation.BoundedContextCanvas.Domain;
+﻿using LivingDocumentation.Domain;
 using Microsoft.CodeAnalysis;
 
-namespace LivingDocumentation.BoundedContextCanvas.Infrastructure;
+namespace LivingDocumentation.Infrastructure;
 
 public static class INameTypeSymbolExtensions
 {

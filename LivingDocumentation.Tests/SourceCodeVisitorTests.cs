@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using FluentAssertions;
-using LivingDocumentation.BoundedContextCanvas.Domain;
-using LivingDocumentation.BoundedContextCanvas.Infrastructure;
+using LivingDocumentation.Domain;
+using LivingDocumentation.Infrastructure;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 
-namespace LivingDocumentation.BoundedContextCanvas.Tests
+namespace LivingDocumentation.Tests
 {
     public class SourceCodeVisitorTests
     {

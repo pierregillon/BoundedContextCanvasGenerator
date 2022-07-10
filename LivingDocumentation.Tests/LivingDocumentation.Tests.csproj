@@ -23,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LivingDocumentation.BoundedContextCanvas.Infrastructure\LivingDocumentation.BoundedContextCanvas.Infrastructure.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Domain\LivingDocumentation.Domain.csproj" />
+    <ProjectReference Include="..\LivingDocumentation.Infrastructure\LivingDocumentation.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

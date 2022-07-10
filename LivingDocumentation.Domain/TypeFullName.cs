@@ -1,4 +1,4 @@
-﻿namespace LivingDocumentation.BoundedContextCanvas.Domain;
+﻿namespace LivingDocumentation.Domain;
 
 public record TypeFullName(string Value)
 {

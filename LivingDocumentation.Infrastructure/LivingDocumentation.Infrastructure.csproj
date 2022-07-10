@@ -12,7 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LivingDocumentation.BoundedContextCanvas.Domain\LivingDocumentation.BoundedContextCanvas.Domain.csproj" />
+	  <ProjectReference Include="..\LivingDocumentation.Domain\LivingDocumentation.Domain.csproj" />
 	</ItemGroup>
 
 </Project>

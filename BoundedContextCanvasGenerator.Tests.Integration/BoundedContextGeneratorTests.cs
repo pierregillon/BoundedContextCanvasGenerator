@@ -6,92 +6,84 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-namespace BoundedContextCanvasGenerator.Tests.Integration
+namespace BoundedContextCanvasGenerator.Tests.Integration;
+
+public class BoundedContextGeneratorTests
 {
-    public class BoundedContextGeneratorTests
+    private readonly string[] NO_ARGS = Array.Empty<string>();
+    private const string ExampleSolution = "Example\\Example.sln";
+
+    [Fact]
+    public void Start_generator_without_arguments()
     {
-        private readonly string[] NO_ARGS = Array.Empty<string>();
-        private static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        private readonly string ExampleSolution = "Example\\Example.sln";
+        var consoleResult = RunWithArgs(NO_ARGS);
 
-        [Fact]
-        public void Start_generator_without_arguments()
-        {
-            var consoleResult = RunWithArgs(NO_ARGS);
+        consoleResult
+            .Should()
+            .Contain("No solution file provided");
+    }
 
-            consoleResult
-                .Should()
-                .Contain("No solution file provided");
-        }
+    [Fact]
+    public async Task Generating_BCC_twice_returns_the_same_result()
+    {
+        var firstGeneration = await GenerateBoundedContextCanvas(args => args.WithSolution(ExampleSolution).WithOutputFile("results.md"));
+        var secondGeneration = await GenerateBoundedContextCanvas(args => args.WithSolution(ExampleSolution).WithOutputFile("results.md"));
 
-        [Fact]
-        public async Task Generating_BCC_twice_returns_the_same_result()
-        {
-            var firstGeneration = await GenerateSolution(ExampleSolution, "results.md");
-            var secondGeneration = await GenerateSolution(ExampleSolution, "results.md");
+        firstGeneration.Should().Be(secondGeneration);
+    }
 
-            firstGeneration.Should().Be(secondGeneration);
-        }
+    [Fact]
+    public async Task Generating_correct_commands()
+    {
+        var plainText = await GenerateBoundedContextCanvas(args => args.WithSolution(ExampleSolution));
 
-        [Fact]
-        public async Task Generating_correct_commands()
-        {
-            var textResult = await GenerateSolution(ExampleSolution);
-
-            var expectedCommandSection = 
+        const string expectedCommandSection = 
 @"## Commands
 - Catalog.Application.Items.AddItemToCatalogCommand
 - Catalog.Application.Items.AdjustItemPriceCommand
 - Catalog.Application.Items.EntitleItemCommand
 - Catalog.Application.Items.RemoveFromCatalogCommand
 ";
-            textResult
-                .Should()
-                .Contain(expectedCommandSection);
-        }
-
-        private static async Task<string> GenerateSolution(string relativeSolutionPath, string? outputFileName = default)
-        {
-            var outputFile = GetAbsoluteOutputFilePath(outputFileName);
-            var solutionPath = GetAbsoluteSolutionPath(relativeSolutionPath);
-
-            RunWithArgs("--solution", solutionPath, "--output", outputFile);
-
-            var results = await File.ReadAllTextAsync(outputFile);
-
-            if (outputFileName is null)
-            {
-                File.Delete(outputFile);
-            }
-
-            return results;
-        }
-
-        private static string GetAbsoluteOutputFilePath(string? outputFileName) 
-            => Path.Combine(BaseDirectory, outputFileName ?? $"{Guid.NewGuid()}.md");
-
-        private static string GetAbsoluteSolutionPath(string relativeSolutionPath) 
-            => Path.Combine(BaseDirectory, "..", "..", "..", "..", "SolutionExample", relativeSolutionPath);
-
-        private static string RunWithArgs(params string[] args)
-        {
-            var stringBuilder = new StringBuilder();
-            using var writer = new StringWriter(stringBuilder);
-            Console.SetOut(writer);
-            Execute(args);
-            return stringBuilder.ToString();
-        }
-
-        private static void Execute(string[] args)
-        {
-            var programAssembly = Assembly.GetAssembly(typeof(Program));
-            if (programAssembly is null)
-            {
-                throw new InvalidOperationException("Unable to find the bounded context generator program");
-            }
-
-            programAssembly.EntryPoint?.Invoke(null, new object?[] {args});
-        }
+        plainText
+            .Should()
+            .Contain(expectedCommandSection);
     }
-    
+
+    private static async Task<string> GenerateBoundedContextCanvas(Func<ArgsBuilder, ArgsBuilder> configure)
+    {
+        var argsBuilder = new ArgsBuilder();
+
+        argsBuilder = configure(argsBuilder);
+
+        RunWithArgs(argsBuilder.Build());
+
+        var results = await File.ReadAllTextAsync(argsBuilder.OutputAbsolutePath);
+
+        if (!argsBuilder.OutputFileHasBeenCustomized)
+        {
+            File.Delete(argsBuilder.OutputAbsolutePath);
+        }
+
+        return results;
+    }
+
+    private static string RunWithArgs(params string[] args)
+    {
+        var stringBuilder = new StringBuilder();
+        using var writer = new StringWriter(stringBuilder);
+        Console.SetOut(writer);
+        Execute(args);
+        return stringBuilder.ToString();
+    }
+
+    private static void Execute(string[] args)
+    {
+        var programAssembly = Assembly.GetAssembly(typeof(Program));
+        if (programAssembly is null)
+        {
+            throw new InvalidOperationException("Unable to find the bounded context generator program");
+        }
+
+        programAssembly.EntryPoint?.Invoke(null, new object?[] {args});
+    }
 }

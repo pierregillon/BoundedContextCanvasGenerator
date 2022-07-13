@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
-using LivingDocumentation.Domain;
+﻿using LivingDocumentation.Domain;
 
 namespace BoundedContextCanvasGenerator;
 
@@ -23,7 +21,7 @@ public class ReadmeGenerator
 
         await foreach (var typeDefinition in types)
         {
-            if (_configuration.CommandDefinition.IsMatching(typeDefinition)) {
+            if (_configuration.CommandDefinitions.All(x=> x.IsMatching(typeDefinition))) {
                 commands.Add(typeDefinition);
             }
         }
@@ -53,29 +51,4 @@ public class ReadmeGenerator
 
         yield return Environment.NewLine;
     }
-}
-
-public interface IGeneratorConfiguration
-{
-    public IGeneratorDefinition CommandDefinition { get; }
-}
-
-public interface IGeneratorDefinition
-{
-    bool IsMatching(TypeDefinition type);
-}
-
-public class ImplementsInterfaceMatching : IGeneratorDefinition
-{
-    private readonly Regex _regex;
-
-    public ImplementsInterfaceMatching(string pattern) => _regex = new Regex(pattern, RegexOptions.Compiled);
-
-    public bool IsMatching(TypeDefinition type) => type.ImplementedInterfaces.Any(x => _regex.IsMatch(x.Value));
-}
-
-public static class StringExtensions
-{
-    public static string JoinLines(this IEnumerable<string> elements) 
-        => string.Join(Environment.NewLine, elements);
 }

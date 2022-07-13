@@ -21,25 +21,25 @@ await parsedResults.MapResult(
 
 static async Task RunApplicationAsync(Options options)
 {
-    var solutionName = new SolutionName(options.Solution!);
+    var solutionName = new SolutionName(options.SolutionFilePath!);
 
-    var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), new DefaultGeneratorConfiguration());
+    var configuration = await new ConfigurationFactory().Build(options.ConfigurationFilePath);
+
+    var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), configuration);
 
     var readmeContent = await generator.Generate(solutionName);
 
-    await File.WriteAllTextAsync(options.Output!, readmeContent);
+    await File.WriteAllTextAsync(options.OutputFilePath!, readmeContent);
 }
 
 public class Options
 {
     [Option("solution", Required = true, HelpText = "The solution to analyze.")]
-    public string? Solution { get; set; }
+    public string? SolutionFilePath { get; set; }
 
     [Option("output", Required = true, HelpText = "The output readme file.")]
-    public string? Output { get; set; }
-}
-
-public class DefaultGeneratorConfiguration : IGeneratorConfiguration
-{
-    public IGeneratorDefinition CommandDefinition => new ImplementsInterfaceMatching(".*ICommand$");
+    public string? OutputFilePath { get; set; }
+    
+    [Option("configuration", Required = false, HelpText = "The yaml configuration file.")]
+    public string? ConfigurationFilePath { get; set; }
 }

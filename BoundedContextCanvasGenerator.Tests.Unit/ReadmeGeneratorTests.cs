@@ -31,8 +31,8 @@ No commands found
         [Fact]
         public async Task Commands_matching_pattern_are_listed()
         {
-            _configuration.CommandDefinition
-                .Returns(new ImplementsInterfaceMatching(".*ICommand"));
+            _configuration.CommandDefinitions
+                .Returns(new[]{ new ImplementsInterfaceMatching(".*ICommand") });
 
             Define(new TypeDefinition[] {
                 A.Class("Some.Namespace.MyCommand").Implementing("Some.Namespace.ICommand"),

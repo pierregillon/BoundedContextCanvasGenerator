@@ -1,7 +1,10 @@
-﻿using BoundedContextCanvasGenerator;
+﻿using System.Runtime.CompilerServices;
+using BoundedContextCanvasGenerator;
 using CommandLine;
 using LivingDocumentation.Domain;
 using LivingDocumentation.Infrastructure;
+
+[assembly: InternalsVisibleTo("BoundedContextCanvasGenerator.Tests.Integration")]
 
 if (!args.Any()) {
     Console.WriteLine("No solution file provided");
@@ -18,13 +21,13 @@ await parsedResults.MapResult(
 
 static async Task RunApplicationAsync(Options options)
 {
-    var solutionName = new SolutionName(options.Solution);
+    var solutionName = new SolutionName(options.Solution!);
 
     var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), new DefaultGeneratorConfiguration());
 
     var readmeContent = await generator.Generate(solutionName);
 
-    await File.AppendAllTextAsync(options.Output, readmeContent);
+    await File.WriteAllTextAsync(options.Output!, readmeContent);
 }
 
 public class Options
@@ -38,5 +41,5 @@ public class Options
 
 public class DefaultGeneratorConfiguration : IGeneratorConfiguration
 {
-    public IGeneratorDefinition CommandDefinition => new ImplementsInterfaceMatching(".*ICommand");
+    public IGeneratorDefinition CommandDefinition => new ImplementsInterfaceMatching(".*ICommand$");
 }

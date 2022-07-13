@@ -1,4 +1,4 @@
-﻿namespace Catalog;
+﻿namespace Catalog.Application;
 
 public interface ICommandHandler<in T> where T : ICommand
 {

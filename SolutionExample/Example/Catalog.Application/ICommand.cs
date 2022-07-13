@@ -1,3 +1,3 @@
-﻿namespace Catalog;
+﻿namespace Catalog.Application;
 
 public interface ICommand { }

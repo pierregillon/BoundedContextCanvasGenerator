@@ -5,7 +5,10 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Configuration;
 
 public class StaticGeneratorConfiguration : IGeneratorConfiguration
 {
-    public StaticGeneratorConfiguration(ConfigurationDto dto) => CommandDefinitions = dto.Commands.Build();
+    public StaticGeneratorConfiguration(ConfigurationDto dto)
+    {
+        CommandsConfiguration = dto?.Commands?.Build() ?? TypeDefinitionPredicates.Empty();
+    }
 
-    public IEnumerable<ITypeDefinitionPredicate> CommandDefinitions { get; }
+    public TypeDefinitionPredicates CommandsConfiguration { get; }
 }

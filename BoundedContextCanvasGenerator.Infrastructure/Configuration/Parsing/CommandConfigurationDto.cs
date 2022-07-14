@@ -9,12 +9,16 @@ public class CommandConfigurationDto
     public string? Type { get; set; }
     public ImplementingConfigurationDto? Implementing { get; set; }
 
-    public IEnumerable<ITypeDefinitionPredicate> Build()
+    public TypeDefinitionPredicates Build() => TypeDefinitionPredicates.From(GetAll());
+
+    private IEnumerable<ITypeDefinitionPredicate> GetAll()
     {
-        if (Type is not null) {
+        if (Type is not null)
+        {
             yield return new OfType(Type.ToTypeKind());
         }
-        if (Implementing is not null) {
+        if (Implementing is not null)
+        {
             yield return Implementing.Build();
         }
     }

@@ -25,7 +25,23 @@ public class BoundedContextGeneratorTests
     }
 
     [Fact]
-    public async Task Generating_correct_commands()
+    public async Task Generating_BCC_without_commands_configuration_does_not_list_commands()
+    {
+        var plainText = await A
+            .Generator()
+            .TargetingSolution(ExampleSolution)
+            .WithEmptyConfiguration()
+            .Execute();
+
+        const string commandsSection = "## Commands";
+
+        plainText
+            .Should()
+            .NotContain(commandsSection);
+    }
+
+    [Fact]
+    public async Task Generating_BCC_with_commands_configuration_lists_commands_matching_predicates()
     {
         var plainText = await A
             .Generator()
@@ -37,7 +53,7 @@ public class BoundedContextGeneratorTests
         pattern: '.*ICommand$'")
             .Execute();
 
-        const string expectedCommandSection = 
+        const string commandsSection = 
 @"## Commands
 - Catalog.Application.Items.AddItemToCatalogCommand
 - Catalog.Application.Items.AdjustItemPriceCommand
@@ -46,6 +62,6 @@ public class BoundedContextGeneratorTests
 ";
         plainText
             .Should()
-            .Contain(expectedCommandSection);
+            .Contain(commandsSection);
     }
 }

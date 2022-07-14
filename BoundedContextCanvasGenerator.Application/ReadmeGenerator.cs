@@ -22,14 +22,14 @@ public class ReadmeGenerator
 
         await foreach (var typeDefinition in types)
         {
-            if (_configuration.CommandDefinitions.All(x=> x.IsMatching(typeDefinition))) {
+            if (_configuration.CommandsConfiguration.IsEnabled && _configuration.CommandsConfiguration.AllMatching(typeDefinition)) {
                 commands.Add(typeDefinition);
             }
         }
 
         var sections = new[] {
             "# Bounded context canvas",
-            GenerateCommandsSection(commands).JoinLines()
+            _configuration.CommandsConfiguration.IsEnabled ? GenerateCommandsSection(commands).JoinLines() : string.Empty
         };
 
         return sections.JoinLines();

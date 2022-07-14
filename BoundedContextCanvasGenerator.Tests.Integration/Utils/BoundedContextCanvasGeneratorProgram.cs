@@ -38,6 +38,8 @@ public record BoundedContextCanvasGeneratorProgram
         return this;
     }
 
+    public BoundedContextCanvasGeneratorProgram WithEmptyConfiguration() => WithConfiguration(string.Empty);
+
     public async Task<string> Execute()
     {
         try

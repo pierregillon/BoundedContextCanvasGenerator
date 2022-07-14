@@ -2,5 +2,5 @@
 
 public interface IGeneratorConfiguration
 {
-    public IEnumerable<ITypeDefinitionPredicate> CommandDefinitions { get; }
+    public TypeDefinitionPredicates CommandsConfiguration { get; }
 }

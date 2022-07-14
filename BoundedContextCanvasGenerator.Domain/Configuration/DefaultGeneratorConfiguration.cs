@@ -4,10 +4,5 @@ namespace BoundedContextCanvasGenerator.Domain.Configuration;
 
 public class DefaultGeneratorConfiguration : IGeneratorConfiguration
 {
-    public IEnumerable<ITypeDefinitionPredicate> CommandDefinitions
-    {
-        get {
-            yield return new ImplementsInterfaceMatching(".*ICommand$");
-        }
-    }
+    public TypeDefinitionPredicates CommandsConfiguration => new(new []{ new ImplementsInterfaceMatching(".*ICommand$") });
 }

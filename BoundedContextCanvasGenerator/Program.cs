@@ -26,7 +26,14 @@ static async Task RunApplicationAsync(Options options)
 {
     var solutionName = new SolutionName(options.SolutionFilePath!);
 
-    var configuration = await new ConfigurationFactory(new YamlDotNetFileReader()).Build(options.ConfigurationFilePath);
+    IGeneratorConfiguration configuration;
+    if (options.ConfigurationFilePath is null)
+    {
+        configuration = new DefaultGeneratorConfiguration();
+    }
+    else {
+        configuration = await new YamlFileConfigurationRepository(options.ConfigurationFilePath).Get();
+    }
 
     var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), configuration);
 

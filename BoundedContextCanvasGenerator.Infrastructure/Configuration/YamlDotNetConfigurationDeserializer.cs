@@ -8,7 +8,7 @@ public class YamlDotNetConfigurationDeserializer
     public ConfigurationDto Deserialize(string plainText)
     {
         var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-            .WithNamingConvention(CamelCaseNamingConvention.Instance)
+            .WithNamingConvention(UnderscoredNamingConvention.Instance)
             .Build();
 
         return deserializer.Deserialize<ConfigurationDto>(plainText);

@@ -24,6 +24,6 @@ public class MarkdownBoundedContextCanvasGenerator
 
         var extraction = await extractor.Extract(solutionPath);
 
-        return await new MarkdownGenerator().Generate(extraction);
+        return await new MarkdownGenerator().Generate(extraction, configuration);
     }
 }

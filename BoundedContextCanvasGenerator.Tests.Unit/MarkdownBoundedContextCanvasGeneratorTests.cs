@@ -20,7 +20,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
         private readonly MarkdownBoundedContextCanvasGenerator _generator;
         private readonly ITypeDefinitionRepository _typeDefinitionRepository = Substitute.For<ITypeDefinitionRepository>();
         private readonly ICanvasSettingsRepository _canvasSettingsRepository = Substitute.For<ICanvasSettingsRepository>();
-        private readonly ICanvasSettings _configuration = Substitute.For<ICanvasSettings>();
+        private readonly ICanvasSettings _canvasSettings = Substitute.For<ICanvasSettings>();
 
         public MarkdownBoundedContextCanvasGeneratorTests()
         {
@@ -28,15 +28,103 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
 
             _canvasSettingsRepository
                 .Get(Arg.Any<CanvasSettingsPath>())
-                .Returns(_configuration);
+                .Returns(_canvasSettings);
 
-            _configuration
+            _canvasSettings
+                .Name
+                .Returns(CanvasName.Default);
+            
+            _canvasSettings
+                .Definition
+                .Returns(CanvasDefinition.Empty);
+            
+            _canvasSettings
                 .Commands
                 .Returns(TypeDefinitionPredicates.Empty());
 
-            _configuration
+            _canvasSettings
                 .DomainEvents
                 .Returns(TypeDefinitionPredicates.Empty());
+        }
+
+        [Fact]
+        public async Task No_definition_settings_do_not_generate_definition_section()
+        {
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().NotContain("## Definition");
+        }
+
+        [Fact]
+        public async Task Name_settings_generates_section()
+        {
+            const string name = "Catalog";
+
+            _canvasSettings
+                .Name
+                .Returns(new CanvasName(name));
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().StartWith(@"# Catalog");
+        }
+
+        [Fact]
+        public async Task Strategic_classification_generates_section()
+        {
+            _canvasSettings
+                .Definition
+                .Returns(new CanvasDefinition(
+                    Text.Empty, 
+                    new StrategicClassification(DomainType.CoreDomain, BusinessModel.RevenueGenerator, Evolution.Commodity),
+                    DomainRole.Empty
+                ));
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+@"### Strategic classification [(?)](https://github.com/ddd-crew/bounded-context-canvas#strategic-classification)
+| Domain | Business Model | Evolution |
+| ------------ | ------------ | ------------ |
+| *Core domain*<br/>(a key strategic initiative) | *Revenue generator*<br/>(people pay directly for this) | *Commodity*<br/>(highly-standardised versions exist) |
+");
+        }
+
+        [Fact]
+        public async Task Domain_role_generates_section()
+        {
+            _canvasSettings
+                .Definition
+                .Returns(new CanvasDefinition(
+                    Text.Empty,
+                    StrategicClassification.Empty,
+                    new DomainRole(new Text("gateway context"), new Text("Provide catalog item allowing Basket, Ordering and Payment contexts to properly work."))
+                ));
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+@"### Domain role [(?)](https://github.com/ddd-crew/bounded-context-canvas/blob/master/resources/model-traits-worksheet.md): *gateway context*
+Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
+");
+        }
+
+        [Fact]
+        public async Task Description_settings_generates_section()
+        {
+            const string description = "Display the product catalog and the items available to purchase.";
+
+            _canvasSettings
+                .Definition
+                .Returns(new CanvasDefinition(new Text(description), StrategicClassification.Empty, DomainRole.Empty));
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+@"## Definition
+
+### Description
+> Display the product catalog and the items available to purchase.");
         }
 
         [Fact]
@@ -55,7 +143,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
         [Fact]
         public async Task No_commands_renders_not_found()
         {
-            _configuration
+            _canvasSettings
                 .Commands
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
 
@@ -70,7 +158,7 @@ No commands found
         [Fact]
         public async Task Commands_matching_pattern_are_listed()
         {
-            _configuration
+            _canvasSettings
                 .Commands
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
 
@@ -104,7 +192,7 @@ No commands found
         [Fact]
         public async Task No_domain_events_matching_render_empty_section()
         {
-            _configuration
+            _canvasSettings
                 .DomainEvents
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
 
@@ -119,7 +207,7 @@ No domain event found
         [Fact]
         public async Task Domain_events_matching_pattern_are_listed()
         {
-            _configuration
+            _canvasSettings
                 .DomainEvents
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
 

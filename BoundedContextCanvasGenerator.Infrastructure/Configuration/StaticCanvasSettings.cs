@@ -5,12 +5,16 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Configuration;
 
 public class StaticCanvasSettings : ICanvasSettings
 {
-    public StaticCanvasSettings(ConfigurationDto dto)
+    public StaticCanvasSettings(ConfigurationDto? dto)
     {
+        Name = CanvasName.From(dto?.Name);
+        Definition = dto?.Definition?.Build() ?? CanvasDefinition.Empty;
         Commands = dto?.Commands?.Build() ?? TypeDefinitionPredicates.Empty();
         DomainEvents = dto?.DomainEvents?.Build() ?? TypeDefinitionPredicates.Empty();
     }
 
+    public CanvasName Name { get; }
+    public CanvasDefinition Definition { get; }
     public TypeDefinitionPredicates Commands { get; }
     public TypeDefinitionPredicates DomainEvents { get; }
 }

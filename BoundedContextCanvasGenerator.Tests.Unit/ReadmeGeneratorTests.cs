@@ -19,13 +19,22 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
         private readonly ReadmeGenerator _generator;
         private readonly IGeneratorConfiguration _configuration = Substitute.For<IGeneratorConfiguration>();
 
-        public ReadmeGeneratorTests() => _generator = new ReadmeGenerator(_repository, _configuration);
+        public ReadmeGeneratorTests()
+        {
+            _generator = new ReadmeGenerator(_repository, _configuration);
+
+            _configuration
+                .CommandsConfiguration
+                .Returns(TypeDefinitionPredicates.Empty());
+
+            _configuration
+                .DomainEventsConfiguration
+                .Returns(TypeDefinitionPredicates.Empty());
+        }
 
         [Fact]
         public async Task No_commands_configuration_do_not_generate_commands_section()
         {
-            _configuration.CommandsConfiguration.Returns(TypeDefinitionPredicates.Empty());
-
             Define(new TypeDefinition[] {
                 A.Class("Some.Namespace.MyCommand").Implementing("Some.Namespace.ICommand"),
                 A.Class("Some.Namespace.MySecondCommand").Implementing("Some.Namespace.ICommand"),
@@ -54,7 +63,8 @@ No commands found
         [Fact]
         public async Task Commands_matching_pattern_are_listed()
         {
-            _configuration.CommandsConfiguration
+            _configuration
+                .CommandsConfiguration
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
 
             Define(new TypeDefinition[] {
@@ -68,6 +78,55 @@ No commands found
 @"## Commands
 - Some.Namespace.MyCommand
 - Some.Namespace.MySecondCommand
+");
+        }
+
+        [Fact]
+        public async Task No_domain_events_configuration_do_not_generate_domain_events_section()
+        {
+            Define(new TypeDefinition[] {
+                A.Class("Some.Namespace.MyDomainEvent").Implementing("Some.Namespace.IDomainEvent"),
+                A.Class("Some.Namespace.MySecondDomainEvent").Implementing("Some.Namespace.IDomainEvent"),
+            });
+
+            var readme = await _generator.Generate(SomeSolution);
+
+            readme.Should().NotContain("## Domain events");
+        }
+
+        [Fact]
+        public async Task No_domain_events_matching_render_empty_section()
+        {
+            _configuration
+                .DomainEventsConfiguration
+                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
+
+            var readme = await _generator.Generate(SomeSolution);
+
+            readme.Should().Contain(
+                @"## Domain events
+No domain event found
+");
+        }
+
+        [Fact]
+        public async Task Domain_events_matching_pattern_are_listed()
+        {
+            _configuration
+                .DomainEventsConfiguration
+                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
+
+            Define(new TypeDefinition[] {
+                A.Class("Some.Namespace.MyDomainEvent").Implementing("Some.Namespace.IDomainEvent"),
+                A.Class("Some.Namespace.MySecondDomainEvent").Implementing("Some.Namespace.IDomainEvent"),
+            });
+
+            var readme = await _generator.Generate(SomeSolution);
+
+            readme.Should().Contain(
+@"## Domain events
+- Some.Namespace.MyDomainEvent
+- Some.Namespace.MySecondDomainEvent
 ");
         }
 

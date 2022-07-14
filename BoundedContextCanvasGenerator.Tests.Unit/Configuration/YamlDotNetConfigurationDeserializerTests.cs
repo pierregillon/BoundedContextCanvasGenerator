@@ -11,7 +11,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Configuration
         public YamlDotNetConfigurationDeserializerTests() => _deserializer = new YamlDotNetConfigurationDeserializer();
 
         [Fact]
-        public void Deserializes_correctly_commands()
+        public void Deserializes_commands()
         {
             const string yaml = 
 @"commands:
@@ -23,6 +23,21 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Configuration
 
             configuration.Commands!.Type.Should().Be("class");
             configuration.Commands!.Implementing!.Pattern.Should().Be(".*ICommand$");
+        }
+        
+        [Fact]
+        public void Deserializes_domain_events()
+        {
+            const string yaml =
+@"domainEvents:
+    type: 'class'
+    implementing:
+        pattern: '.*IDomainEvent$'";
+
+            var configuration = _deserializer.Deserialize(yaml);
+
+            configuration.DomainEvents!.Type.Should().Be("class");
+            configuration.DomainEvents!.Implementing!.Pattern.Should().Be(".*IDomainEvent$");
         }
     }
 }

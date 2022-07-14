@@ -3,4 +3,5 @@
 public class ConfigurationDto
 {
     public CommandConfigurationDto? Commands { get; set; }
+    public DomainEventConfigurationDto? DomainEvents { get; set; }
 }

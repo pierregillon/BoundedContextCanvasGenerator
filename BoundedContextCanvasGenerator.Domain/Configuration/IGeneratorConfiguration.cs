@@ -3,4 +3,5 @@
 public interface IGeneratorConfiguration
 {
     public TypeDefinitionPredicates CommandsConfiguration { get; }
+    public TypeDefinitionPredicates DomainEventsConfiguration { get; }
 }

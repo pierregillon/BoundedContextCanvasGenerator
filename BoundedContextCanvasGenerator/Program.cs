@@ -6,6 +6,7 @@ using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration;
 using BoundedContextCanvasGenerator.Infrastructure.Types;
 using CommandLine;
+using Microsoft.Extensions.DependencyInjection;
 
 [assembly: InternalsVisibleTo("BoundedContextCanvasGenerator.Tests.Integration")]
 
@@ -24,20 +25,18 @@ await parsedResults.MapResult(
 
 static async Task RunApplicationAsync(Options options)
 {
-    var solutionName = new SolutionName(options.SolutionFilePath!);
+    var serviceProvider = new ServiceCollection()
+        .AddScoped<MarkdownBoundedContextCanvasGenerator>()
+        .AddScoped<ITypeDefinitionRepository, SourceCodeAnalyserTypeDefinitionRepository>()
+        .AddScoped<IConfigurationRepository, YamlFileConfigurationRepository>()
+        .BuildServiceProvider();
 
-    IGeneratorConfiguration configuration;
-    if (options.ConfigurationFilePath is null)
-    {
-        configuration = new DefaultGeneratorConfiguration();
-    }
-    else {
-        configuration = await new YamlFileConfigurationRepository(options.ConfigurationFilePath).Get();
-    }
+    var generator = serviceProvider.GetRequiredService<MarkdownBoundedContextCanvasGenerator>();
 
-    var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), configuration);
+    var markdown = await generator.Generate(
+        new SolutionPath(options.SolutionFilePath), 
+        new ConfigurationPath(options.ConfigurationFilePath)
+    );
 
-    var readmeContent = await generator.Generate(solutionName);
-
-    await File.WriteAllTextAsync(options.OutputFilePath!, readmeContent);
+    await File.WriteAllTextAsync(options.OutputFilePath!, markdown);
 }

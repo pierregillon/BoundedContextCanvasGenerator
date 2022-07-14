@@ -12,16 +12,23 @@ using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit
 {
-    public class ReadmeGeneratorTests
+    public class MarkdownBoundedContextCanvasGeneratorTests
     {
-        private static readonly SolutionName SomeSolution = new("some");
-        private readonly ITypeDefinitionRepository _repository = Substitute.For<ITypeDefinitionRepository>();
-        private readonly ReadmeGenerator _generator;
+        private static readonly SolutionPath SomeSolution = new("some");
+        private static readonly ConfigurationPath SomeConfigurationPath = new("some");
+
+        private readonly MarkdownBoundedContextCanvasGenerator _generator;
+        private readonly ITypeDefinitionRepository _typeDefinitionRepository = Substitute.For<ITypeDefinitionRepository>();
+        private readonly IConfigurationRepository _configurationRepository = Substitute.For<IConfigurationRepository>();
         private readonly IGeneratorConfiguration _configuration = Substitute.For<IGeneratorConfiguration>();
 
-        public ReadmeGeneratorTests()
+        public MarkdownBoundedContextCanvasGeneratorTests()
         {
-            _generator = new ReadmeGenerator(_repository, _configuration);
+            _generator = new MarkdownBoundedContextCanvasGenerator(_typeDefinitionRepository, _configurationRepository);
+
+            _configurationRepository
+                .Get(Arg.Any<ConfigurationPath>())
+                .Returns(_configuration);
 
             _configuration
                 .CommandsConfiguration
@@ -40,9 +47,9 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
                 A.Class("Some.Namespace.MySecondCommand").Implementing("Some.Namespace.ICommand"),
             });
 
-            var readme = await _generator.Generate(SomeSolution);
+            var markdown = await GenerateMarkdown();
 
-            readme.Should().NotContain("## Commands");
+            markdown.Should().NotContain("## Commands");
         }
 
         [Fact]
@@ -52,9 +59,9 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
                 .CommandsConfiguration
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
 
-            var readme = await _generator.Generate(SomeSolution);
+            var markdown = await GenerateMarkdown();
 
-            readme.Should().Contain(
+            markdown.Should().Contain(
 @"## Commands
 No commands found
 ");
@@ -72,9 +79,9 @@ No commands found
                 A.Class("Some.Namespace.MySecondCommand").Implementing("Some.Namespace.ICommand"),
             });
 
-            var readme = await _generator.Generate(SomeSolution);
+            var markdown = await GenerateMarkdown();
 
-            readme.Should().Contain(
+            markdown.Should().Contain(
 @"## Commands
 - Some.Namespace.MyCommand
 - Some.Namespace.MySecondCommand
@@ -89,9 +96,9 @@ No commands found
                 A.Class("Some.Namespace.MySecondDomainEvent").Implementing("Some.Namespace.IDomainEvent"),
             });
 
-            var readme = await _generator.Generate(SomeSolution);
+            var markdown = await GenerateMarkdown();
 
-            readme.Should().NotContain("## Domain events");
+            markdown.Should().NotContain("## Domain events");
         }
 
         [Fact]
@@ -101,9 +108,9 @@ No commands found
                 .DomainEventsConfiguration
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
 
-            var readme = await _generator.Generate(SomeSolution);
+            var markdown = await GenerateMarkdown();
 
-            readme.Should().Contain(
+            markdown.Should().Contain(
                 @"## Domain events
 No domain event found
 ");
@@ -121,18 +128,20 @@ No domain event found
                 A.Class("Some.Namespace.MySecondDomainEvent").Implementing("Some.Namespace.IDomainEvent"),
             });
 
-            var readme = await _generator.Generate(SomeSolution);
+            var markdown = await GenerateMarkdown();
 
-            readme.Should().Contain(
+            markdown.Should().Contain(
 @"## Domain events
 - Some.Namespace.MyDomainEvent
 - Some.Namespace.MySecondDomainEvent
 ");
         }
 
+        private Task<string> GenerateMarkdown() => _generator.Generate(SomeSolution, SomeConfigurationPath);
+
         private void Define(IEnumerable<TypeDefinition> types)
         {
-            _repository
+            _typeDefinitionRepository
                 .GetAll(SomeSolution)
                 .Returns(Create(types));
         }

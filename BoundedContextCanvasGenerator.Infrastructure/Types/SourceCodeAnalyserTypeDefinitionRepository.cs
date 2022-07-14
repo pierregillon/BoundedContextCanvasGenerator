@@ -7,9 +7,9 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 
 public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionRepository
 {
-    public async IAsyncEnumerable<TypeDefinition> GetAll(SolutionName name)
+    public async IAsyncEnumerable<TypeDefinition> GetAll(SolutionPath path)
     {
-        var manager = new AnalyzerManager(name.Value);
+        var manager = new AnalyzerManager(path.Value);
 
         var workspace = manager.GetWorkspace();
 

@@ -4,13 +4,14 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Configuration;
 
 public class YamlFileConfigurationRepository : IConfigurationRepository
 {
-    private readonly string _configurationFilePath;
-
-    public YamlFileConfigurationRepository(string configurationFilePath) => _configurationFilePath = configurationFilePath;
-
-    public async Task<IGeneratorConfiguration> Get()
+    public async Task<IGeneratorConfiguration> Get(ConfigurationPath configurationPath)
     {
-        var fileContent = await File.ReadAllTextAsync(_configurationFilePath);
+        if (configurationPath.IsUndefined)
+        {
+            return new DefaultGeneratorConfiguration();
+        }
+
+        var fileContent = await File.ReadAllTextAsync(configurationPath.Value);
 
         var dto = new YamlDotNetConfigurationDeserializer().Deserialize(fileContent);
 

@@ -2,5 +2,5 @@
 
 public interface IConfigurationRepository
 {
-    Task<IGeneratorConfiguration> Get();
+    Task<IGeneratorConfiguration> Get(ConfigurationPath configurationPath);
 }

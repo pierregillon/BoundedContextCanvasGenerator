@@ -2,5 +2,5 @@
 
 public interface ITypeDefinitionRepository
 {
-    IAsyncEnumerable<TypeDefinition> GetAll(SolutionName name);
+    IAsyncEnumerable<TypeDefinition> GetAll(SolutionPath path);
 }

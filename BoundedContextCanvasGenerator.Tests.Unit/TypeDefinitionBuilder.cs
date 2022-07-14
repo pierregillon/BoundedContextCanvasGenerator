@@ -5,12 +5,17 @@ namespace BoundedContextCanvasGenerator.Tests.Unit;
 
 public class TypeDefinitionBuilder
 {
+    private readonly TypeKind _kind;
     private readonly TypeFullName _className;
     private readonly List<TypeFullName> _interfaces = new();
 
-    private TypeDefinitionBuilder(string className) => _className = new TypeFullName(className);
+    private TypeDefinitionBuilder(string className, TypeKind kind)
+    {
+        _kind = kind;
+        _className = new TypeFullName(className);
+    }
 
-    public static TypeDefinitionBuilder Class(string className) => new (className);
+    public static TypeDefinitionBuilder Class(string className) => new (className, TypeKind.Class);
 
     public TypeDefinitionBuilder Implementing(string interfaceName)
     {
@@ -20,5 +25,5 @@ public class TypeDefinitionBuilder
 
     public static implicit operator TypeDefinition(TypeDefinitionBuilder builder) => builder.Build();
 
-    private TypeDefinition Build() => new(_className, _interfaces);
+    private TypeDefinition Build() => new(_className, _kind, _interfaces);
 }

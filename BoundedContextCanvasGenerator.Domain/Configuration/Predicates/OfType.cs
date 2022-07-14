@@ -4,16 +4,9 @@ namespace BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 
 public class OfType : ITypeDefinitionPredicate
 {
-    private readonly string _typeName;
+    private readonly TypeKind _typeKind;
 
-    public OfType(string typeName) => _typeName = typeName;
+    public OfType(TypeKind typeKind) => _typeKind = typeKind;
 
-    public bool IsMatching(TypeDefinition type)
-    {
-        return _typeName switch {
-            "class" => type.Type == TypeType.Class,
-            "interface" => type.Type == TypeType.Interface,
-            _ => throw new InvalidOperationException($"Unknown type name {_typeName}")
-        };
-    }
+    public bool IsMatching(TypeDefinition type) => _typeKind == type.Type;
 }

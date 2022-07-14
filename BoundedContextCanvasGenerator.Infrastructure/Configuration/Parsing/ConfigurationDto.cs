@@ -2,5 +2,5 @@
 
 public class ConfigurationDto
 {
-    public CommandConfigurationDto Commands { get; set; }
+    public CommandConfigurationDto? Commands { get; set; }
 }

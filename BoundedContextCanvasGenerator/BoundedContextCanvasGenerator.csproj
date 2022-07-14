@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="YamlDotNet" Version="11.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LivingDocumentation.Domain\LivingDocumentation.Domain.csproj" />
-    <ProjectReference Include="..\LivingDocumentation.Infrastructure\LivingDocumentation.Infrastructure.csproj" />
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Application\BoundedContextCanvasGenerator.Application.csproj" />
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj" />
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Infrastructure\BoundedContextCanvasGenerator.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

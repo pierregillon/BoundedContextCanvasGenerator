@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
 
-using A = BoundedContextCanvasGenerator.Tests.Integration.BoundedContextCanvasGeneratorProgram;
+using A = BoundedContextCanvasGenerator.Tests.Integration.Utils.BoundedContextCanvasGeneratorProgram;
 
 namespace BoundedContextCanvasGenerator.Tests.Integration;
 
@@ -15,8 +15,8 @@ public class BoundedContextGeneratorTests
     {
         var builder = A
             .Generator()
-            .TargettingSolution(ExampleSolution)
-            .OutputingFile("results.md");
+            .TargetingSolution(ExampleSolution)
+            .OutputtingFile("results.md");
 
         var firstGeneration = await builder.Execute();
         var secondGeneration = await builder.Execute();
@@ -29,7 +29,7 @@ public class BoundedContextGeneratorTests
     {
         var plainText = await A
             .Generator()
-            .TargettingSolution(ExampleSolution)
+            .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"commands:
     type: 'class'

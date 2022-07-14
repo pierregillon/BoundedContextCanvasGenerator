@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BoundedContextCanvasGenerator.Application;
+using BoundedContextCanvasGenerator.Domain.Configuration;
+using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
+using BoundedContextCanvasGenerator.Domain.Types;
 using FluentAssertions;
-using LivingDocumentation.Domain;
 using NSubstitute;
 using Xunit;
-using A= BoundedContextCanvasGenerator.Tests.TypeDefinitionBuilder;
+using A= BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
 
-namespace BoundedContextCanvasGenerator.Tests
+namespace BoundedContextCanvasGenerator.Tests.Unit
 {
     public class ReadmeGeneratorTests
     {

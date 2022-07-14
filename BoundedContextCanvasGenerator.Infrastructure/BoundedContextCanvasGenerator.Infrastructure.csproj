@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Buildalyzer" Version="4.1.4" />
+		<PackageReference Include="Buildalyzer.Workspaces" Version="4.1.4" />
+		<PackageReference Include="YamlDotNet" Version="11.2.1" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

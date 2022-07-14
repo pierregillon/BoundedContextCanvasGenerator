@@ -1,8 +1,11 @@
 ﻿using System.Runtime.CompilerServices;
 using BoundedContextCanvasGenerator;
+using BoundedContextCanvasGenerator.Application;
+using BoundedContextCanvasGenerator.Domain.Configuration;
+using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Infrastructure.Configuration;
+using BoundedContextCanvasGenerator.Infrastructure.Types;
 using CommandLine;
-using LivingDocumentation.Domain;
-using LivingDocumentation.Infrastructure;
 
 [assembly: InternalsVisibleTo("BoundedContextCanvasGenerator.Tests.Integration")]
 
@@ -23,23 +26,11 @@ static async Task RunApplicationAsync(Options options)
 {
     var solutionName = new SolutionName(options.SolutionFilePath!);
 
-    var configuration = await new ConfigurationFactory().Build(options.ConfigurationFilePath);
+    var configuration = await new ConfigurationFactory(new YamlDotNetFileReader()).Build(options.ConfigurationFilePath);
 
     var generator = new ReadmeGenerator(new SourceCodeAnalyserTypeDefinitionRepository(), configuration);
 
     var readmeContent = await generator.Generate(solutionName);
 
     await File.WriteAllTextAsync(options.OutputFilePath!, readmeContent);
-}
-
-public class Options
-{
-    [Option("solution", Required = true, HelpText = "The solution to analyze.")]
-    public string? SolutionFilePath { get; set; }
-
-    [Option("output", Required = true, HelpText = "The output readme file.")]
-    public string? OutputFilePath { get; set; }
-    
-    [Option("configuration", Required = false, HelpText = "The yaml configuration file.")]
-    public string? ConfigurationFilePath { get; set; }
 }

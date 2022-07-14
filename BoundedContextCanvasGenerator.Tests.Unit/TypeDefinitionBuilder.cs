@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using LivingDocumentation.Domain;
+using BoundedContextCanvasGenerator.Domain.Types;
 
-namespace BoundedContextCanvasGenerator.Tests;
+namespace BoundedContextCanvasGenerator.Tests.Unit;
 
 public class TypeDefinitionBuilder
 {

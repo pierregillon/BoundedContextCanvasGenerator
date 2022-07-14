@@ -1,4 +1,5 @@
 using System;
+using BoundedContextCanvasGenerator.Tests.Integration.Utils;
 using FluentAssertions;
 using Xunit;
 

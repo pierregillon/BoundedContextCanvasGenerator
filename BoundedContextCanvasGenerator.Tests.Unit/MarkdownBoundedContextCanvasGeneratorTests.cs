@@ -15,27 +15,27 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
     public class MarkdownBoundedContextCanvasGeneratorTests
     {
         private static readonly SolutionPath SomeSolution = new("some");
-        private static readonly ConfigurationPath SomeConfigurationPath = new("some");
+        private static readonly CanvasSettingsPath SomeCanvasSettingsPath = new("some");
 
         private readonly MarkdownBoundedContextCanvasGenerator _generator;
         private readonly ITypeDefinitionRepository _typeDefinitionRepository = Substitute.For<ITypeDefinitionRepository>();
-        private readonly IConfigurationRepository _configurationRepository = Substitute.For<IConfigurationRepository>();
-        private readonly IGeneratorConfiguration _configuration = Substitute.For<IGeneratorConfiguration>();
+        private readonly ICanvasSettingsRepository _canvasSettingsRepository = Substitute.For<ICanvasSettingsRepository>();
+        private readonly ICanvasSettings _configuration = Substitute.For<ICanvasSettings>();
 
         public MarkdownBoundedContextCanvasGeneratorTests()
         {
-            _generator = new MarkdownBoundedContextCanvasGenerator(_typeDefinitionRepository, _configurationRepository);
+            _generator = new MarkdownBoundedContextCanvasGenerator(_typeDefinitionRepository, _canvasSettingsRepository);
 
-            _configurationRepository
-                .Get(Arg.Any<ConfigurationPath>())
+            _canvasSettingsRepository
+                .Get(Arg.Any<CanvasSettingsPath>())
                 .Returns(_configuration);
 
             _configuration
-                .CommandsConfiguration
+                .Commands
                 .Returns(TypeDefinitionPredicates.Empty());
 
             _configuration
-                .DomainEventsConfiguration
+                .DomainEvents
                 .Returns(TypeDefinitionPredicates.Empty());
         }
 
@@ -56,7 +56,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
         public async Task No_commands_renders_not_found()
         {
             _configuration
-                .CommandsConfiguration
+                .Commands
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
 
             var markdown = await GenerateMarkdown();
@@ -71,7 +71,7 @@ No commands found
         public async Task Commands_matching_pattern_are_listed()
         {
             _configuration
-                .CommandsConfiguration
+                .Commands
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
 
             Define(new TypeDefinition[] {
@@ -105,7 +105,7 @@ No commands found
         public async Task No_domain_events_matching_render_empty_section()
         {
             _configuration
-                .DomainEventsConfiguration
+                .DomainEvents
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
 
             var markdown = await GenerateMarkdown();
@@ -120,7 +120,7 @@ No domain event found
         public async Task Domain_events_matching_pattern_are_listed()
         {
             _configuration
-                .DomainEventsConfiguration
+                .DomainEvents
                 .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEvent")));
 
             Define(new TypeDefinition[] {
@@ -137,7 +137,7 @@ No domain event found
 ");
         }
 
-        private Task<string> GenerateMarkdown() => _generator.Generate(SomeSolution, SomeConfigurationPath);
+        private Task<string> GenerateMarkdown() => _generator.Generate(SomeSolution, SomeCanvasSettingsPath);
 
         private void Define(IEnumerable<TypeDefinition> types)
         {

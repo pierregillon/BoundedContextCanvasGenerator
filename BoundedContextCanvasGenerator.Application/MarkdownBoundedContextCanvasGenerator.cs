@@ -6,19 +6,19 @@ namespace BoundedContextCanvasGenerator.Application;
 public class MarkdownBoundedContextCanvasGenerator
 {
     private readonly ITypeDefinitionRepository _typeDefinitionRepository;
-    private readonly IConfigurationRepository _configurationRepository;
+    private readonly ICanvasSettingsRepository _canvasSettingsRepository;
 
     public MarkdownBoundedContextCanvasGenerator(
         ITypeDefinitionRepository typeDefinitionRepository,
-        IConfigurationRepository configurationRepository)
+        ICanvasSettingsRepository canvasSettingsRepository)
     {
         _typeDefinitionRepository = typeDefinitionRepository;
-        _configurationRepository = configurationRepository;
+        _canvasSettingsRepository = canvasSettingsRepository;
     }
 
-    public async Task<string> Generate(SolutionPath solutionPath, ConfigurationPath configurationPath)
+    public async Task<string> Generate(SolutionPath solutionPath, CanvasSettingsPath canvasSettingsPath)
     {
-        var configuration = await _configurationRepository.Get(configurationPath);
+        var configuration = await _canvasSettingsRepository.Get(canvasSettingsPath);
 
         var extractor = new TypeDefinitionExtractor(_typeDefinitionRepository, configuration);
 

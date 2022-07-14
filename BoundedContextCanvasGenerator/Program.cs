@@ -28,14 +28,14 @@ static async Task RunApplicationAsync(Options options)
     var serviceProvider = new ServiceCollection()
         .AddScoped<MarkdownBoundedContextCanvasGenerator>()
         .AddScoped<ITypeDefinitionRepository, SourceCodeAnalyserTypeDefinitionRepository>()
-        .AddScoped<IConfigurationRepository, YamlFileConfigurationRepository>()
+        .AddScoped<ICanvasSettingsRepository, YamlFileCanvasSettingsRepository>()
         .BuildServiceProvider();
 
     var generator = serviceProvider.GetRequiredService<MarkdownBoundedContextCanvasGenerator>();
 
     var markdown = await generator.Generate(
         new SolutionPath(options.SolutionFilePath), 
-        new ConfigurationPath(options.ConfigurationFilePath)
+        new CanvasSettingsPath(options.ConfigurationFilePath)
     );
 
     await File.WriteAllTextAsync(options.OutputFilePath!, markdown);

@@ -6,9 +6,9 @@ namespace BoundedContextCanvasGenerator.Application;
 public class TypeDefinitionExtractor
 {
     private readonly ITypeDefinitionRepository _repository;
-    private readonly IGeneratorConfiguration _configuration;
+    private readonly ICanvasSettings _configuration;
 
-    public TypeDefinitionExtractor(ITypeDefinitionRepository repository, IGeneratorConfiguration configuration)
+    public TypeDefinitionExtractor(ITypeDefinitionRepository repository, ICanvasSettings configuration)
     {
         _repository = repository;
         _configuration = configuration;
@@ -23,20 +23,20 @@ public class TypeDefinitionExtractor
 
         await foreach (var typeDefinition in types)
         {
-            if (_configuration.CommandsConfiguration.IsEnabled && _configuration.CommandsConfiguration.AllMatching(typeDefinition))
+            if (_configuration.Commands.IsEnabled && _configuration.Commands.AllMatching(typeDefinition))
             {
                 commands.Add(typeDefinition);
             }
 
-            if (_configuration.DomainEventsConfiguration.IsEnabled && _configuration.DomainEventsConfiguration.AllMatching(typeDefinition))
+            if (_configuration.DomainEvents.IsEnabled && _configuration.DomainEvents.AllMatching(typeDefinition))
             {
                 domainEvents.Add(typeDefinition);
             }
         }
 
         return new TypeDefinitionExtraction(
-            new ExtractedElements(_configuration.CommandsConfiguration.IsEnabled, commands), 
-            new ExtractedElements(_configuration.DomainEventsConfiguration.IsEnabled, domainEvents)
+            new ExtractedElements(_configuration.Commands.IsEnabled, commands), 
+            new ExtractedElements(_configuration.DomainEvents.IsEnabled, domainEvents)
         );
     }
 }

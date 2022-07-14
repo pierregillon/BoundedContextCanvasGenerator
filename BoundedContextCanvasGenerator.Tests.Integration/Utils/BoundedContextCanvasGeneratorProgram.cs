@@ -11,11 +11,12 @@ public record BoundedContextCanvasGeneratorProgram
     private readonly ProgramRunner<Program> _runner = new();
 
     private string? _solutionAbsolutePath;
-    private string _outputAbsolutePath = Path.Combine(BaseDirectory, $"{Guid.NewGuid()}.md");
+    private string? _outputAbsolutePath;
     private string? _configurationAbsolutePath;
     private bool _outputFileHasBeenCustomized;
 
-    public static BoundedContextCanvasGeneratorProgram Generator() => new();
+    public static BoundedContextCanvasGeneratorProgram Generator() 
+        => new BoundedContextCanvasGeneratorProgram().OutputtingFile($"{Guid.NewGuid()}.md");
 
     public BoundedContextCanvasGeneratorProgram TargetingSolution(string relativePath)
     {

@@ -1,6 +1,6 @@
 ﻿namespace BoundedContextCanvasGenerator.Domain.Configuration;
 
-public record ConfigurationPath(string Value)
+public record CanvasSettingsPath(string Value)
 {
     public bool IsUndefined => string.IsNullOrEmpty(Value);
 }

@@ -8,6 +8,10 @@ definition:
   domain_role:
       name: 'gateway context'
       description: 'Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.'
+ubiquitous_language:
+    type: 'class'
+    implementing:
+        pattern: '.*IAggregateRoot<.*>'
 commands:
     type: 'class'
     implementing:

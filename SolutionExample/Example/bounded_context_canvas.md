@@ -14,6 +14,12 @@
 Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
 
 
+## Ubiquitous language (Context-specific domain terminology)
+| Aggregator root<t> | Catalog item |
+| ----- | ----- |
+|  | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |
+
+
 ## Commands
 - Catalog.Application.Items.AddItemToCatalogCommand
 - Catalog.Application.Items.AdjustItemPriceCommand

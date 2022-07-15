@@ -2,6 +2,9 @@
 
 namespace Catalog.Domain.Items;
 
+/// <summary>
+/// An item of a catalog. It is the minimum unit to purchase. The price includes the currency.
+/// </summary>
 public class CatalogItem : AggregatorRoot<CatalogItemId>
 {
     public CatalogId CatalogId { get; }

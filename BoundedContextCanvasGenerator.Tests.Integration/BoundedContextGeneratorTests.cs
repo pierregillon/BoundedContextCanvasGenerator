@@ -183,4 +183,27 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .Should()
             .Contain(commandsSection);
     }
+
+    [Fact]
+    public async Task Generating_BCC_with_ubquitous_language_configuration_lists_context_specific_terminology()
+    {
+        var plainText = await A
+            .Generator()
+            .TargetingSolution(ExampleSolution)
+            .WithConfiguration(
+@"ubiquitous_language:
+    type: 'class'
+    implementing:
+        pattern: '.*IAggregateRoot<.*>'")
+            .Execute();
+
+        const string commandsSection =
+@"## Ubiquitous language (Context-specific domain terminology)
+| Aggregator root<t> | Catalog item |
+| ----- | ----- |
+|  | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |";
+        plainText
+            .Should()
+            .Contain(commandsSection);
+    }
 }

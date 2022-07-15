@@ -3,8 +3,14 @@ namespace BoundedContextCanvasGenerator.Domain;
 
 public static class StringExtensions
 {
-    public static string JoinLines(this IEnumerable<string> elements) 
-        => string.Join(Environment.NewLine, elements);
+    public static string JoinLines(this IEnumerable<string> elements)
+        => elements.JoinWith(Environment.NewLine);
+
+    public static string JoinWith(this IEnumerable<string> elements, string separator)
+        => string.Join(separator, elements);
+
+    public static string SurroundWith(this string value, string left, string right)
+        => $"{left}{value}{right}";
 
     public static string TrimWord(this string value, string word) => value.EndsWith(word) ? value[..^word.Length] : value;
     public static string ToReadableSentence(this string value) => new(AddSpaceCharBetweenWords(value).ToArray());

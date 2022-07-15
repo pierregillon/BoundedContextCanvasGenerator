@@ -2,5 +2,6 @@
 
 public record TypeDefinitionExtraction(
     ExtractedElements Commands,
-    ExtractedElements DomainEvents
+    ExtractedElements DomainEvents, 
+    ExtractedElements Aggregates
 );

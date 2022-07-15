@@ -51,6 +51,10 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
             _canvasSettings
                 .DomainEvents
                 .Returns(TypeDefinitionPredicates.Empty());
+
+            _canvasSettings
+                .UbiquitousLanguage
+                .Returns(UbiquitousLanguageDefinition.Empty());
         }
 
         [Fact]
@@ -229,6 +233,44 @@ No domain event found
 - Some.Namespace.MyDomainEvent
 - Some.Namespace.MySecondDomainEvent
 ");
+        }
+
+        [Fact]
+        public async Task No_ubiquitous_language_render_empty_section()
+        {
+            _canvasSettings
+                .UbiquitousLanguage
+                .Returns(UbiquitousLanguageDefinition.From(new ImplementsInterfaceMatching(".*IAggregateRoot\\<.*\\>")));
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+                @"## Ubiquitous language (Context-specific domain terminology)
+No ubiquitous language found
+");
+        }
+
+        [Fact]
+        public async Task Ubiquitous_language_renders_class_implementing_interfaces()
+        {
+            _canvasSettings
+                .UbiquitousLanguage
+                .Returns(UbiquitousLanguageDefinition.From(new ImplementsInterfaceMatching(".*IAggregateRoot<.*>")));
+
+            Define(new TypeDefinition[] {
+                A
+                    .Class("Some.Namespace.Catalog")
+                    .WithDescription("A set of items to show to customers.")
+                    .Implementing("Some.Namespace.IAggregateRoot<CatalogId>"),
+            });
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+@"## Ubiquitous language (Context-specific domain terminology)
+| Catalog |
+| ----- |
+| A set of items to show to customers. |");
         }
 
         private Task<string> GenerateMarkdown() => _generator.Generate(SomeSolution, SomeCanvasSettingsPath);

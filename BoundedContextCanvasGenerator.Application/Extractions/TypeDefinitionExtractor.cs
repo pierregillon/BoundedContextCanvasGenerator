@@ -15,6 +15,7 @@ public class TypeDefinitionExtractor : ITypeDefinitionExtractor
 
         var commands = new List<TypeDefinition>();
         var domainEvents = new List<TypeDefinition>();
+        var aggregates = new List<TypeDefinition>();
 
         await foreach (var typeDefinition in types)
         {
@@ -27,11 +28,17 @@ public class TypeDefinitionExtractor : ITypeDefinitionExtractor
             {
                 domainEvents.Add(typeDefinition);
             }
+            
+            if (settings.UbiquitousLanguage.IsEnabled && settings.UbiquitousLanguage.AllMatching(typeDefinition))
+            {
+                aggregates.Add(typeDefinition);
+            }
         }
 
         return new TypeDefinitionExtraction(
             new ExtractedElements(settings.Commands.IsEnabled, commands), 
-            new ExtractedElements(settings.DomainEvents.IsEnabled, domainEvents)
+            new ExtractedElements(settings.DomainEvents.IsEnabled, domainEvents),
+            new ExtractedElements(settings.UbiquitousLanguage.IsEnabled, aggregates)
         );
     }
 }

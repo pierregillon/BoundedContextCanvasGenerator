@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Types;
@@ -6,7 +5,7 @@ using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using TypeKind = BoundedContextCanvasGenerator.Domain.Types.TypeKind;
+using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 {
@@ -30,8 +29,8 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(new TypeFullName("CreateUser"), TypeKind.Class, Array.Empty<TypeFullName>())
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A.Class("CreateUser")
             });
         }
 
@@ -45,8 +44,8 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(new TypeFullName("Test.CreateUser"), TypeKind.Class, Array.Empty<TypeFullName>())
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A.Class("Test.CreateUser")
             });
         }
 
@@ -62,14 +61,11 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(new TypeFullName("Test.CreateUser"), 
-                    TypeKind.Class, 
-                    new[] {
-                        new TypeFullName("Test.ICommand"),
-                        new TypeFullName("Test.IDisposable")
-                    }
-                )
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A
+                    .Class("Test.CreateUser")
+                    .Implementing("Test.ICommand")
+                    .Implementing("Test.IDisposable")
             });
         }
 
@@ -83,12 +79,8 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(
-                    new TypeFullName("CreateUser"),
-                    TypeKind.Class,
-                    new[] { new TypeFullName("System.IEquatable<CreateUser>") }
-                )
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A.Class("CreateUser").Implementing("System.IEquatable<CreateUser>")
             });
         }
 
@@ -103,12 +95,8 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 ";
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(
-                    new TypeFullName("Test.CreateUser"),
-                    TypeKind.Class,
-                    new[] { new TypeFullName("System.IEquatable<Test.CreateUser>") }
-                )
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A.Class("Test.CreateUser").Implementing("System.IEquatable<Test.CreateUser>")
             });
         }
 
@@ -125,16 +113,11 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 ";
             var typeDefinitions = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new[] {
-                new TypeDefinition(
-                    new TypeFullName("Test.CreateUser"), 
-                    TypeKind.Class,
-                    new[] {
-                        new TypeFullName("System.IEquatable<Test.CreateUser>"),
-                        new TypeFullName("Test.ICommand"),
-                        new TypeFullName("Test.IDisposable")
-                    }
-                )
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A.Class("Test.CreateUser")
+                    .Implementing("System.IEquatable<Test.CreateUser>")
+                    .Implementing("Test.ICommand")
+                    .Implementing("Test.IDisposable")
             });
         }
 

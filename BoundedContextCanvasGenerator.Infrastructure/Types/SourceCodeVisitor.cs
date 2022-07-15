@@ -37,6 +37,7 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
         if (type != null) {
             _typeDefinitions.Add(new TypeDefinition(
                 type.GetFullName(),
+                type.GetDescription(),
                 type.GetTypeKind(),
                 Enumerable.Select(type.AllInterfaces, i => i.GetFullName()).ToArray()
             ));

@@ -8,4 +8,5 @@ public class DefaultCanvasSettings : ICanvasSettings
     public CanvasDefinition Definition => CanvasDefinition.Empty;
     public TypeDefinitionPredicates Commands => new(new []{ new ImplementsInterfaceMatching(".*ICommand$") });
     public TypeDefinitionPredicates DomainEvents => new(new[] { new ImplementsInterfaceMatching(".*IDomainEvent$") });
+    public UbiquitousLanguageDefinition UbiquitousLanguage => UbiquitousLanguageDefinition.Empty();
 }

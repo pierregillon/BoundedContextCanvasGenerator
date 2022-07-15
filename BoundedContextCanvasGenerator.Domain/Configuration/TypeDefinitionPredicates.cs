@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using BoundedContextCanvasGenerator.Domain.Types;
+﻿using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Domain.Configuration;
 

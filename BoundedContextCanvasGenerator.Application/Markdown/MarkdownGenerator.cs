@@ -21,6 +21,7 @@ public class MarkdownGenerator : IMarkdownGenerator
         var sections = new[] {
             $"# {canvasSettings.Name.Value}{Environment.NewLine}",
             canvasSettings.Definition.IsEnabled ? GenerateDefinitionSection(canvasSettings.Definition).JoinLines() : string.Empty,
+            extraction.Aggregates.IsEnabled ? GenerateUbiquitousLanguageSection(extraction.Aggregates.Values).JoinLines() : string.Empty,
             extraction.Commands.IsEnabled ? GenerateCommandsSection(extraction.Commands.Values).JoinLines() : string.Empty,
             extraction.DomainEvents.IsEnabled ? GenerateDomainEventsSection(extraction.DomainEvents.Values).JoinLines() : string.Empty,
         };
@@ -59,6 +60,22 @@ public class MarkdownGenerator : IMarkdownGenerator
 
         yield return $"{Environment.NewLine}### Domain role [(?)]({DomainRoleDocumentationUrl}): *{domainRole.Title.Value}*";
         yield return domainRole.Description.Value;
+    }
+
+    private IEnumerable<string> GenerateUbiquitousLanguageSection(IReadOnlyCollection<TypeDefinition> aggregates)
+    {
+        yield return "## Ubiquitous language (Context-specific domain terminology)";
+
+        if (aggregates.Any()) {
+            yield return aggregates.Select(x => x.Name.Name.ToReadableSentence()).ToArray().JoinWith(" | ").SurroundWith("| ", " |");
+            yield return aggregates.Select(_ => "-----").ToArray().JoinWith(" | ").SurroundWith("| ", " |");
+            yield return aggregates.Select(x => x.Description.Value).ToArray().JoinWith(" | ").SurroundWith("| ", " |");
+        }
+        else {
+            yield return "No ubiquitous language found";
+        }
+
+        yield return Environment.NewLine;
     }
 
     private static string Generate(Evolution evolution)

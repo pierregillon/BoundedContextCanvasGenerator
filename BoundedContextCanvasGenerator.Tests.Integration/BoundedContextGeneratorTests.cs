@@ -1,5 +1,9 @@
+using System;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Xunit;
 
 using A = BoundedContextCanvasGenerator.Tests.Integration.Utils.BoundedContextCanvasGeneratorProgram;
@@ -22,6 +26,54 @@ public class BoundedContextGeneratorTests
         var secondGeneration = await builder.Execute();
 
         firstGeneration.Should().Be(secondGeneration);
+    }
+
+    [Fact]
+    public async Task Generating_BCC_with_solution_path_only_output_result_in_default_file()
+    {
+        var rootDirectory = Path.GetDirectoryName(A.GetAbsoluteSolutionPath(ExampleSolution))!;
+        var settingsPath = Path.Combine(rootDirectory, "bounded_context_canvas_settings.yaml");
+        var resultPath = Path.Combine(rootDirectory, "bounded_context_canvas.md");
+
+        if (File.Exists(resultPath)) {
+            File.Delete(resultPath);
+        }
+
+        _ = await A
+            .Generator()
+            .TargetingSolution(ExampleSolution)
+            .NoOutputFileDefined()
+            .Execute();
+
+        File.Exists(resultPath).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Generating_BCC_with_solution_path_only_use_settings_of_default_file()
+    {
+        using var scope = new AssertionScope();
+
+        var rootDirectory = Path.GetDirectoryName(A.GetAbsoluteSolutionPath(ExampleSolution))!;
+        var settingsPath = Path.Combine(rootDirectory, "bounded_context_canvas_settings.yaml");
+        var tempSettingsPath = settingsPath + "_backup";
+
+        if (File.Exists(settingsPath)) {
+            File.Move(settingsPath, tempSettingsPath);
+        }
+
+        Func<Task> tryGenerating = () => A
+            .Generator()
+            .TargetingSolution(ExampleSolution)
+            .NoOutputFileDefined()
+            .Execute();
+
+        await tryGenerating
+            .Should()
+            .ThrowAsync<TargetInvocationException>();
+
+        if (File.Exists(tempSettingsPath)) {
+            File.Move(tempSettingsPath, settingsPath);
+        }
     }
 
     [Theory]

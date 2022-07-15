@@ -33,10 +33,17 @@ static async Task RunApplicationAsync(Options options)
 
     var generator = serviceProvider.GetRequiredService<MarkdownBoundedContextCanvasGenerator>();
 
+    var solutionPath = new SolutionPath(options.SolutionPath);
+    var canvasSettingsPath = options.GetCanvasSettingsPathOrDefault();
+    var outputPath = options.GetOutputPathOrDefault();
+
     var markdown = await generator.Generate(
-        new SolutionPath(options.SolutionFilePath), 
-        new CanvasSettingsPath(options.ConfigurationFilePath)
+        solutionPath,
+        canvasSettingsPath
     );
 
-    await File.WriteAllTextAsync(options.OutputFilePath!, markdown);
+    await WriteAllText(outputPath, markdown);
 }
+
+static Task WriteAllText(OutputPath outputFilePath, string content) 
+    => File.WriteAllTextAsync(outputFilePath.Value, content);

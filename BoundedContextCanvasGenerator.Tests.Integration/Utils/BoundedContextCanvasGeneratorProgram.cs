@@ -31,6 +31,13 @@ public record BoundedContextCanvasGeneratorProgram
         return this;
     }
 
+    public BoundedContextCanvasGeneratorProgram NoOutputFileDefined()
+    {
+        this._outputAbsolutePath = null;
+        this._outputFileHasBeenCustomized = false;
+        return this;
+    }
+
     public BoundedContextCanvasGeneratorProgram WithConfiguration(string configurationYaml)
     {
         var filePath = Path.Combine(BaseDirectory, $"{Guid.NewGuid()}.yaml");
@@ -47,14 +54,14 @@ public record BoundedContextCanvasGeneratorProgram
         {
             (string Output, string Error) output = this._runner.Run(BuildArgs());
 
-            if (!File.Exists(this._outputAbsolutePath))
-            {
-                throw new InvalidOperationException($"Nothing has been generated.\r\n{output.Output}");
+            if (this._outputAbsolutePath is not null) {
+                if (!File.Exists(this._outputAbsolutePath)) {
+                    throw new InvalidOperationException($"Nothing has been generated.\r\n{output.Output}");
+                }
+                return  await File.ReadAllTextAsync(this._outputAbsolutePath);
             }
 
-            var results = await File.ReadAllTextAsync(this._outputAbsolutePath);
-
-            return results;
+            return "No output file known, unable to read generated content.";
         }
         finally
         {
@@ -66,10 +73,13 @@ public record BoundedContextCanvasGeneratorProgram
     {
         yield return "--solution";
         yield return _solutionAbsolutePath ?? throw new InvalidOperationException("Solution path is mandatory");
-        yield return "--output";
-        yield return _outputAbsolutePath;
 
-        if (!string.IsNullOrWhiteSpace(this._configurationAbsolutePath))
+        if (_outputAbsolutePath is not null) {
+            yield return "--output";
+            yield return _outputAbsolutePath;
+        }
+
+        if (this._configurationAbsolutePath is not null)
         {
             yield return "--configuration";
             yield return _configurationAbsolutePath;
@@ -77,15 +87,15 @@ public record BoundedContextCanvasGeneratorProgram
 
     }
 
-    private static string GetAbsoluteSolutionPath(string relativeSolutionPath)
+    public static string GetAbsoluteSolutionPath(string relativeSolutionPath)
         => Path.Combine(BaseDirectory, "..", "..", "..", "..", "SolutionExample", relativeSolutionPath);
 
     public void ClearFiles()
     {
-        if (!_outputFileHasBeenCustomized && File.Exists(_outputAbsolutePath)) {
+        if (!_outputFileHasBeenCustomized && _outputAbsolutePath is not null && File.Exists(_outputAbsolutePath)) {
             File.Delete(_outputAbsolutePath);
         }
-        if (!string.IsNullOrWhiteSpace(this._configurationAbsolutePath) && File.Exists(this._configurationAbsolutePath)) {
+        if (this._configurationAbsolutePath is not null && File.Exists(this._configurationAbsolutePath)) {
             File.Delete(this._configurationAbsolutePath);
         }
     }

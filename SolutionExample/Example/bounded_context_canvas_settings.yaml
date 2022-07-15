@@ -1,0 +1,18 @@
+name: 'Catalog'
+definition:
+  description: 'Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.'
+  strategic_classification:
+      domain: 'core'
+      business_model: 'revenue_generator'
+      evolution: 'commodity'
+  domain_role:
+      name: 'gateway context'
+      description: 'Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.'
+commands:
+    type: 'class'
+    implementing:
+        pattern: '.*ICommand$'
+domain_events:
+    type: 'class'
+    implementing:
+        pattern: '.*IDomainEvent$'

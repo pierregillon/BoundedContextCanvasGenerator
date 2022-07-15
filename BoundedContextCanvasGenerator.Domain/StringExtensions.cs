@@ -1,5 +1,5 @@
 ﻿
-namespace BoundedContextCanvasGenerator.Application;
+namespace BoundedContextCanvasGenerator.Domain;
 
 public static class StringExtensions
 {

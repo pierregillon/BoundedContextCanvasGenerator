@@ -13,6 +13,7 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Application\BoundedContextCanvasGenerator.Application.csproj" />
     <ProjectReference Include="..\BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj" />
   </ItemGroup>
 

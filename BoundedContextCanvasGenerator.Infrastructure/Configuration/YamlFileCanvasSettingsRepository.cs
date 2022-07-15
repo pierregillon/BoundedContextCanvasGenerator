@@ -6,8 +6,7 @@ public class YamlFileCanvasSettingsRepository : ICanvasSettingsRepository
 {
     public async Task<ICanvasSettings> Get(CanvasSettingsPath canvasSettingsPath)
     {
-        if (canvasSettingsPath.IsUndefined)
-        {
+        if (canvasSettingsPath.IsUndefined) {
             return new DefaultCanvasSettings();
         }
 

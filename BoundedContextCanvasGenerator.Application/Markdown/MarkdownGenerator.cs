@@ -1,9 +1,11 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration;
+﻿using BoundedContextCanvasGenerator.Application.Extractions;
+using BoundedContextCanvasGenerator.Domain;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
 
-namespace BoundedContextCanvasGenerator.Application;
+namespace BoundedContextCanvasGenerator.Application.Markdown;
 
-public class MarkdownGenerator
+public class MarkdownGenerator : IMarkdownGenerator
 {
     public const string StrategicClassificationDocumentationUrl = "https://github.com/ddd-crew/bounded-context-canvas#strategic-classification";
     public const string DomainRoleDocumentationUrl = "https://github.com/ddd-crew/bounded-context-canvas/blob/master/resources/model-traits-worksheet.md";

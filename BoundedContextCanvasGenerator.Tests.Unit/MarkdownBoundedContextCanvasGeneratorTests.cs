@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BoundedContextCanvasGenerator.Application;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
 using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
@@ -24,7 +24,13 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
 
         public MarkdownBoundedContextCanvasGeneratorTests()
         {
-            _generator = new MarkdownBoundedContextCanvasGenerator(_typeDefinitionRepository, _canvasSettingsRepository);
+            var serviceProvider = new ServiceCollection()
+                .RegisterApplication()
+                .AddScoped(_ => _typeDefinitionRepository)
+                .AddScoped(_ => _canvasSettingsRepository)
+                .BuildServiceProvider();
+
+            _generator = serviceProvider.GetRequiredService<MarkdownBoundedContextCanvasGenerator>();
 
             _canvasSettingsRepository
                 .Get(Arg.Any<CanvasSettingsPath>())

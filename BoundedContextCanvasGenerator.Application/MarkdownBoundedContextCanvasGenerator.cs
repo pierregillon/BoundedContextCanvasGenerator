@@ -1,29 +1,32 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration;
+﻿using BoundedContextCanvasGenerator.Application.Extractions;
+using BoundedContextCanvasGenerator.Application.Markdown;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Application;
 
 public class MarkdownBoundedContextCanvasGenerator
 {
-    private readonly ITypeDefinitionRepository _typeDefinitionRepository;
     private readonly ICanvasSettingsRepository _canvasSettingsRepository;
+    private readonly ITypeDefinitionExtractor _extractor;
+    private readonly IMarkdownGenerator _markdownGenerator;
 
     public MarkdownBoundedContextCanvasGenerator(
-        ITypeDefinitionRepository typeDefinitionRepository,
-        ICanvasSettingsRepository canvasSettingsRepository)
+        ICanvasSettingsRepository canvasSettingsRepository,
+        ITypeDefinitionExtractor extractor,
+        IMarkdownGenerator markdownGenerator)
     {
-        _typeDefinitionRepository = typeDefinitionRepository;
         _canvasSettingsRepository = canvasSettingsRepository;
+        _extractor = extractor;
+        _markdownGenerator = markdownGenerator;
     }
 
     public async Task<string> Generate(SolutionPath solutionPath, CanvasSettingsPath canvasSettingsPath)
     {
         var configuration = await _canvasSettingsRepository.Get(canvasSettingsPath);
 
-        var extractor = new TypeDefinitionExtractor(_typeDefinitionRepository, configuration);
+        var extraction = await _extractor.Extract(solutionPath, configuration);
 
-        var extraction = await extractor.Extract(solutionPath);
-
-        return await new MarkdownGenerator().Generate(extraction, configuration);
+        return await _markdownGenerator.Generate(extraction, configuration);
     }
 }

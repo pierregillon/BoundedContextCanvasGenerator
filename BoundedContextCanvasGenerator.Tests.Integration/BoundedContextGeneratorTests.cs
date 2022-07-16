@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -135,31 +135,6 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
     }
 
     [Fact]
-    public async Task Generating_BCC_with_commands_configuration_lists_commands_matching_predicates()
-    {
-        var plainText = await A
-            .Generator()
-            .TargetingSolution(ExampleSolution)
-            .WithConfiguration(
-@"commands:
-    type: class
-    implementing:
-        pattern: .*ICommand$")
-            .Execute();
-
-        const string commandsSection = 
-@"## Commands
-- Catalog.Application.Items.AddItemToCatalogCommand
-- Catalog.Application.Items.AdjustItemPriceCommand
-- Catalog.Application.Items.EntitleItemCommand
-- Catalog.Application.Items.RemoveFromCatalogCommand
-";
-        plainText
-            .Should()
-            .Contain(commandsSection);
-    }
-
-    [Fact]
     public async Task Generating_BCC_with_domain_events_configuration_lists_them_that_matches_predicates()
     {
         var plainText = await A
@@ -185,7 +160,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
     }
 
     [Fact]
-    public async Task Generating_BCC_with_ubquitous_language_configuration_lists_context_specific_terminology()
+    public async Task Generating_BCC_with_ubiquitous_language_configuration_lists_context_specific_terminology()
     {
         var plainText = await A
             .Generator()
@@ -204,6 +179,56 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 | Catalog item |
 | ----- |
 | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |";
+        plainText
+            .Should()
+            .Contain(commandsSection);
+    }
+
+    [Fact]
+    public async Task Generating_BCC_with_inbound_communication_configuration_lists_commands_grouped_by_folders()
+    {
+        var plainText = await A
+            .Generator()
+            .TargetingSolution(ExampleSolution)
+            .WithConfiguration(
+@"inbound_communication:
+    type: class
+    implementing:
+        pattern: .*ICommand$")
+            .Execute();
+
+        const string commandsSection =
+@"## Inbound communication
+
+### Catalog
+------------
+```mermaid
+graph LR
+	Collaborators>""🖥 WebApp""]
+	DeleteCatalog[""Delete catalog""]
+	RegisterNewCatalogCommand[""Register new catalog""]
+	Collaborators --> DeleteCatalog
+	Collaborators --> RegisterNewCatalogCommand
+	
+	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+```
+
+### Items
+------------
+```mermaid
+graph LR
+	Collaborators>""🖥 WebApp""]
+    AddItemToCatalogCommand[""Add item to catalog""]
+    AdjustItemPriceCommand[""Adjust item price""]
+    EntitleItemCommand[""Entitle item""]
+	RemoveFromCatalogCommand[""Remove from catalog""]
+	Collaborators --> AddItemToCatalogCommand
+	Collaborators --> AdjustItemPriceCommand
+	Collaborators --> EntitleItemCommand
+	Collaborators --> RemoveFromCatalogCommand
+	
+	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+```";
         plainText
             .Should()
             .Contain(commandsSection);

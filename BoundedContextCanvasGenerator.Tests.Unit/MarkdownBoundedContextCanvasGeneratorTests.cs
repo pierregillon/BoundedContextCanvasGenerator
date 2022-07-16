@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using BoundedContextCanvasGenerator.Application;
 using BoundedContextCanvasGenerator.Domain.Configuration;
@@ -138,55 +138,6 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
         }
 
         [Fact]
-        public async Task No_commands_configuration_do_not_generate_commands_section()
-        {
-            Define(new TypeDefinition[] {
-                A.Class("Some.Namespace.MyCommand").Implementing("Some.Namespace.ICommand"),
-                A.Class("Some.Namespace.MySecondCommand").Implementing("Some.Namespace.ICommand"),
-            });
-
-            var markdown = await GenerateMarkdown();
-
-            markdown.Should().NotContain("## Commands");
-        }
-
-        [Fact]
-        public async Task No_commands_renders_not_found()
-        {
-            _canvasSettings
-                .Commands
-                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
-
-            var markdown = await GenerateMarkdown();
-
-            markdown.Should().Contain(
-@"## Commands
-No commands found
-");
-        }
-
-        [Fact]
-        public async Task Commands_matching_pattern_are_listed()
-        {
-            _canvasSettings
-                .Commands
-                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
-
-            Define(new TypeDefinition[] {
-                A.Class("Some.Namespace.MyCommand").Implementing("Some.Namespace.ICommand"),
-                A.Class("Some.Namespace.MySecondCommand").Implementing("Some.Namespace.ICommand"),
-            });
-
-            var markdown = await GenerateMarkdown();
-
-            markdown.Should().Contain(
-@"## Commands
-- Some.Namespace.MyCommand
-- Some.Namespace.MySecondCommand
-");
-        }
-
-        [Fact]
         public async Task No_domain_events_configuration_do_not_generate_domain_events_section()
         {
             Define(new TypeDefinition[] {
@@ -297,6 +248,62 @@ No ubiquitous language found
 No ubiquitous language found
 ");
         }
+
+        [Fact]
+        public async Task No_commands_configuration_do_not_generate_commands_section()
+        {
+            Define(new TypeDefinition[] {
+                A.Class("Some.Namespace.MyCommand").Implementing("Some.Namespace.ICommand"),
+                A.Class("Some.Namespace.MySecondCommand").Implementing("Some.Namespace.ICommand"),
+            });
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().NotContain("## Commands");
+        }
+
+        [Fact]
+        public async Task No_commands_renders_not_found()
+        {
+            _canvasSettings
+                .Commands
+                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+                @"## Commands
+No commands found
+");
+        }
+
+        [Fact]
+        public async Task Commands_matching_pattern_are_rendered_as_mermaid_graph()
+        {
+            _canvasSettings
+                .Commands
+                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
+
+            Define(new TypeDefinition[] {
+                A.Class("Some.Namespace.RegisterNewTransactionCommand").Implementing("Some.Namespace.ICommand"),
+                A.Class("Some.Namespace.RescheduleTransactionCommand").Implementing("Some.Namespace.ICommand"),
+            });
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+@"## Inbound communication
+```mermaid
+graph LR
+	Collaborators>""🖥 WebApp""]
+	Some.Namespace.RegisterNewTransactionCommand[""Register new transaction""]
+	Some.Namespace.RescheduleTransactionCommand[""Reschedule transaction""]
+	
+	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+```");
+        }
+
+        // ----- Private
 
         private Task<string> GenerateMarkdown() => _generator.Generate(SomeSolution, SomeCanvasSettingsPath);
 

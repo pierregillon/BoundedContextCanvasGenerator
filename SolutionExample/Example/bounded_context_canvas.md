@@ -3,7 +3,7 @@
 ## Definition
 
 ### Description
-> Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.
+> Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated items.
 
 ### Strategic classification [(?)](https://github.com/ddd-crew/bounded-context-canvas#strategic-classification)
 | Domain | Business Model | Evolution |

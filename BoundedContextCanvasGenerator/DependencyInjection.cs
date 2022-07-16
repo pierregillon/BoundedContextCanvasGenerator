@@ -4,6 +4,7 @@ using BoundedContextCanvasGenerator.Application.Markdown;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration;
+using BoundedContextCanvasGenerator.Infrastructure.Markdown;
 using BoundedContextCanvasGenerator.Infrastructure.Monitoring;
 using BoundedContextCanvasGenerator.Infrastructure.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,7 @@ public static class DependencyInjection
             .AddScoped<ITypeDefinitionRepository, SourceCodeAnalyserTypeDefinitionRepository>()
             .AddScoped<ICanvasSettingsRepository, YamlFileCanvasSettingsRepository>()
             .AddScoped<ITypeDefinitionExtractor, TypeDefinitionExtractor>()
-            .AddScoped<IMarkdownGenerator, MarkdownGenerator>()
+            .AddScoped<IMarkdownGenerator, GrynwaldMarkdownGenerator>()
             ;
         
         return services;

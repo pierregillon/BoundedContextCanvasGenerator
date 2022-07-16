@@ -94,9 +94,10 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
 
             markdown.Should().Contain(
 @"### Strategic classification [(?)](https://github.com/ddd-crew/bounded-context-canvas#strategic-classification)
-| Domain | Business Model | Evolution |
-| ------------ | ------------ | ------------ |
-| *Core domain*<br/>(a key strategic initiative) | *Revenue generator*<br/>(people pay directly for this) | *Commodity*<br/>(highly-standardised versions exist) |
+
+| Domain                                         | Business Model                                         | Evolution                                             |
+| ---------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
+| *Core domain*<br/>(a key strategic initiative) | *Revenue generator*<br/>(people pay directly for this) | *Commodity*<br/>(highly\-standardised versions exist) |
 ");
         }
 
@@ -115,6 +116,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
 
             markdown.Should().Contain(
 @"### Domain role [(?)](https://github.com/ddd-crew/bounded-context-canvas/blob/master/resources/model-traits-worksheet.md): *gateway context*
+
 Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
 ");
         }
@@ -134,6 +136,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 @"## Definition
 
 ### Description
+
 > Display the product catalog and the items available to purchase.");
         }
 
@@ -160,7 +163,8 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-                @"## Domain events
+@"## Domain events
+
 No domain event found
 ");
         }
@@ -181,6 +185,7 @@ No domain event found
 
             markdown.Should().Contain(
 @"## Domain events
+
 - Some.Namespace.MyDomainEvent
 - Some.Namespace.MySecondDomainEvent
 ");
@@ -196,7 +201,8 @@ No domain event found
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-@"## Ubiquitous language (Context-specific domain terminology)
+@"## Ubiquitous language (Context\-specific domain terminology)
+
 No ubiquitous language found
 ");
         }
@@ -218,9 +224,10 @@ No ubiquitous language found
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-@"## Ubiquitous language (Context-specific domain terminology)
-| Catalog |
-| ----- |
+@"## Ubiquitous language (Context\-specific domain terminology)
+
+| Catalog                              |
+| ------------------------------------ |
 | A set of items to show to customers. |");
         }
 
@@ -244,7 +251,8 @@ No ubiquitous language found
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-@"## Ubiquitous language (Context-specific domain terminology)
+@"## Ubiquitous language (Context\-specific domain terminology)
+
 No ubiquitous language found
 ");
         }
@@ -272,7 +280,8 @@ No ubiquitous language found
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-                @"## Commands
+@"## Commands
+
 No commands found
 ");
         }

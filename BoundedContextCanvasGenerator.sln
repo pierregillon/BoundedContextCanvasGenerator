@@ -14,11 +14,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerator.Tests.Integration", "BoundedContextCanvasGenerator.Tests.Integration\BoundedContextCanvasGenerator.Tests.Integration.csproj", "{E3C08B61-D966-4A11-AE40-471E28E4D274}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundedContextCanvasGenerator.Domain", "BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj", "{7B7EBF05-CDD8-4D95-87E9-2B1C79B23C10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerator.Domain", "BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj", "{7B7EBF05-CDD8-4D95-87E9-2B1C79B23C10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundedContextCanvasGenerator.Application", "BoundedContextCanvasGenerator.Application\BoundedContextCanvasGenerator.Application.csproj", "{FF58B9BF-01C6-40B5-A65E-A6A559C83432}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerator.Application", "BoundedContextCanvasGenerator.Application\BoundedContextCanvasGenerator.Application.csproj", "{FF58B9BF-01C6-40B5-A65E-A6A559C83432}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundedContextCanvasGenerator.Infrastructure", "BoundedContextCanvasGenerator.Infrastructure\BoundedContextCanvasGenerator.Infrastructure.csproj", "{D6CAB014-60F3-4F13-82BE-7485AE5860F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerator.Infrastructure", "BoundedContextCanvasGenerator.Infrastructure\BoundedContextCanvasGenerator.Infrastructure.csproj", "{D6CAB014-60F3-4F13-82BE-7485AE5860F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundedContextCanvasGenerator.Infrastructure.Markdown", "BoundedContextCanvasGenerator.Infrastructure.Markdown\BoundedContextCanvasGenerator.Infrastructure.Markdown.csproj", "{88CEAFA3-2C3B-4F7B-ACBB-245ED1A625D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{D6CAB014-60F3-4F13-82BE-7485AE5860F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6CAB014-60F3-4F13-82BE-7485AE5860F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6CAB014-60F3-4F13-82BE-7485AE5860F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88CEAFA3-2C3B-4F7B-ACBB-245ED1A625D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88CEAFA3-2C3B-4F7B-ACBB-245ED1A625D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88CEAFA3-2C3B-4F7B-ACBB-245ED1A625D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88CEAFA3-2C3B-4F7B-ACBB-245ED1A625D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

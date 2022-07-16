@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BoundedContextCanvasGenerator.Application\BoundedContextCanvasGenerator.Application.csproj" />
     <ProjectReference Include="..\BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj" />
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Infrastructure.Markdown\BoundedContextCanvasGenerator.Infrastructure.Markdown.csproj" />
     <ProjectReference Include="..\BoundedContextCanvasGenerator.Infrastructure\BoundedContextCanvasGenerator.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -167,9 +167,9 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"domain_events:
-    type: 'class'
+    type: class
     implementing:
-        pattern: '.*IDomainEvent$'")
+        pattern: .*IDomainEvent$")
             .Execute();
 
         const string commandsSection =
@@ -192,16 +192,18 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"ubiquitous_language:
-    type: 'class'
+    type: class
+    modifiers:
+        - concrete
     implementing:
-        pattern: '.*IAggregateRoot<.*>'")
+        pattern: .*IAggregateRoot<.*>")
             .Execute();
 
         const string commandsSection =
 @"## Ubiquitous language (Context-specific domain terminology)
-| Aggregator root<t> | Catalog item |
-| ----- | ----- |
-|  | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |";
+| Catalog item |
+| ----- |
+| An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |";
         plainText
             .Should()
             .Contain(commandsSection);

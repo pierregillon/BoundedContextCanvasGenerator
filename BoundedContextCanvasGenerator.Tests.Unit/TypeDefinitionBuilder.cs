@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BoundedContextCanvasGenerator.Domain.Types;
 
@@ -9,6 +10,7 @@ public class TypeDefinitionBuilder
     private readonly TypeFullName _className;
     private readonly List<TypeFullName> _interfaces = new();
     private TypeDescription _description = TypeDescription.Empty;
+    private TypeModifiers _modifiers = TypeModifiers.None;
 
     private TypeDefinitionBuilder(string className, TypeKind kind)
     {
@@ -16,7 +18,7 @@ public class TypeDefinitionBuilder
         _className = new TypeFullName(className);
     }
 
-    public static TypeDefinitionBuilder Class(string className) => new (className, TypeKind.Class);
+    public static TypeDefinitionBuilder Class(string className) => new TypeDefinitionBuilder(className, TypeKind.Class).Concrete();
 
     public TypeDefinitionBuilder WithDescription(string value)
     {
@@ -30,7 +32,25 @@ public class TypeDefinitionBuilder
         return this;
     }
 
-    public static implicit operator TypeDefinition(TypeDefinitionBuilder builder) => builder.Build();
+    public TypeDefinitionBuilder Abstract()
+    {
+        if (this._modifiers.HasFlag(TypeModifiers.Concrete)) {
+            this._modifiers = this._modifiers.RemoveFlag(TypeModifiers.Concrete);
+        }
+        this._modifiers = this._modifiers.AddFlag(TypeModifiers.Abstract);
+        return this;
+    }
 
-    private TypeDefinition Build() => new(_className, _description, _kind, _interfaces);
+    public TypeDefinitionBuilder Concrete()
+    {
+        if (this._modifiers.HasFlag(TypeModifiers.Abstract)) {
+            this._modifiers = this._modifiers.RemoveFlag(TypeModifiers.Abstract);
+        }
+        this._modifiers = this._modifiers.AddFlag(TypeModifiers.Concrete);
+        return this;
+    }
+
+    private TypeDefinition Build() => new(_className, _description, _kind, _modifiers, _interfaces);
+
+    public static implicit operator TypeDefinition(TypeDefinitionBuilder builder) => builder.Build();
 }

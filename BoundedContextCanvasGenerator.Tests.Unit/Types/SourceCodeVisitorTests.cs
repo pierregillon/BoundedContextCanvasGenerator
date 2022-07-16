@@ -35,6 +35,20 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
         }
 
         [Fact]
+        public void Indicates_if_class_is_abstract()
+        {
+            const string sourceCode = @"
+                public abstract class CreateUser { }
+            ";
+
+            var typeDefinitions = Visit(sourceCode);
+
+            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
+                A.Class("CreateUser").Abstract()
+            });
+        }
+
+        [Fact]
         public void Extract_class_namespace_from_source_code()
         {
             const string sourceCode = @"

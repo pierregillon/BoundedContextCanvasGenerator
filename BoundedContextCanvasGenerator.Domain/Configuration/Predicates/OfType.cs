@@ -8,5 +8,5 @@ public class OfType : ITypeDefinitionPredicate
 
     public OfType(TypeKind typeKind) => _typeKind = typeKind;
 
-    public bool IsMatching(TypeDefinition type) => _typeKind == type.Type;
+    public bool IsMatching(TypeDefinition type) => _typeKind == type.Kind;
 }

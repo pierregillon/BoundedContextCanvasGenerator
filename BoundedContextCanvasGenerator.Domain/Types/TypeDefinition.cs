@@ -1,8 +1,9 @@
 ﻿namespace BoundedContextCanvasGenerator.Domain.Types;
 
 public record TypeDefinition(
-    TypeFullName Name, 
+    TypeFullName FullName, 
     TypeDescription Description, 
-    TypeKind Type, 
+    TypeKind Kind,
+    TypeModifiers Modifiers,
     IEnumerable<TypeFullName> ImplementedInterfaces
 );

@@ -245,7 +245,7 @@ No domain event found
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-                @"## Ubiquitous language (Context-specific domain terminology)
+@"## Ubiquitous language (Context-specific domain terminology)
 No ubiquitous language found
 ");
         }
@@ -271,6 +271,31 @@ No ubiquitous language found
 | Catalog |
 | ----- |
 | A set of items to show to customers. |");
+        }
+
+        [Fact]
+        public async Task Ubiquitous_language_ignores_abstract_classes()
+        {
+            _canvasSettings
+                .UbiquitousLanguage
+                .Returns(UbiquitousLanguageDefinition.From(
+                    new ImplementsInterfaceMatching(".*IAggregateRoot<.*>"),
+                    new WithModifiers(TypeModifiers.Concrete)
+                ));
+
+            Define(new TypeDefinition[] {
+                A
+                    .Class("Some.Namespace.Catalog")
+                    .Abstract()
+                    .Implementing("Some.Namespace.IAggregateRoot<CatalogId>"),
+            });
+
+            var markdown = await GenerateMarkdown();
+
+            markdown.Should().Contain(
+@"## Ubiquitous language (Context-specific domain terminology)
+No ubiquitous language found
+");
         }
 
         private Task<string> GenerateMarkdown() => _generator.Generate(SomeSolution, SomeCanvasSettingsPath);

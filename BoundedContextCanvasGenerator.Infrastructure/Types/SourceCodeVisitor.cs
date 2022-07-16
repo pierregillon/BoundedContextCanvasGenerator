@@ -35,12 +35,7 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
         var type = _semanticModel.GetDeclaredSymbol(node);
 
         if (type != null) {
-            _typeDefinitions.Add(new TypeDefinition(
-                type.GetFullName(),
-                type.GetDescription(),
-                type.GetTypeKind(),
-                Enumerable.Select(type.AllInterfaces, i => i.GetFullName()).ToArray()
-            ));
+            _typeDefinitions.Add(type.ToTypeDefinition());
         }
     }
 }

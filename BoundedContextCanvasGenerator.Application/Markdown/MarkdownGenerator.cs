@@ -67,7 +67,7 @@ public class MarkdownGenerator : IMarkdownGenerator
         yield return "## Ubiquitous language (Context-specific domain terminology)";
 
         if (aggregates.Any()) {
-            yield return aggregates.Select(x => x.Name.Name.ToReadableSentence()).ToArray().JoinWith(" | ").SurroundWith("| ", " |");
+            yield return aggregates.Select(x => x.FullName.Name.ToReadableSentence()).ToArray().JoinWith(" | ").SurroundWith("| ", " |");
             yield return aggregates.Select(_ => "-----").ToArray().JoinWith(" | ").SurroundWith("| ", " |");
             yield return aggregates.Select(x => x.Description.Value).ToArray().JoinWith(" | ").SurroundWith("| ", " |");
         }
@@ -107,7 +107,7 @@ public class MarkdownGenerator : IMarkdownGenerator
 
         foreach (var typeDefinition in commands) {
             anyElement = true;
-            yield return $"- {typeDefinition.Name.Value}";
+            yield return $"- {typeDefinition.FullName.Value}";
         }
 
         if (!anyElement) {
@@ -126,7 +126,7 @@ public class MarkdownGenerator : IMarkdownGenerator
         foreach (var typeDefinition in domainEvents)
         {
             anyElement = true;
-            yield return $"- {typeDefinition.Name.Value}";
+            yield return $"- {typeDefinition.FullName.Value}";
         }
 
         if (!anyElement)

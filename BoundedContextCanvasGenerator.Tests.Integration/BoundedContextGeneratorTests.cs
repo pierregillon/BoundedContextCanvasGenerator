@@ -101,16 +101,16 @@ public class BoundedContextGeneratorTests
             .Generator()
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
-@"name: 'Catalog'
+@"name: Catalog
 definition:
-    description: 'Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.'
+    description: Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.
     strategic_classification:
-        domain: 'core'
-        business_model: 'revenue_generator'
-        evolution: 'commodity'
+        domain: core
+        business_model: revenue_generator
+        evolution: commodity
     domain_role:
-        name: 'gateway context'
-        description: 'Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.'
+        name: gateway context
+        description: Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
     ")
             .Execute();
 
@@ -142,9 +142,9 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"commands:
-    type: 'class'
+    type: class
     implementing:
-        pattern: '.*ICommand$'")
+        pattern: .*ICommand$")
             .Execute();
 
         const string commandsSection = 

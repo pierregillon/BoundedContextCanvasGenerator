@@ -1,22 +1,24 @@
-name: 'Catalog'
+name: Catalog
 definition:
-  description: 'Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.'
+  description: Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.
   strategic_classification:
-      domain: 'core'
-      business_model: 'revenue_generator'
-      evolution: 'commodity'
+      domain: core
+      business_model: revenue_generator
+      evolution: commodity
   domain_role:
-      name: 'gateway context'
-      description: 'Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.'
+      name: gateway context
+      description: Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
 ubiquitous_language:
-    type: 'class'
+    type: class
+    modifiers:
+        - concrete
     implementing:
-        pattern: '.*IAggregateRoot<.*>'
+        pattern: .*IAggregateRoot<.*>
 commands:
-    type: 'class'
+    type: class
     implementing:
-        pattern: '.*ICommand$'
+        pattern: .*ICommand$
 domain_events:
-    type: 'class'
+    type: class
     implementing:
-        pattern: '.*IDomainEvent$'
+        pattern: .*IDomainEvent$

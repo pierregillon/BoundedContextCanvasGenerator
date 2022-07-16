@@ -1,5 +1,4 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration;
-using YamlDotNet.Serialization;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 
@@ -32,5 +31,5 @@ public class DomainRoleDto
     public string? Name { get; set; }
     public string? Description{ get; set; }
 
-    public DomainRole Build() => new DomainRole(Text.From(Name), Text.From(Description));
+    public DomainRole Build() => new(Text.From(Name), Text.From(Description));
 }

@@ -5,15 +5,15 @@ using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 
-public class UbiquitousLanguageDefinitionDto
+public class TypeDefinitionPredicatesDto
 {
     public string? Type { get; set; }
     public ImplementingConfigurationDto? Implementing { get; set; }
     public string[]? Modifiers { get; set; }
 
-    public UbiquitousLanguageDefinition Build() => UbiquitousLanguageDefinition.From(GetAll());
+    public TypeDefinitionPredicates Build() => TypeDefinitionPredicates.From(GetPredicates());
 
-    private IEnumerable<ITypeDefinitionPredicate> GetAll()
+    private IEnumerable<ITypeDefinitionPredicate> GetPredicates()
     {
         if (Type is not null)
         {
@@ -23,7 +23,8 @@ public class UbiquitousLanguageDefinitionDto
         {
             yield return Implementing.Build();
         }
-        if (Modifiers is not null) {
+        if (Modifiers is not null)
+        {
             yield return Modifiers
                 .Select(x => x.ToTypeModifiers())
                 .Aggregate()

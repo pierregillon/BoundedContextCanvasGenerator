@@ -46,15 +46,15 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
             
             _canvasSettings
                 .Commands
-                .Returns(TypeDefinitionPredicates.Empty());
+                .Returns(TypeDefinitionPredicates.Empty);
 
             _canvasSettings
                 .DomainEvents
-                .Returns(TypeDefinitionPredicates.Empty());
+                .Returns(TypeDefinitionPredicates.Empty);
 
             _canvasSettings
                 .UbiquitousLanguage
-                .Returns(UbiquitousLanguageDefinition.Empty());
+                .Returns(TypeDefinitionPredicates.Empty);
         }
 
         [Fact]
@@ -240,7 +240,7 @@ No domain event found
         {
             _canvasSettings
                 .UbiquitousLanguage
-                .Returns(UbiquitousLanguageDefinition.From(new ImplementsInterfaceMatching(".*IAggregateRoot\\<.*\\>")));
+                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IAggregateRoot\\<.*\\>")));
 
             var markdown = await GenerateMarkdown();
 
@@ -255,7 +255,7 @@ No ubiquitous language found
         {
             _canvasSettings
                 .UbiquitousLanguage
-                .Returns(UbiquitousLanguageDefinition.From(new ImplementsInterfaceMatching(".*IAggregateRoot<.*>")));
+                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IAggregateRoot<.*>")));
 
             Define(new TypeDefinition[] {
                 A
@@ -278,7 +278,7 @@ No ubiquitous language found
         {
             _canvasSettings
                 .UbiquitousLanguage
-                .Returns(UbiquitousLanguageDefinition.From(
+                .Returns(TypeDefinitionPredicates.From(
                     new ImplementsInterfaceMatching(".*IAggregateRoot<.*>"),
                     new WithModifiers(TypeModifiers.Concrete)
                 ));

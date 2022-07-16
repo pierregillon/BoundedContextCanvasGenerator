@@ -12,7 +12,7 @@ public class EntitleItemCommandHandler : ICommandHandler<EntitleItemCommand>
 
     public async Task Handle(EntitleItemCommand command)
     {
-        var catalogItem = await _repository.Load(command.Id);
+        var catalogItem = await _repository.Get(command.Id);
 
         catalogItem.Entitle(command.NewTitle);
 

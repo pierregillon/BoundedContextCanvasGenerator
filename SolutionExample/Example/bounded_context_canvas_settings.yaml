@@ -1,6 +1,6 @@
 name: Catalog
 definition:
-  description: Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated new items.
+  description: Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated items.
   strategic_classification:
       domain: core
       business_model: revenue_generator

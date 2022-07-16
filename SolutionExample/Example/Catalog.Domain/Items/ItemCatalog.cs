@@ -1,4 +1,6 @@
-﻿namespace Catalog.Domain.Items;
+﻿using Catalog.Domain.Catalog;
+
+namespace Catalog.Domain.Items;
 
 public record ItemCatalog(CatalogId Id)
 {

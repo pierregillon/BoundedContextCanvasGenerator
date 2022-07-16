@@ -12,7 +12,7 @@ public class AdjustItemPriceCommandHandler : ICommandHandler<AdjustItemPriceComm
 
     public async Task Handle(AdjustItemPriceCommand command)
     {
-        var catalogItem = await _repository.Load(command.Id);
+        var catalogItem = await _repository.Get(command.Id);
 
         catalogItem.AdjustPrice(command.NewPrice);
 

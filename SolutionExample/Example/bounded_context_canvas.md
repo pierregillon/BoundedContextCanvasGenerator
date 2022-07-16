@@ -15,12 +15,14 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 
 ## Ubiquitous language (Context-specific domain terminology)
-| Catalog item |
-| ----- |
-| An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |
+| Catalog | Catalog item |
+| ----- | ----- |
+| An enumeration of items to purchase. It is systematically described and target a specific audience. | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |
 
 
 ## Commands
+- Catalog.Application.Catalog.DeleteCatalog
+- Catalog.Application.Catalog.RegisterNewCatalogCommand
 - Catalog.Application.Items.AddItemToCatalogCommand
 - Catalog.Application.Items.AdjustItemPriceCommand
 - Catalog.Application.Items.EntitleItemCommand
@@ -28,6 +30,8 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 
 ## Domain events
+- Catalog.Domain.Catalog.Events.CatalogDeleted
+- Catalog.Domain.Catalog.Events.CatalogRegistered
 - Catalog.Domain.Items.Events.CatalogItemAdded
 - Catalog.Domain.Items.Events.CatalogItemEntitled
 - Catalog.Domain.Items.Events.CatalogItemPriceAdjusted

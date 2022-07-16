@@ -12,7 +12,7 @@ public class RemoveFromCatalogCommandHandler : ICommandHandler<RemoveFromCatalog
 
     public async Task Handle(RemoveFromCatalogCommand command)
     {
-        var catalogItem = await _repository.Load(command.Id);
+        var catalogItem = await _repository.Get(command.Id);
 
         catalogItem.Remove();
 

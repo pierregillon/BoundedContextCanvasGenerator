@@ -1,4 +1,5 @@
-﻿using Catalog.Domain.Items;
+﻿using Catalog.Domain.Catalog;
+using Catalog.Domain.Items;
 
 namespace Catalog.Application.Items;
 

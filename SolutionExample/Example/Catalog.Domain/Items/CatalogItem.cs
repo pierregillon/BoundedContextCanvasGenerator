@@ -1,4 +1,5 @@
-﻿using Catalog.Domain.Items.Events;
+﻿using Catalog.Domain.Catalog;
+using Catalog.Domain.Items.Events;
 
 namespace Catalog.Domain.Items;
 

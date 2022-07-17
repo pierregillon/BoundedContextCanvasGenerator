@@ -2,24 +2,23 @@
 using FluentAssertions;
 using Xunit;
 
-namespace BoundedContextCanvasGenerator.Tests.Unit.Types
+namespace BoundedContextCanvasGenerator.Tests.Unit.Types;
+
+public class DocumentationCommentTests
 {
-    public class DocumentationCommentTests
+    [Fact]
+    public void Parse()
     {
-        [Fact]
-        public void Parse()
-        {
-            const string xmlDocumentation = 
-@"<member name=""T:Catalog.Domain.Items.CatalogItem"">
+        const string xmlDocumentation = 
+            @"<member name=""T:Catalog.Domain.Items.CatalogItem"">
     <summary>
     An item of a catalog. It is the minimum unit to purchase. The price includes the currency.
     </summary>
 </member>
 ";
 
-            var summary = new DocumentationComment(xmlDocumentation).GetSummary();
+        var summary = new DocumentationComment(xmlDocumentation).GetSummary();
 
-            summary.Should().Be("An item of a catalog. It is the minimum unit to purchase. The price includes the currency.");
-        }
+        summary.Should().Be("An item of a catalog. It is the minimum unit to purchase. The price includes the currency.");
     }
 }

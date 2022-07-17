@@ -5,5 +5,6 @@ public record TypeDefinition(
     TypeDescription Description, 
     TypeKind Kind,
     TypeModifiers Modifiers,
-    IEnumerable<TypeFullName> ImplementedInterfaces
+    IEnumerable<TypeFullName> ImplementedInterfaces,
+    AssemblyDefinition AssemblyDefinition
 );

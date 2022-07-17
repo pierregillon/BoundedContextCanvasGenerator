@@ -4,6 +4,8 @@ using BoundedContextCanvasGenerator.Infrastructure.Markdown;
 using FluentAssertions;
 using Xunit;
 
+using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
+
 namespace BoundedContextCanvasGenerator.Tests.Unit.Mermaid
 {
     public class InboundCommunicationFlowChartBuilderTests
@@ -22,7 +24,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Mermaid
         public void Generate_flowchart_with_single_command()
         {
             var types = new TypeDefinition[] {
-                TypeDefinitionBuilder.Class("Test.Namespace.OrderNewProductCommand")
+                A.Class("Test.Namespace.OrderNewProductCommand")
             };
 
             GenerateMermaid(types)
@@ -39,25 +41,14 @@ flowchart LR
     Test --> TestNamespace
     TestNamespace --> TestNamespaceOrderNewProductCommand
 ```");
-
-//            GenerateMermaid(types)
-//                .Should()
-//                .Be(
-//@"```mermaid
-//flowchart LR
-//    Collaborators>""WebApp""]
-//    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-//    TestNamespaceOrderNewProductCommand[""Order new product""]
-//    Collaborators --> TestNamespaceOrderNewProductCommand
-//```");
         }
 
         [Fact]
-        public void Generate_flowchart_with_two_commands_in_the_same_folder()
+        public void Generate_flowchart_with_commands_in_the_same_folder()
         {
             var types = new TypeDefinition[] {
-                TypeDefinitionBuilder.Class("Test.Namespace.Order.OrderNewProductCommand"),
-                TypeDefinitionBuilder.Class("Test.Namespace.Order.CancelOrderCommand"),
+                A.Class("Test.Namespace.Order.OrderNewProductCommand"),
+                A.Class("Test.Namespace.Order.CancelOrderCommand"),
             };
 
             GenerateMermaid(types)
@@ -84,8 +75,8 @@ flowchart LR
         public void Generate_flowchart_with_commands_in_different_folders()
         {
             var types = new TypeDefinition[] {
-                TypeDefinitionBuilder.Class("Test.Namespace.Order.OrderNewProductCommand"),
-                TypeDefinitionBuilder.Class("Test.Namespace.Contact.EditContactDetailsCommand"),
+                A.Class("Test.Namespace.Order.OrderNewProductCommand"),
+                A.Class("Test.Namespace.Contact.EditContactDetailsCommand"),
             };
 
             GenerateMermaid(types)
@@ -108,33 +99,36 @@ flowchart LR
     TestNamespace --> TestNamespaceContact
     TestNamespaceContact --> TestNamespaceContactEditContactDetailsCommand
 ```");
-            
-//            GenerateMermaid(types)
-//                .Should()
-//                .Be(
-//@"### Order
+        }
 
-//------------
+        [Fact]
+        public void Does_not_generate_folders_from_contained_assembly_namespace()
+        {
+            var types = new TypeDefinition[] {
+                A
+                    .Class("Test.Namespace.Order.OrderNewProductCommand")
+                    .InAssembly("Test.Namespace"),
+                A
+                    .Class("Test.Namespace.Contact.EditContactDetailsCommand")
+                    .InAssembly("Test.Namespace"),
+            };
 
-//```mermaid
-//flowchart LR
-//    Collaborators>""WebApp""]
-//    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-//    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
-//    Collaborators --> TestNamespaceOrderOrderNewProductCommand
-//```
-
-//### Contact
-
-//------------
-
-//```mermaid
-//flowchart LR
-//    Collaborators>""WebApp""]
-//    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-//    TestNamespaceContactEditContactDetailsCommand[""Edit contact details""]
-//    Collaborators --> TestNamespaceContactEditContactDetailsCommand
-//```");
+            GenerateMermaid(types)
+                .Should()
+                .Be(
+@"```mermaid
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    TestNamespaceOrder[""Order""]
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    TestNamespaceContact[""Contact""]
+    TestNamespaceContactEditContactDetailsCommand[""Edit contact details""]
+    Collaborators --> TestNamespaceOrder
+    TestNamespaceOrder --> TestNamespaceOrderOrderNewProductCommand
+    Collaborators --> TestNamespaceContact
+    TestNamespaceContact --> TestNamespaceContactEditContactDetailsCommand
+```");
         }
 
         private static string GenerateMermaid(params TypeDefinition[] types)

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using BoundedContextCanvasGenerator.Domain;
+﻿using BoundedContextCanvasGenerator.Domain;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Mermaid.FlowchartDiagram;
 using Grynwald.MarkdownGenerator;
@@ -51,28 +50,28 @@ public class InboundCommunicationFlowChartBuilder
 
 public record Tree(Node Root)
 {
-    private readonly IDictionary<Folder, Node> _alreadyCreatedFolderNodes = new Dictionary<Folder, Node>();
+    private readonly IDictionary<Namespace, Node> _alreadyCreatedNamespaceNodes = new Dictionary<Namespace, Node>();
 
     public IEnumerable<IMermaidGeneratable> GenerateNodes(IReadOnlyCollection<Command> commands) => commands.SelectMany(GenerateNodes);
 
     private IEnumerable<IMermaidGeneratable> GenerateNodes(Command command)
     {
-        var folderNodes = GenerateFolderNodes(command).ToArray();
+        var namespaceNodes = GenerateNamespaceNodes(command).ToArray();
         var commandNodes = GenerateCommandNodes(command).ToArray();
-        return folderNodes.Concat(commandNodes);
+        return namespaceNodes.Concat(commandNodes);
     }
 
-    private IEnumerable<IMermaidGeneratable> GenerateFolderNodes(Command command)
+    private IEnumerable<IMermaidGeneratable> GenerateNamespaceNodes(Command command)
     {
-        Node? previousSubFolderNode = null;
-        foreach (var subFolder in command.ParentFolder.GetSubfolders())
+        Node? previousNamespaceNode = null;
+        foreach (var subNamespace in command.GetSubNamespaces())
         {
-            if (this.TryCreateFolderNode(subFolder, out var folderNode))
+            if (this.TryCreateNamespaceNode(subNamespace, out var namespaceNode))
             {
-                yield return folderNode;
-                yield return Link.From(previousSubFolderNode ?? Root).To(folderNode);
+                yield return namespaceNode;
+                yield return Link.From(previousNamespaceNode ?? Root).To(namespaceNode);
             }
-            previousSubFolderNode = folderNode;
+            previousNamespaceNode = namespaceNode;
         }
     }
 
@@ -80,77 +79,41 @@ public record Tree(Node Root)
     {
         var node = BuildNode(command);
         yield return node;
-        if (_alreadyCreatedFolderNodes.TryGetValue(command.ParentFolder, out var parentFolderNode)) {
-            yield return Link.From(parentFolderNode).To(node);
+        if (_alreadyCreatedNamespaceNodes.TryGetValue(command.ParentNamespace, out var parentNamespaceNode)) {
+            yield return Link.From(parentNamespaceNode).To(node);
         }
     }
 
-    private bool TryCreateFolderNode(Folder folder, out Node result)
+    private bool TryCreateNamespaceNode(Namespace @namespace, out Node result)
     {
-        if (_alreadyCreatedFolderNodes.TryGetValue(folder, out var node))
+        if (_alreadyCreatedNamespaceNodes.TryGetValue(@namespace, out var node))
         {
             result = node;
             return false;
         }
-        var folderNode = BuildNode(folder);
-        _alreadyCreatedFolderNodes.Add(folder, folderNode);
-        result = folderNode;
+        var namespaceNode = BuildNode(@namespace);
+        _alreadyCreatedNamespaceNodes.Add(@namespace, namespaceNode);
+        result = namespaceNode;
         return true;
     }
 
-    private static Node BuildNode(Folder folder) 
-        => Node.Named(new MermaidName(folder.Path, folder.Name));
+    private static Node BuildNode(Namespace @namespace) 
+        => Node.Named(new MermaidName(@namespace.Path, @namespace.Name));
 
     private static Node BuildNode(Command command)
         => Node.Named(new MermaidName(command.FullName, command.FriendlyName));
 }
 
-public record Folder(string Path)
-{
-    private const char FolderSeparator = '.';
-
-    public string[] Segments { get; } = Path.Split(FolderSeparator);
-    public string Name => this.Segments.Last();
-
-    public IEnumerable<Folder> GetSubfolders()
-    {
-        var root = string.Empty;
-        foreach (var segment in Segments) {
-            root = string.IsNullOrEmpty(root)
-                ? segment
-                : string.Join(FolderSeparator, root, segment);
-
-            yield return new Folder(root);
-        }
-    }
-
-    public virtual bool Equals(Folder? other)
-    {
-        if (ReferenceEquals(null, other))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return this.Path == other.Path;
-    }
-
-    public override int GetHashCode()
-    {
-        return this.Path.GetHashCode();
-    }
-
-    public override string ToString() => this.Path;
-
-}
-
 public record Command(TypeDefinition TypeDefinition)
 {
-    public Folder ParentFolder { get; } = new(TypeDefinition.FullName.Namespace);
+    public Namespace ParentNamespace { get; } = TypeDefinition.FullName.Namespace;
     public string FullName => TypeDefinition.FullName.Value;
     public string FriendlyName => TypeDefinition.FullName.Name.TrimWord("Command").ToReadableSentence();
+
+    public IEnumerable<Namespace> GetSubNamespaces()
+    {
+        return ParentNamespace
+            .GetSubNamespaces()
+            .Where(@namespace => !TypeDefinition.AssemblyDefinition.Namespace.StartWith(@namespace));
+    }
 }

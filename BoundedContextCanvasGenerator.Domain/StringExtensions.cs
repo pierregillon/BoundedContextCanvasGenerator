@@ -9,12 +9,15 @@ public static class StringExtensions
     public static string JoinWith(this IEnumerable<string> elements, string separator)
         => string.Join(separator, elements);
 
+    public static string JoinWith(this IEnumerable<string> elements, char separator)
+        => string.Join(separator, elements);
+
     public static string SurroundWith(this string value, string left, string right)
         => $"{left}{value}{right}";
 
     public static string TrimWord(this string value, string word) => value.EndsWith(word) ? value[..^word.Length] : value;
     public static string ToReadableSentence(this string value) => new(AddSpaceCharBetweenWords(value).ToArray());
-
+    
     private static IEnumerable<char> AddSpaceCharBetweenWords(string value)
     {
         for (int i = 0; i < value.Length; i++)

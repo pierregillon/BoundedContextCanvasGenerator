@@ -1,6 +1,7 @@
-using System;
 using System.Collections.Generic;
 using BoundedContextCanvasGenerator.Domain.Types;
+using AssemblyDefinition = BoundedContextCanvasGenerator.Domain.Types.AssemblyDefinition;
+using TypeDefinition = BoundedContextCanvasGenerator.Domain.Types.TypeDefinition;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit;
 
@@ -11,6 +12,7 @@ public class TypeDefinitionBuilder
     private readonly List<TypeFullName> _interfaces = new();
     private TypeDescription _description = TypeDescription.Empty;
     private TypeModifiers _modifiers = TypeModifiers.None;
+    private AssemblyDefinition _assemblyDefinition = new(new Namespace("Some"));
 
     private TypeDefinitionBuilder(string className, TypeKind kind)
     {
@@ -50,7 +52,20 @@ public class TypeDefinitionBuilder
         return this;
     }
 
-    private TypeDefinition Build() => new(_className, _description, _kind, _modifiers, _interfaces);
+    public TypeDefinitionBuilder InAssembly(string assemblyNamespace)
+    {
+        this._assemblyDefinition = new AssemblyDefinition(new Namespace(assemblyNamespace));
+        return this;
+    }
+
+    private TypeDefinition Build() =>
+        new(_className,
+            _description,
+            _kind,
+            _modifiers,
+            _interfaces,
+            _assemblyDefinition
+        );
 
     public static implicit operator TypeDefinition(TypeDefinitionBuilder builder) => builder.Build();
 }

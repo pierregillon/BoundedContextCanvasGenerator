@@ -14,7 +14,8 @@ public static class INameTypeSymbolExtensions
             symbol.GetDescription(),
             symbol.GetTypeKind(),
             symbol.GetModifiers(),
-            Enumerable.Select(symbol.AllInterfaces, i => i.GetFullName()).ToArray()
+            Enumerable.Select(symbol.AllInterfaces, i => i.GetFullName()).ToArray(),
+            symbol.GetAssemblyDefinition()
         );
     }
 
@@ -50,5 +51,8 @@ public static class INameTypeSymbolExtensions
         }
 
         return Find().Aggregate();
-    }
+    } 
+    
+    private static AssemblyDefinition GetAssemblyDefinition(this INamedTypeSymbol symbol) 
+        => new(new Namespace(symbol.ContainingAssembly.Name));
 }

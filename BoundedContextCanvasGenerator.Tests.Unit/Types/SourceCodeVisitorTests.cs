@@ -30,7 +30,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("CreateUser")
+                A.Class("CreateUser").InAssembly("Test")
             });
         }
 
@@ -44,7 +44,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("CreateUser").Abstract()
+                A.Class("CreateUser").InAssembly("Test").Abstract()
             });
         }
 
@@ -59,7 +59,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("Test.CreateUser")
+                A.Class("Test.CreateUser").InAssembly("Test")
             });
         }
 
@@ -78,6 +78,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
                 A
                     .Class("Test.CreateUser")
+                    .InAssembly("Test")
                     .Implementing("Test.ICommand")
                     .Implementing("Test.IDisposable")
             });
@@ -94,7 +95,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("CreateUser").Implementing("System.IEquatable<CreateUser>")
+                A.Class("CreateUser").InAssembly("Test").Implementing("System.IEquatable<CreateUser>")
             });
         }
 
@@ -110,7 +111,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
             var typeDefinitions = Visit(sourceCode);
 
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("Test.CreateUser").Implementing("System.IEquatable<Test.CreateUser>")
+                A.Class("Test.CreateUser").InAssembly("Test").Implementing("System.IEquatable<Test.CreateUser>")
             });
         }
 
@@ -129,6 +130,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 
             typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
                 A.Class("Test.CreateUser")
+                    .InAssembly("Test")
                     .Implementing("System.IEquatable<Test.CreateUser>")
                     .Implementing("Test.ICommand")
                     .Implementing("Test.IDisposable")

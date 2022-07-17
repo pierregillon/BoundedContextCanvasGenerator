@@ -32,7 +32,6 @@ public class BoundedContextGeneratorTests
     public async Task Generating_BCC_with_solution_path_only_output_result_in_default_file()
     {
         var rootDirectory = Path.GetDirectoryName(A.GetAbsoluteSolutionPath(ExampleSolution))!;
-        var settingsPath = Path.Combine(rootDirectory, "bounded_context_canvas_settings.yaml");
         var resultPath = Path.Combine(rootDirectory, "bounded_context_canvas.md");
 
         if (File.Exists(resultPath)) {
@@ -208,31 +207,35 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 @"## Inbound communication
 
 ### Catalog
-------------
+
+---
+
 ```mermaid
-graph LR
-	Collaborators>""WebApp""]
-	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-	DeleteCatalog[""Delete catalog""]
-	RegisterNewCatalogCommand[""Register new catalog""]
-	Collaborators --> DeleteCatalog
-	Collaborators --> RegisterNewCatalogCommand
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    CatalogApplicationCatalogDeleteCatalog[""Delete catalog""]
+    CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
+    Collaborators --> CatalogApplicationCatalogDeleteCatalog
+    Collaborators --> CatalogApplicationCatalogRegisterNewCatalogCommand
 ```
 
 ### Items
-------------
+
+---
+
 ```mermaid
-graph LR
-	Collaborators>""WebApp""]
-	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-    AddItemToCatalogCommand[""Add item to catalog""]
-    AdjustItemPriceCommand[""Adjust item price""]
-    EntitleItemCommand[""Entitle item""]
-	RemoveFromCatalogCommand[""Remove from catalog""]
-	Collaborators --> AddItemToCatalogCommand
-	Collaborators --> AdjustItemPriceCommand
-	Collaborators --> EntitleItemCommand
-	Collaborators --> RemoveFromCatalogCommand
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
+    CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
+    CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
+    CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
+    Collaborators --> CatalogApplicationItemsAddItemToCatalogCommand
+    Collaborators --> CatalogApplicationItemsAdjustItemPriceCommand
+    Collaborators --> CatalogApplicationItemsEntitleItemCommand
+    Collaborators --> CatalogApplicationItemsRemoveFromCatalogCommand
 ```";
         plainText
             .Should()

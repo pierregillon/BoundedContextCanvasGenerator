@@ -99,7 +99,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
             yield return new MdParagraph("No inbound communication found");
         }
         else {
-            yield return InboundCommunicationFlowChartBuilder.From(commands).Build();
+            yield return InboundCommunicationFlowChartBuilder.From(commands).Build(true);
         }
     }
 

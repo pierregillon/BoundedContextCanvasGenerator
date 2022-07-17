@@ -24,30 +24,36 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ## Inbound communication
 
+### Catalog
+
+---
+
 ```mermaid
 flowchart LR
     Collaborators>"WebApp"]
     style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-    Catalog
-    CatalogApplication["Application"]
-    CatalogApplicationCatalog["Catalog"]
     CatalogApplicationCatalogDeleteCatalog["Delete catalog"]
     CatalogApplicationCatalogRegisterNewCatalogCommand["Register new catalog"]
-    CatalogApplicationItems["Items"]
+    Collaborators --> CatalogApplicationCatalogDeleteCatalog
+    Collaborators --> CatalogApplicationCatalogRegisterNewCatalogCommand
+```
+
+### Items
+
+---
+
+```mermaid
+flowchart LR
+    Collaborators>"WebApp"]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
     CatalogApplicationItemsAddItemToCatalogCommand["Add item to catalog"]
     CatalogApplicationItemsAdjustItemPriceCommand["Adjust item price"]
     CatalogApplicationItemsEntitleItemCommand["Entitle item"]
     CatalogApplicationItemsRemoveFromCatalogCommand["Remove from catalog"]
-    Collaborators --> Catalog
-    Catalog --> CatalogApplication
-    CatalogApplication --> CatalogApplicationCatalog
-    CatalogApplicationCatalog --> CatalogApplicationCatalogDeleteCatalog
-    CatalogApplicationCatalog --> CatalogApplicationCatalogRegisterNewCatalogCommand
-    CatalogApplication --> CatalogApplicationItems
-    CatalogApplicationItems --> CatalogApplicationItemsAddItemToCatalogCommand
-    CatalogApplicationItems --> CatalogApplicationItemsAdjustItemPriceCommand
-    CatalogApplicationItems --> CatalogApplicationItemsEntitleItemCommand
-    CatalogApplicationItems --> CatalogApplicationItemsRemoveFromCatalogCommand
+    Collaborators --> CatalogApplicationItemsAddItemToCatalogCommand
+    Collaborators --> CatalogApplicationItemsAdjustItemPriceCommand
+    Collaborators --> CatalogApplicationItemsEntitleItemCommand
+    Collaborators --> CatalogApplicationItemsRemoveFromCatalogCommand
 ```
 
 ## Domain events

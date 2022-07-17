@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace BoundedContextCanvasGenerator.Domain.Types;
+﻿namespace BoundedContextCanvasGenerator.Domain.Types;
 
 public record Namespace(string Path)
 {
@@ -32,10 +30,31 @@ public record Namespace(string Path)
     public bool StartWith(Namespace start) 
         => start.Segments.Count <= this.Segments.Count && GetFirstDifferentSegmentIndex(start) == -1;
 
+    public bool EndWith(Namespace end)
+        => end.Segments.Count <= this.Segments.Count && GetFirstDifferentSegmentIndexFromTheEnd(end) == -1;
+
+    public Namespace TrimStart(Namespace start)
+    {
+        var index = GetFirstDifferentSegmentIndex(start);
+        return index == -1 
+            ? this.Segments.Skip(start.Segments.Count).Pipe(FromSegments)
+            : this.Segments.Skip(index).Pipe(FromSegments);
+    }
+
     private int GetFirstDifferentSegmentIndex(Namespace other)
     {
-        for (var index = 0; index < other.Segments.Count; index++) {
+        for (var index = 0; index < Math.Min(other.Segments.Count, this.Segments.Count); index++) {
             if (this.Segments.ElementAt(index) != other.Segments.ElementAt(index))
+                return index;
+        }
+
+        return -1;
+    }
+    
+    private int GetFirstDifferentSegmentIndexFromTheEnd(Namespace other)
+    {
+        for (var index = 0; index < Math.Min(other.Segments.Count, Segments.Count); index++) {
+            if (Segments.ElementAt(Segments.Count - index - 1) != other.Segments.ElementAt(other.Segments.Count - index - 1))
                 return index;
         }
 

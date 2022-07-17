@@ -76,6 +76,24 @@ public class NamespaceTests
             .BeTrue();
     }
 
+    [Theory]
+    [InlineData("C")]
+    [InlineData("B.C")]
+    [InlineData("A.B.C")]
+    [InlineData("Namespace.A.B.C")]
+    [InlineData("Test.Namespace.A.B.C")]
+    public void Ends_with_another_namespace_when_all_reversed_segments_are_identical(string namespaceToCompare)
+    {
+        var @namespace = new Namespace("Test.Namespace.A.B.C");
+        var toCompare = new Namespace(namespaceToCompare);
+
+        var result = @namespace.EndWith(toCompare);
+
+        result
+            .Should()
+            .BeTrue();
+    }
+
     [Fact]
     public void Getting_sub_namespaces_enumerates_all_namespaces_from_root()
     {
@@ -90,5 +108,27 @@ public class NamespaceTests
                 new Namespace("Test.Namespace.Commands"),
                 new Namespace("Test.Namespace.Commands.Elements"),
             });
+    }
+
+    [Fact]
+    public void Trimming_reduce_namespace_from_all_identical_parts()
+    {
+        var initial = new Namespace("Test.Namespace.Commands.Elements");
+
+        initial
+            .TrimStart(new Namespace("Test.Namespace"))
+            .Should()
+            .Be(new Namespace("Commands.Elements"));
+    }
+
+    [Fact]
+    public void Trimming_reduce_namespace_from_first_identical_part()
+    {
+        var initial = new Namespace("Test.Namespace.Commands.Elements");
+
+        initial
+            .TrimStart(new Namespace("Test"))
+            .Should()
+            .Be(new Namespace("Namespace.Commands.Elements"));
     }
 }

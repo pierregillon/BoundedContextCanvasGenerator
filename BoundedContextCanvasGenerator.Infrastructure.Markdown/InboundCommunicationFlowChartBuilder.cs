@@ -20,7 +20,25 @@ public class InboundCommunicationFlowChartBuilder
         _commands = commands;
     }
 
-    public MdContainerBlock Build()
+    public MdContainerBlock Build(bool splitIntoLanes) => 
+        !splitIntoLanes 
+            ? new MdContainerBlock(GenerateAllCommands()) 
+            : new MdContainerBlock(GenerateLanes());
+
+    private MdCodeBlock GenerateAllCommands() => GenerateMermaidBlock(_commands, false);
+
+    private IEnumerable<MdBlock> GenerateLanes()
+    {
+        return _commands
+            .GroupBy(x => x.Lane)
+            .SelectMany(x => new MdBlock[] {
+                new MdHeading(3, x.Key.Name),
+                new MdParagraph(new MdRawMarkdownSpan("---")),
+                GenerateMermaidBlock(x, true)
+            });
+    }
+
+    private static MdCodeBlock GenerateMermaidBlock(IEnumerable<Command> commands, bool splitIntoLanes)
     {
         var flowChart = Flowchart.Start(Orientation.LeftToRight);
 
@@ -30,12 +48,14 @@ public class InboundCommunicationFlowChartBuilder
             .Styled(new NodeStyle("fill:#f9f,stroke:#333,stroke-width:2px"));
 
         flowChart = flowChart.WithNode(root);
-        flowChart = new Tree(root)
-            .GenerateNodes(_commands)
+        flowChart = new Tree(root, splitIntoLanes)
+            .GenerateNodes(commands)
             .Aggregate(flowChart, Merge);
 
-        return new MdContainerBlock(new MdCodeBlock(flowChart.ToMermaid(), MERMAID_LANGUAGE));
+        return MermaidBlock(flowChart);
     }
+
+    private static MdCodeBlock MermaidBlock(Flowchart flowChart) => new(flowChart.ToMermaid(), MERMAID_LANGUAGE);
 
     private static Flowchart Merge(Flowchart flowchart, IMermaidGeneratable element)
     {
@@ -48,11 +68,11 @@ public class InboundCommunicationFlowChartBuilder
 
 }
 
-public record Tree(Node Root)
+public record Tree(Node Root, bool splitIntoLanes)
 {
     private readonly IDictionary<Namespace, Node> _alreadyCreatedNamespaceNodes = new Dictionary<Namespace, Node>();
 
-    public IEnumerable<IMermaidGeneratable> GenerateNodes(IReadOnlyCollection<Command> commands) => commands.SelectMany(GenerateNodes);
+    public IEnumerable<IMermaidGeneratable> GenerateNodes(IEnumerable<Command> commands) => commands.SelectMany(GenerateNodes);
 
     private IEnumerable<IMermaidGeneratable> GenerateNodes(Command command)
     {
@@ -64,7 +84,7 @@ public record Tree(Node Root)
     private IEnumerable<IMermaidGeneratable> GenerateNamespaceNodes(Command command)
     {
         Node? previousNamespaceNode = null;
-        foreach (var subNamespace in command.GetSubNamespaces())
+        foreach (var subNamespace in command.GetSubNamespaces(splitIntoLanes))
         {
             if (this.TryCreateNamespaceNode(subNamespace, out var namespaceNode))
             {
@@ -81,6 +101,9 @@ public record Tree(Node Root)
         yield return node;
         if (_alreadyCreatedNamespaceNodes.TryGetValue(command.ParentNamespace, out var parentNamespaceNode)) {
             yield return Link.From(parentNamespaceNode).To(node);
+        }
+        else {
+            yield return Link.From(Root).To(node);
         }
     }
 
@@ -109,11 +132,14 @@ public record Command(TypeDefinition TypeDefinition)
     public Namespace ParentNamespace { get; } = TypeDefinition.FullName.Namespace;
     public string FullName => TypeDefinition.FullName.Value;
     public string FriendlyName => TypeDefinition.FullName.Name.TrimWord("Command").ToReadableSentence();
+    public Namespace Lane => ParentNamespace.TrimStart(TypeDefinition.AssemblyDefinition.Namespace);
 
-    public IEnumerable<Namespace> GetSubNamespaces()
+    public IEnumerable<Namespace> GetSubNamespaces(bool splitIntoLanes)
     {
         return ParentNamespace
             .GetSubNamespaces()
-            .Where(@namespace => !TypeDefinition.AssemblyDefinition.Namespace.StartWith(@namespace));
+            .Where(@namespace => !TypeDefinition.AssemblyDefinition.Namespace.StartWith(@namespace))
+            .Where(@namespace => !splitIntoLanes || !@namespace.EndWith(Lane))
+            ;
     }
 }

@@ -287,7 +287,7 @@ No inbound communication found
         }
 
         [Fact]
-        public async Task Commands_matching_pattern_are_rendered_as_mermaid_graph()
+        public async Task Inbound_communication_renders_commands_matching_pattern_as_mermaid_graph()
         {
             _canvasSettings
                 .Commands
@@ -302,6 +302,10 @@ No inbound communication found
 
             markdown.Should().Contain(
 @"## Inbound communication
+
+### Namespace
+
+---
 
 ```mermaid
 flowchart LR

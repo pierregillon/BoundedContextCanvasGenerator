@@ -27,7 +27,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Mermaid
                 A.Class("Test.Namespace.OrderNewProductCommand")
             };
 
-            GenerateMermaid(types)
+            GenerateMermaid(types, false)
                 .Should()
                 .Be(
 @"```mermaid
@@ -51,7 +51,7 @@ flowchart LR
                 A.Class("Test.Namespace.Order.CancelOrderCommand"),
             };
 
-            GenerateMermaid(types)
+            GenerateMermaid(types, false)
                 .Should()
                 .Be(
                     @"```mermaid
@@ -79,7 +79,7 @@ flowchart LR
                 A.Class("Test.Namespace.Contact.EditContactDetailsCommand"),
             };
 
-            GenerateMermaid(types)
+            GenerateMermaid(types, false)
                 .Should()
                 .Be(
 @"```mermaid
@@ -131,11 +131,51 @@ flowchart LR
 ```");
         }
 
-        private static string GenerateMermaid(params TypeDefinition[] types)
+        [Fact]
+        public void Split_into_lanes()
+        {
+            var types = new TypeDefinition[] {
+                A
+                    .Class("Test.Namespace.Order.OrderNewProductCommand")
+                    .InAssembly("Test.Namespace"),
+                A
+                    .Class("Test.Namespace.Contact.EditContactDetailsCommand")
+                    .InAssembly("Test.Namespace"),
+            };
+
+            GenerateMermaid(types, true)
+                .Should()
+                .Be(
+@"### Order
+
+---
+
+```mermaid
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    Collaborators --> TestNamespaceOrderOrderNewProductCommand
+```
+
+### Contact
+
+---
+
+```mermaid
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    TestNamespaceContactEditContactDetailsCommand[""Edit contact details""]
+    Collaborators --> TestNamespaceContactEditContactDetailsCommand
+```");
+        }
+
+        private static string GenerateMermaid(TypeDefinition[] types, bool splitIntoLanes = false)
         {
             var builder = InboundCommunicationFlowChartBuilder.From(types);
 
-            return builder.Build().ToString().Trim('\r', '\n');
+            return builder.Build(splitIntoLanes).ToString().Trim('\r', '\n');
         }
     }
 }

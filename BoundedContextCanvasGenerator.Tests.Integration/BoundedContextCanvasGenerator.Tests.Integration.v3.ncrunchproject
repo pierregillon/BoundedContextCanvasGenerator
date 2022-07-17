@@ -1,7 +1,0 @@
-﻿<ProjectConfiguration>
-  <Settings>
-    <AdditionalFilesToIncludeForProject>
-      <Value>..\SolutionExample\**.*</Value>
-    </AdditionalFilesToIncludeForProject>
-  </Settings>
-</ProjectConfiguration>

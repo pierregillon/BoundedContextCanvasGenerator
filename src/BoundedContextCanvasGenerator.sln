@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerator.Infrastructure.Mermaid", "BoundedContextCanvasGenerator.Infrastructure.Mermaid\BoundedContextCanvasGenerator.Infrastructure.Mermaid.csproj", "{50D44168-B592-40A2-8F57-9D0888B72C8A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{8ABBF8D8-47D5-40C9-B6FB-77319A260B80}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8ABBF8D8-47D5-40C9-B6FB-77319A260B80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +67,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{45833E34-ABA1-48D4-9CFF-A190AD52BC7E} = {8ABBF8D8-47D5-40C9-B6FB-77319A260B80}
+		{E3C08B61-D966-4A11-AE40-471E28E4D274} = {8ABBF8D8-47D5-40C9-B6FB-77319A260B80}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {66B3BD1A-E0E8-4EDB-B017-D3687B116498}

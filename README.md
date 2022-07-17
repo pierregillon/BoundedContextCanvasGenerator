@@ -1,20 +1,25 @@
-﻿# Bounded context generator 🔣 -> 📝
+﻿# Bounded context canvas generator 🔣 -> 📝
 
 ## Description
 
-This repository is a *proof of concept* to generate a **Bounded Context Canvas** directly from source code.
-
-The idea is to analyse **symbols and annotations** in order to detects DDD tactical patterns,
+The idea is to analyse **symbols and annotations** from a target solution in order to detects DDD tactical patterns,
 (commands, aggregate, entity, value object, domain event, integration event, ... ) and draw diagrams
 and text description.
-
-This generated documentation **lives with the code** and is a support to **communicate** with teams and domain experts.
 
 ## Command line generation
 
 Current :
 
-    ./BoundedContextGenerator.exe path/to/sln
+    ./BoundedContextCanvasGenerator.exe path/to/sln
+
+By default:
+- the generator is looking for the yaml configuration in the same solution folder, named **bounded_context_canvas_settings.md**
+- the generator is outputting the final markdown in the same solution folder, named **bounded_context_canvas.md**
+
+Optional parameters:
+
+    --output $filePath : The output markdown file.
+    --configuration $filePath: The yaml configuration file.
 
 Later :
     
@@ -23,23 +28,52 @@ Later :
 
 ## Configuration
 
-The configuration will be in yaml format.
+The configuration is a **yaml format** that describes bounded context canvas information and
+how to retrieve core concepts.
 
-    description:
-        - assemblyinfo
-            - description
-    command:
-        - class
-        - implementing
-            - SomeNamespace.ICommand
-    domain-event:
-        - class
-        - implementing
-            - SomeNamespace.IDomainEvent
-    aggregate:
-        - class
-        - extending
-            - SomeNamespace.AggregateRoot
+```yaml
+name: Catalog
+definition:
+    description: Display the product catalog and the items available to purchase. Allows extended search to find a specific item. Provide the ability for administrators to update catalogs and associated items.
+    strategic_classification:
+        domain: core
+        business_model: revenue_generator
+        evolution: commodity
+    domain_role:
+        name: gateway context
+        description: Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
+ubiquitous_language:
+    type: class
+    modifiers:
+        - concrete
+    implementing:
+        pattern: .*IAggregateRoot<.*>
+inbound_communication:
+    type: class
+    implementing:
+        pattern: .*ICommand$
+```
+
+[Full example here](src/SolutionExample/Example/bounded_context_canvas_settings.yaml)
+
+## Generated markdown
+
+Based on the configuration, and the source code in [SolutionExample](src/SolutionExample/Example/), the generated markdown looks this.
+
+![Generated markdown](docs/generated.PNG "a title")
+
+[Full generated markdown here](src/SolutionExample/Example/bounded_context_canvas.md)
+
+## More in depth
+
+This repository is a *proof of concept* to generate a **Bounded Context Canvas** directly from source code.
+
+The living documentation follows the idea that **the source code is the only source of truth that is always up to date**.
+Creating documentation from it ensures the documentation is always up to date.
+
+Also from a DDD perspective, if it is hard to generate from your code a **readable and comprehensible documentation** for teams 
+and domain experts, it probably means the code is **diverging** from the domain you are addressing. Wrong domain language, 
+technical details or poor object design might be the cause.
 
 ## Definition
 

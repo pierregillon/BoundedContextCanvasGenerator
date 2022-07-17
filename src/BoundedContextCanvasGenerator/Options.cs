@@ -8,7 +8,7 @@ public class Options
     [Option("solution", Required = true, HelpText = "The solution to analyze.")]
     public string? SolutionPath { get; set; }
 
-    [Option("output", Required = false, HelpText = "The output readme file.")]
+    [Option("output", Required = false, HelpText = "The output markdown file.")]
     public string? OutputPath { get; set; }
     
     [Option("configuration", Required = false, HelpText = "The yaml configuration file.")]

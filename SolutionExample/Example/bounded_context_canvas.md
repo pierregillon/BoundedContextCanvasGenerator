@@ -22,14 +22,33 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
 | An enumeration of items to purchase. It is systematically described and target a specific audience. | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |
 
-## Commands
+## Inbound communication
 
-- Catalog.Application.Catalog.DeleteCatalog
-- Catalog.Application.Catalog.RegisterNewCatalogCommand
-- Catalog.Application.Items.AddItemToCatalogCommand
-- Catalog.Application.Items.AdjustItemPriceCommand
-- Catalog.Application.Items.EntitleItemCommand
-- Catalog.Application.Items.RemoveFromCatalogCommand
+```mermaid
+flowchart LR
+    Collaborators>"WebApp"]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    Catalog
+    CatalogApplication["Application"]
+    CatalogApplicationCatalog["Catalog"]
+    CatalogApplicationCatalogDeleteCatalog["Delete catalog"]
+    CatalogApplicationCatalogRegisterNewCatalogCommand["Register new catalog"]
+    CatalogApplicationItems["Items"]
+    CatalogApplicationItemsAddItemToCatalogCommand["Add item to catalog"]
+    CatalogApplicationItemsAdjustItemPriceCommand["Adjust item price"]
+    CatalogApplicationItemsEntitleItemCommand["Entitle item"]
+    CatalogApplicationItemsRemoveFromCatalogCommand["Remove from catalog"]
+    Collaborators --> Catalog
+    Catalog --> CatalogApplication
+    CatalogApplication --> CatalogApplicationCatalog
+    CatalogApplicationCatalog --> CatalogApplicationCatalogDeleteCatalog
+    CatalogApplicationCatalog --> CatalogApplicationCatalogRegisterNewCatalogCommand
+    CatalogApplication --> CatalogApplicationItems
+    CatalogApplicationItems --> CatalogApplicationItemsAddItemToCatalogCommand
+    CatalogApplicationItems --> CatalogApplicationItemsAdjustItemPriceCommand
+    CatalogApplicationItems --> CatalogApplicationItemsEntitleItemCommand
+    CatalogApplicationItems --> CatalogApplicationItemsRemoveFromCatalogCommand
+```
 
 ## Domain events
 

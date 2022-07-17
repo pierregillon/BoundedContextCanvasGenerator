@@ -58,15 +58,14 @@ public record Tree(Node Root)
     private IEnumerable<IMermaidGeneratable> GenerateNodes(Command command)
     {
         var folderNodes = GenerateFolderNodes(command).ToArray();
-        var lastGeneratedFolder = folderNodes.OfType<Node>().LastOrDefault();
-        var commandNodes = GenerateCommandNodes(command, lastGeneratedFolder).ToArray();
+        var commandNodes = GenerateCommandNodes(command).ToArray();
         return folderNodes.Concat(commandNodes);
     }
 
     private IEnumerable<IMermaidGeneratable> GenerateFolderNodes(Command command)
     {
         Node? previousSubFolderNode = null;
-        foreach (var subFolder in command.Folder.GetSubfolders())
+        foreach (var subFolder in command.ParentFolder.GetSubfolders())
         {
             if (this.TryCreateFolderNode(subFolder, out var folderNode))
             {
@@ -77,13 +76,12 @@ public record Tree(Node Root)
         }
     }
 
-    private static IEnumerable<IMermaidGeneratable> GenerateCommandNodes(Command command, Node? parent)
+    private IEnumerable<IMermaidGeneratable> GenerateCommandNodes(Command command)
     {
         var node = BuildNode(command);
         yield return node;
-        if (parent is not null)
-        {
-            yield return Link.From(parent).To(node);
+        if (_alreadyCreatedFolderNodes.TryGetValue(command.ParentFolder, out var parentFolderNode)) {
+            yield return Link.From(parentFolderNode).To(node);
         }
     }
 
@@ -152,7 +150,7 @@ public record Folder(string Path)
 
 public record Command(TypeDefinition TypeDefinition)
 {
-    public Folder Folder { get; } = new(TypeDefinition.FullName.Namespace);
+    public Folder ParentFolder { get; } = new(TypeDefinition.FullName.Namespace);
     public string FullName => TypeDefinition.FullName.Value;
     public string FriendlyName => TypeDefinition.FullName.Name.TrimWord("Command").ToReadableSentence();
 }

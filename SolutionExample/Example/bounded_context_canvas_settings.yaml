@@ -14,7 +14,7 @@ ubiquitous_language:
         - concrete
     implementing:
         pattern: .*IAggregateRoot<.*>
-commands:
+inbound_communication:
     type: class
     implementing:
         pattern: .*ICommand$

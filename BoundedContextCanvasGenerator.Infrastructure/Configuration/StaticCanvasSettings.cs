@@ -10,7 +10,7 @@ public class StaticCanvasSettings : ICanvasSettings
         Name = CanvasName.From(dto?.Name);
         Definition = dto?.Definition?.Build() ?? CanvasDefinition.Empty;
         UbiquitousLanguage = dto?.UbiquitousLanguage?.Build() ?? TypeDefinitionPredicates.Empty;
-        Commands = dto?.Commands?.Build() ?? TypeDefinitionPredicates.Empty;
+        Commands = dto?.InboundCommunication?.Build() ?? TypeDefinitionPredicates.Empty;
         DomainEvents = dto?.DomainEvents?.Build() ?? TypeDefinitionPredicates.Empty;
     }
 

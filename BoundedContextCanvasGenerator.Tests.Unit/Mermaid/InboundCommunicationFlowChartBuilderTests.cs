@@ -53,6 +53,34 @@ flowchart LR
         }
 
         [Fact]
+        public void Generate_flowchart_with_two_commands_in_the_same_folder()
+        {
+            var types = new TypeDefinition[] {
+                TypeDefinitionBuilder.Class("Test.Namespace.Order.OrderNewProductCommand"),
+                TypeDefinitionBuilder.Class("Test.Namespace.Order.CancelOrderCommand"),
+            };
+
+            GenerateMermaid(types)
+                .Should()
+                .Be(
+                    @"```mermaid
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    Test
+    TestNamespace[""Namespace""]
+    TestNamespaceOrder[""Order""]
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderCancelOrderCommand[""Cancel order""]
+    Collaborators --> Test
+    Test --> TestNamespace
+    TestNamespace --> TestNamespaceOrder
+    TestNamespaceOrder --> TestNamespaceOrderOrderNewProductCommand
+    TestNamespaceOrder --> TestNamespaceOrderCancelOrderCommand
+```");
+        }
+
+        [Fact]
         public void Generate_flowchart_with_commands_in_different_folders()
         {
             var types = new TypeDefinition[] {

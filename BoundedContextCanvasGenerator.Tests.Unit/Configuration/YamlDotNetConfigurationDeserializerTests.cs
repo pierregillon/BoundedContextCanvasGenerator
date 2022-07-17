@@ -11,18 +11,18 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Configuration
         public YamlDotNetConfigurationDeserializerTests() => _deserializer = new YamlDotNetConfigurationDeserializer();
 
         [Fact]
-        public void Deserializes_commands()
+        public void Deserializes_inbound_communication()
         {
-            const string yaml = 
-@"commands:
+            const string yaml =
+@"inbound_communication:
     type: 'class'
     implementing:
         pattern: '.*ICommand$'";
 
             var configuration = _deserializer.Deserialize(yaml);
 
-            configuration.Commands!.Type.Should().Be("class");
-            configuration.Commands!.Implementing!.Pattern.Should().Be(".*ICommand$");
+            configuration.InboundCommunication!.Type.Should().Be("class");
+            configuration.InboundCommunication!.Implementing!.Pattern.Should().Be(".*ICommand$");
         }
         
         [Fact]

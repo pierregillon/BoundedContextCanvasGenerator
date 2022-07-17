@@ -267,7 +267,7 @@ No ubiquitous language found
 
             var markdown = await GenerateMarkdown();
 
-            markdown.Should().NotContain("## Commands");
+            markdown.Should().NotContain("## Inbound communication");
         }
 
         [Fact]
@@ -280,9 +280,9 @@ No ubiquitous language found
             var markdown = await GenerateMarkdown();
 
             markdown.Should().Contain(
-@"## Commands
+@"## Inbound communication
 
-No commands found
+No inbound communication found
 ");
         }
 
@@ -302,13 +302,15 @@ No commands found
 
             markdown.Should().Contain(
 @"## Inbound communication
+
 ```mermaid
-graph LR
-	Collaborators>""🖥 WebApp""]
-	Some.Namespace.RegisterNewTransactionCommand[""Register new transaction""]
-	Some.Namespace.RescheduleTransactionCommand[""Reschedule transaction""]
-	
-	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+flowchart LR
+    Collaborators>""WebApp""]
+    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    SomeNamespaceRegisterNewTransactionCommand[""Register new transaction""]
+    SomeNamespaceRescheduleTransactionCommand[""Reschedule transaction""]
+    Collaborators --> SomeNamespaceRegisterNewTransactionCommand
+    Collaborators --> SomeNamespaceRescheduleTransactionCommand
 ```");
         }
 

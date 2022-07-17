@@ -211,20 +211,20 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 ------------
 ```mermaid
 graph LR
-	Collaborators>""🖥 WebApp""]
+	Collaborators>""WebApp""]
+	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
 	DeleteCatalog[""Delete catalog""]
 	RegisterNewCatalogCommand[""Register new catalog""]
 	Collaborators --> DeleteCatalog
 	Collaborators --> RegisterNewCatalogCommand
-	
-	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
 ```
 
 ### Items
 ------------
 ```mermaid
 graph LR
-	Collaborators>""🖥 WebApp""]
+	Collaborators>""WebApp""]
+	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
     AddItemToCatalogCommand[""Add item to catalog""]
     AdjustItemPriceCommand[""Adjust item price""]
     EntitleItemCommand[""Entitle item""]
@@ -233,8 +233,6 @@ graph LR
 	Collaborators --> AdjustItemPriceCommand
 	Collaborators --> EntitleItemCommand
 	Collaborators --> RemoveFromCatalogCommand
-	
-	style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
 ```";
         plainText
             .Should()

@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BoundedContextCanvasGenerator.Application\BoundedContextCanvasGenerator.Application.csproj" />
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Infrastructure.Mermaid\BoundedContextCanvasGenerator.Infrastructure.Mermaid.csproj" />
   </ItemGroup>
 
 </Project>

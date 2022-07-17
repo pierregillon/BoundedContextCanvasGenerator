@@ -32,7 +32,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
         }
 
         if (extraction.Commands.IsEnabled) {
-            yield return GenerateCommandsSection(extraction.Commands.Values).ToContainerBlock();
+            yield return GenerateInboundCommunicationSection(extraction.Commands.Values).ToContainerBlock();
         }
 
         if (extraction.DomainEvents.IsEnabled) {
@@ -91,27 +91,28 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
         }
     }
 
-    private static IEnumerable<MdBlock> GenerateCommandsSection(IReadOnlyCollection<TypeDefinition> commands)
+    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(IReadOnlyCollection<TypeDefinition> commands)
     {
-        yield return new MdHeading(2, "Commands");
+        yield return new MdHeading(2, "Inbound communication");
 
         if (!commands.Any()) {
-            yield return new MdParagraph("No commands found");
+            yield return new MdParagraph("No inbound communication found");
         }
-
-        yield return new MdBulletList(commands.Select(x => new MdListItem(x.FullName.Value)));
+        else {
+            yield return InboundCommunicationFlowChartBuilder.From(commands).Build();
+        }
     }
 
     private static IEnumerable<MdBlock> GenerateDomainEventsSection(IReadOnlyCollection<TypeDefinition> domainEvents)
     {
         yield return new MdHeading(2, "Domain events");
 
-        if (!domainEvents.Any())
-        {
+        if (!domainEvents.Any()) {
             yield return new MdParagraph("No domain event found");
         }
-
-        yield return new MdBulletList(domainEvents.Select(x => new MdListItem(x.FullName.Value)));
+        else {
+            yield return new MdBulletList(domainEvents.Select(x => new MdListItem(x.FullName.Value)));
+        }
     }
 
     private static MdCompositeSpan GetNameAndDefinition(Enum @enum) =>

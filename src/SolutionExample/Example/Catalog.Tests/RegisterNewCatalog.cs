@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Catalog.Application.Catalog;
 using Catalog.Domain;
@@ -10,7 +9,6 @@ using Catalog.Domain.Catalog.Events;
 using FluentAssertions;
 using NSubstitute;
 using Xunit;
-using Catalog = Catalog.Domain.Catalog.Catalog;
 
 namespace Catalog.Tests;
 

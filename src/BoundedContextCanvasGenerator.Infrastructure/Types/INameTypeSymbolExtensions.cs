@@ -7,21 +7,29 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 
 public static class INameTypeSymbolExtensions
 {
-    public static TypeDefinition ToTypeDefinition(this INamedTypeSymbol symbol)
+    public static TypeDefinition ToTypeDefinition(this ISymbol symbol)
     {
         return new TypeDefinition(
             symbol.GetFullName(),
             symbol.GetDescription(),
             symbol.GetTypeKind(),
             symbol.GetModifiers(),
-            Enumerable.Select(symbol.AllInterfaces, i => i.GetFullName()).ToArray(),
+            symbol.GetAllInterfaces(),
             symbol.GetAssemblyDefinition()
         );
     }
 
-    private static TypeFullName GetFullName(this INamedTypeSymbol symbol) => new(symbol.ToString()!);
+    public static IEnumerable<TypeFullName> GetAllInterfaces(this ISymbol symbol)
+    {
+        if (symbol is not INamedTypeSymbol namedTypeSymbol) {
+            return Array.Empty<TypeFullName>();
+        }
+        return Enumerable.Select(namedTypeSymbol.AllInterfaces, i => i.GetFullName()).ToArray();
+    }
 
-    private static TypeDescription GetDescription(this INamedTypeSymbol symbol)
+    public static TypeFullName GetFullName(this ISymbol symbol) => new(symbol.ToString()!);
+
+    private static TypeDescription GetDescription(this ISymbol symbol)
     {
         var xml = symbol.GetDocumentationCommentXml();
         return string.IsNullOrWhiteSpace(xml)
@@ -29,16 +37,19 @@ public static class INameTypeSymbolExtensions
             : new DocumentationComment(xml).GetSummary().Pipe(TypeDescription.From);
     }
 
-    private static TypeKind GetTypeKind(this INamedTypeSymbol symbol)
+    private static TypeKind GetTypeKind(this ISymbol symbol)
     {
-        return symbol.TypeKind switch {
+        if (symbol is not INamedTypeSymbol namedTypeSymbol) {
+            return TypeKind.Unknown;
+        }
+        return namedTypeSymbol.TypeKind switch {
             Microsoft.CodeAnalysis.TypeKind.Class => TypeKind.Class,
             Microsoft.CodeAnalysis.TypeKind.Interface => TypeKind.Interface,
-            _ => throw new InvalidOperationException($"Kind {symbol.TypeKind} not supported yet.")
+            _ => throw new InvalidOperationException($"Kind {namedTypeSymbol.TypeKind} not supported yet.")
         };
     }
 
-    private static TypeModifiers GetModifiers(this INamedTypeSymbol symbol)
+    private static TypeModifiers GetModifiers(this ISymbol symbol)
     {
         IEnumerable<TypeModifiers> Find()
         {
@@ -53,6 +64,6 @@ public static class INameTypeSymbolExtensions
         return Find().Aggregate();
     } 
     
-    private static AssemblyDefinition GetAssemblyDefinition(this INamedTypeSymbol symbol) 
+    private static AssemblyDefinition GetAssemblyDefinition(this ISymbol symbol) 
         => new(new Namespace(symbol.ContainingAssembly.Name));
 }

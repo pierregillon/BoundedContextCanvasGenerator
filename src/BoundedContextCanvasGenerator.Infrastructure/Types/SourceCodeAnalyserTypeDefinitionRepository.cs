@@ -31,11 +31,11 @@ public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionReposit
         foreach (var tree in compilation.SyntaxTrees) {
             var semanticModel = compilation.GetSemanticModel(tree, true);
 
-            var typeDefinitions = new List<TypeDefinition>();
+            var visitedData = new VisitedData();
 
-            new SourceCodeVisitor(semanticModel, typeDefinitions).Visit(await tree.GetRootAsync());
+            new SourceCodeVisitor(semanticModel, visitedData).Visit(await tree.GetRootAsync());
 
-            foreach (var typeDefinition in typeDefinitions) {
+            foreach (var typeDefinition in visitedData.TypeDefinitions) {
                 yield return typeDefinition;
             }
         }

@@ -27,11 +27,14 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
                 {accessibility} class CreateUser {{ }}
             ";
 
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("CreateUser").InAssembly("Test")
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A.Class("CreateUser").InAssembly("Test")
+                });
         }
 
         [Fact]
@@ -41,11 +44,14 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
                 public abstract class CreateUser { }
             ";
 
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("CreateUser").InAssembly("Test").Abstract()
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A.Class("CreateUser").InAssembly("Test").Abstract()
+                });
         }
 
         [Fact]
@@ -56,11 +62,14 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
                 public class CreateUser { }
             ";
 
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("Test.CreateUser").InAssembly("Test")
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A.Class("Test.CreateUser").InAssembly("Test")
+                });
         }
 
         [Fact]
@@ -73,15 +82,18 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
                 public class CreateUser : ICommand, IDisposable { }
             ";
 
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A
-                    .Class("Test.CreateUser")
-                    .InAssembly("Test")
-                    .Implementing("Test.ICommand")
-                    .Implementing("Test.IDisposable")
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A
+                        .Class("Test.CreateUser")
+                        .InAssembly("Test")
+                        .Implementing("Test.ICommand")
+                        .Implementing("Test.IDisposable")
+                });
         }
 
         [Theory]
@@ -92,11 +104,17 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
                 {accessibility} record CreateUser;
             ";
 
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("CreateUser").InAssembly("Test").Implementing("System.IEquatable<CreateUser>")
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A
+                        .Class("CreateUser")
+                        .InAssembly("Test")
+                        .Implementing("System.IEquatable<CreateUser>")
+                });
         }
 
         [Fact]
@@ -108,11 +126,14 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
         public record CreateUser;
     }
 ";
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("Test.CreateUser").InAssembly("Test").Implementing("System.IEquatable<Test.CreateUser>")
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A.Class("Test.CreateUser").InAssembly("Test").Implementing("System.IEquatable<Test.CreateUser>")
+                });
         }
 
         [Fact]
@@ -126,18 +147,254 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
         public record CreateUser : ICommand, IDisposable;
     }
 ";
-            var typeDefinitions = Visit(sourceCode);
+            var data = Visit(sourceCode);
 
-            typeDefinitions.Should().BeEquivalentTo(new TypeDefinition[] {
-                A.Class("Test.CreateUser")
-                    .InAssembly("Test")
-                    .Implementing("System.IEquatable<Test.CreateUser>")
-                    .Implementing("Test.ICommand")
-                    .Implementing("Test.IDisposable")
-            });
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A.Class("Test.CreateUser")
+                        .InAssembly("Test")
+                        .Implementing("System.IEquatable<Test.CreateUser>")
+                        .Implementing("Test.ICommand")
+                        .Implementing("Test.IDisposable")
+                });
         }
 
-        public static IEnumerable<TypeDefinition> Visit(string source)
+        [Fact]
+        public void Extract_documentation_from_class()
+        {
+            const string sourceCode = @"
+        
+        /// <summary>
+        /// A simple class to create user.
+        /// </summary>
+        public class CreateUser;
+";
+            var data = Visit(sourceCode);
+
+            data
+                .TypeDefinitions
+                .Should()
+                .BeEquivalentTo(new TypeDefinition[] {
+                    A.Class("CreateUser")
+                        .InAssembly("Test")
+                        .WithDescription("A simple class to create user.")
+                });
+        }
+
+        [Fact]
+        public void Extract_a_method_instanciating_an_known_type()
+        {
+            const string sourceCode = @"
+    namespace Test
+    {
+        public record CreateUser;
+
+        public class CreateUserService
+        {
+            public void Do()
+            {
+                var command = new CreateUser();
+            }
+        }
+    }
+";
+            var data = Visit(sourceCode);
+
+            data
+                .Methods
+                .Should()
+                .BeEquivalentTo(new Dictionary<TypeFullName, List<MethodDefinition>> {
+                    {
+                        new TypeFullName("Test.CreateUserService"), 
+                        new List<MethodDefinition> {
+                            new MethodDefinition("Do", new [] {
+                                new TypeFullName("Test.CreateUser")
+                            })
+                        }
+                    }
+                });
+        }
+
+        [Fact]
+        public void Extract_a_method_instanciating_multiple_types()
+        {
+            const string sourceCode = @"
+    public record CreateUser;
+    public record DeleteUser;
+
+    public class CreateUserService
+    {
+        public void Do()
+        {
+            var command1 = new CreateUser();
+            var command2 = new DeleteUser();
+        }
+
+        public void Do2()
+        {
+            var command1 = new CreateUser(), command2 = new DeleteUser();
+        }
+    }
+";
+            var data = Visit(sourceCode);
+            data
+                .Methods
+                .Should()
+                .BeEquivalentTo(new Dictionary<TypeFullName, List<MethodDefinition>> {
+                    {
+                        new TypeFullName("CreateUserService"), 
+                        new List<MethodDefinition> {
+                            new("Do", new [] {
+                                new TypeFullName("CreateUser"),
+                                new TypeFullName("DeleteUser")
+                            }),
+                            new("Do2", new [] {
+                                new TypeFullName("CreateUser"),
+                                new TypeFullName("DeleteUser")
+                            })
+                        }
+                    }
+                });
+        }
+        
+        [Fact]
+        public void Extract_method_by_traversing_statements()
+        {
+            const string sourceCode = @"
+    public record CreateUser;
+
+    public class CreateUserService
+    {
+        public void Do()
+        {
+            if(true) {
+                if(true) {
+                    var command1 = new CreateUser();
+                }
+            }
+        }
+    }
+";
+            var data = Visit(sourceCode);
+            data
+                .Methods
+                .Should()
+                .BeEquivalentTo(new Dictionary<TypeFullName, List<MethodDefinition>> {
+                    {
+                        new TypeFullName("CreateUserService"), 
+                        new List<MethodDefinition> {
+                            new("Do", new [] {
+                                new TypeFullName("CreateUser"),
+                            })
+                        }
+                    }
+                });
+        }
+        
+        [Fact]
+        public void Extract_method_by_traversing_method_call()
+        {
+            const string sourceCode = @"
+    public record CreateUser;
+
+    public class CreateUserService
+    {
+        public void Do()
+        {
+            Create();
+        }
+
+        private void Create()
+        {
+            var command = new CreateUser();
+        }
+    }
+";
+            var data = Visit(sourceCode);
+            data
+                .Methods
+                .Should()
+                .BeEquivalentTo(new Dictionary<TypeFullName, List<MethodDefinition>> {
+                    {
+                        new TypeFullName("CreateUserService"), 
+                        new List<MethodDefinition> {
+                            new("Do", new [] {
+                                new TypeFullName("CreateUser"),
+                            }),
+                            new("Create", new [] {
+                                new TypeFullName("CreateUser"),
+                            })
+                        }
+                    }
+                });
+        }
+        
+        [Fact]
+        public void Extract_method_by_traversing_get_method()
+        {
+            const string sourceCode = @"
+    public record CreateUser;
+
+    public class CreateUserService
+    {
+        public void Do()
+        {
+            var command = Create();
+        }
+
+        private CreateUser Create()
+        {
+            return new CreateUser();
+        }
+    }
+";
+            var data = Visit(sourceCode);
+            data
+                .Methods
+                .Should()
+                .BeEquivalentTo(new Dictionary<TypeFullName, List<MethodDefinition>> {
+                    {
+                        new TypeFullName("CreateUserService"), 
+                        new List<MethodDefinition> {
+                            new("Do", new [] {
+                                new TypeFullName("CreateUser"),
+                            }),
+                            new("Create", new [] {
+                                new TypeFullName("CreateUser"),
+                            })
+                        }
+                    }
+                });
+        }
+
+        [Fact]
+        public void Ignores_method_instanciating_not_declared_type()
+        {
+            const string sourceCode = @"
+    namespace Test
+    {
+        public record CreateUser;
+
+        public class CreateUserService
+        {
+            public void Do()
+            {
+                var command = new object();
+            }
+        }
+    }
+";
+            var data = Visit(sourceCode);
+
+            data
+                .Methods
+                .Should()
+                .BeEmpty();
+        }
+
+        public static VisitedData Visit(string source)
         {
             source
                 .Should()
@@ -155,12 +412,12 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Types
 
             var semanticModel = compilation.GetSemanticModel(syntaxTree, true);
 
-            var types = new List<TypeDefinition>();
-            var visitor = new SourceCodeVisitor(semanticModel, types);
+            var visitedData = new VisitedData();
+            var visitor = new SourceCodeVisitor(semanticModel, visitedData);
 
             visitor.Visit(syntaxTree.GetRoot());
 
-            return types;
+            return visitedData;
         }
     }
 }

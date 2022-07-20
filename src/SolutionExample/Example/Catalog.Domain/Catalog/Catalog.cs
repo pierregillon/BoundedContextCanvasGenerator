@@ -11,10 +11,10 @@ public class Catalog : AggregatorRoot<CatalogId>
 
     private Catalog(CatalogId id, CatalogDescription description) : base(id) => _description = description;
 
-    public static Catalog Register(CatalogDescription description)
+    public static Catalog Register(CatalogName catalogName, CatalogDescription description)
     {
         var catalog = new Catalog(CatalogId.New(), description);
-        catalog.StoreEvent(new CatalogRegistered(catalog.Id, description));
+        catalog.StoreEvent(new CatalogRegistered(catalog.Id, catalogName, description));
         return catalog;
     }
 

@@ -2,11 +2,7 @@
 
 namespace BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 
-public class OfType : ITypeDefinitionPredicate
+public record OfType(TypeKind TypeKind) : ITypeDefinitionPredicate
 {
-    private readonly TypeKind _typeKind;
-
-    public OfType(TypeKind typeKind) => _typeKind = typeKind;
-
-    public bool IsMatching(TypeDefinition type) => _typeKind == type.Kind;
+    public bool IsMatching(TypeDefinition type) => TypeKind == type.Kind;
 }

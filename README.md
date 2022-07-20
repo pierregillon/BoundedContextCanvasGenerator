@@ -45,15 +45,9 @@ definition:
         name: gateway context
         description: Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.
 ubiquitous_language:
-    type: class
-    modifiers:
-        - concrete
-    implementing:
-        pattern: .*IAggregateRoot<.*>
+    selector: concrete class implementing '.*IAggregateRoot<.*>'
 inbound_communication:
-    type: class
-    implementing:
-        pattern: .*ICommand$
+    selector: class implementing '.*ICommand$'
 ```
 
 [Full example here](src/SolutionExample/Example/bounded_context_canvas_settings.yaml)

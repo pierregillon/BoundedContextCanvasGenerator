@@ -144,9 +144,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"domain_events:
-    type: class
-    implementing:
-        pattern: .*IDomainEvent$")
+    selector: class implementing '.*IDomainEvent$'")
             .Execute();
 
         const string commandsSection =
@@ -172,11 +170,8 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"ubiquitous_language:
-    type: class
-    modifiers:
-        - concrete
-    implementing:
-        pattern: .*IAggregateRoot<.*>")
+    selector: concrete class implementing '.*IAggregateRoot<.*>'
+")
             .Execute();
 
         const string commandsSection =
@@ -198,9 +193,8 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"inbound_communication:
-    type: class
-    implementing:
-        pattern: .*ICommand$")
+    selector: class implementing '.*ICommand$'
+")
             .Execute();
 
         const string commandsSection =

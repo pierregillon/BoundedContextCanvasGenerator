@@ -9,36 +9,6 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Configuration
         private readonly YamlDotNetConfigurationDeserializer _deserializer;
 
         public YamlDotNetConfigurationDeserializerTests() => _deserializer = new YamlDotNetConfigurationDeserializer();
-
-        [Fact]
-        public void Deserializes_inbound_communication()
-        {
-            const string yaml =
-@"inbound_communication:
-    type: 'class'
-    implementing:
-        pattern: '.*ICommand$'";
-
-            var configuration = _deserializer.Deserialize(yaml);
-
-            configuration.InboundCommunication!.Type.Should().Be("class");
-            configuration.InboundCommunication!.Implementing!.Pattern.Should().Be(".*ICommand$");
-        }
-        
-        [Fact]
-        public void Deserializes_domain_events()
-        {
-            const string yaml =
-@"domain_events:
-    type: 'class'
-    implementing:
-        pattern: '.*IDomainEvent$'";
-
-            var configuration = _deserializer.Deserialize(yaml);
-
-            configuration.DomainEvents!.Type.Should().Be("class");
-            configuration.DomainEvents!.Implementing!.Pattern.Should().Be(".*IDomainEvent$");
-        }
         
         [Fact]
         public void Deserializes_definition()

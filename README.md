@@ -1,5 +1,7 @@
 ﻿# Bounded context canvas generator 🔣 -> 📝
 
+This repository is a proof of concept to generate a Bounded Context Canvas directly from source code.
+
 ## Description
 
 The idea is to analyse **symbols and annotations** from a target solution in order to detects DDD tactical patterns,
@@ -63,6 +65,82 @@ Based on the configuration, and the source code in [SolutionExample](src/Solutio
 ![Generated markdown](docs/generated.PNG "a title")
 
 [Full generated markdown here](src/SolutionExample/Example/bounded_context_canvas.md)
+
+## Objectives
+
+Main objectives are :
+
+- Generating the maximum of information without modifying any code (ie attributes)
+- Support multiple architecture (hexa, CQS, CRUD) or file structure
+- Support high extensibility (configuration to retrive core concepts)
+- Generate domain graph with high business value, ie :
+
+```mermaid
+flowchart LR
+    Collaborators[\"WebApp"/]
+    Collaborators2[\"WebApp"/]
+    Collaborators3[\"WebApp"/]
+    Collaborators4[\"Mobile"/]
+    CollaboratorsOutput[/"Purchase"\]
+    User[/"User"\]
+    Purchase[/"Purchase"\]
+    Ordering[/"Ordering"\]
+
+    CatalogDeletedEvent["Catalog deleted"]
+    CatalogApplicationCatalogDeleteCatalog2["Delete catalog"]
+    DeleteCatalogPolicy[/"Catalog must be empty<br/>Catalog must not be locked"/]
+    Collaborators --> CatalogApplicationCatalogDeleteCatalog2
+    %%CatalogApplicationCatalogDeleteCatalog2 -. Catalog must be empty<br/>Catalog must not be locked .-> CatalogDeletedEvent
+    CatalogApplicationCatalogDeleteCatalog2 --- DeleteCatalogPolicy
+    DeleteCatalogPolicy --- CatalogDeletedEvent
+    CatalogDeletedEvent -.-> CollaboratorsOutput
+
+    DisplayCatalogQuery["Display catalog"]
+    DisplayCatalogPolicies[/"At least one item"/]
+    DisplayCatalogQuery --- DisplayCatalogPolicies
+    Collaborators2 --> DisplayCatalogQuery
+    Collaborators4 --> DisplayCatalogQuery
+
+    CreateCatalogCommand["Create catalog"]
+    CreateCatalogPolicy[/"Name is unique<br/>"/]
+    CatalogCreatedEvent["Catalog created"]
+    EmailSendEvent["Email sent"]
+    Collaborators3 --> CreateCatalogCommand
+    CreateCatalogCommand --- CreateCatalogPolicy
+    CreateCatalogPolicy --- CatalogCreatedEvent
+    CreateCatalogPolicy --- EmailSendEvent
+    CatalogCreatedEvent -.-> Purchase
+    CatalogCreatedEvent -.-> Ordering
+    EmailSendEvent -.-> User
+
+    classDef policies fill:#FFFFAD, font-style:italic;
+    class DeleteCatalogPolicy policies
+    class CreateCatalogPolicy policies
+    class DisplayCatalogPolicies policies
+
+    classDef command fill:#C0D0FF;
+    class CreateCatalogCommand command
+    class CatalogApplicationCatalogDeleteCatalog2 command
+
+    classDef query fill:#B5FFC4;
+    class DisplayCatalogQuery query
+
+    classDef event fill:#FFCE89;
+    class CatalogCreatedEvent event
+    class EmailSendEvent event
+    class CatalogDeletedEvent event
+
+    classDef collaborators fill:#FFE5FF
+    class Collaborators collaborators
+    class Collaborators2 collaborators
+    class Collaborators3 collaborators
+    class Collaborators4 collaborators
+    class CollaboratorsOutput collaborators
+    class Purchase collaborators
+    class Ordering collaborators
+    class User collaborators
+    
+```
 
 ## More in depth
 

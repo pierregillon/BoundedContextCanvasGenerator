@@ -63,7 +63,7 @@ public class TypeDefinitionFactory
         foreach (var typeDefinition in visitedData.TypeDefinitions) {
             var instanciators = visited.Methods
                 .Where(x => x.Value.Any(m => m.InstanciatedTypes.Contains(typeDefinition.FullName)))
-                .SelectMany(x => x.Value.Select(m => new Instanciator(allTypes[x.Key], new MethodName(m.Name))))
+                .SelectMany(x => x.Value.Select(m => new Instanciator(allTypes[x.Key], m.Method)))
                 .ToArray();
 
             if (instanciators.Any()) {

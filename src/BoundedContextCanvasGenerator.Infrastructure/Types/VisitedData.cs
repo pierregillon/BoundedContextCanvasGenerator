@@ -70,14 +70,14 @@ public class VisitedData2
     }
 }
 
-public record MethodDefinition(string Name, IEnumerable<TypeFullName> InstanciatedTypes)
+public record MethodDefinition(MethodInfo Method, IEnumerable<TypeFullName> InstanciatedTypes)
 {
     public virtual bool Equals(MethodDefinition? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
-        return Name == other.Name && InstanciatedTypes.SequenceEqual(other.InstanciatedTypes);
+        return Method.Equals(other.Method) && InstanciatedTypes.SequenceEqual(other.InstanciatedTypes);
     }
 
-    public override int GetHashCode() => HashCode.Combine(Name, InstanciatedTypes);
+    public override int GetHashCode() => HashCode.Combine(Method, InstanciatedTypes);
 }

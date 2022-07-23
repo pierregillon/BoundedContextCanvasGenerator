@@ -1,4 +1,6 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using BoundedContextCanvasGenerator.Domain.Types;
+using Microsoft.Build.Logging.StructuredLogger;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -68,7 +70,7 @@ public class SourceCodeMethodVisitor : CSharpSyntaxWalker
         var results = FindInstanciatedSymbolsFromMethodBody(methodNode).ToArray();
         if (results.Any())
         {
-            var methodDefinition = new MethodDefinition(methodNode.Identifier.ToString(), results.Select(x => x.GetFullName()).ToArray());
+            var methodDefinition = new MethodDefinition(methodNode.GetInfo(), results.Select(x => x.GetFullName()).ToArray());
             _visitedData.AddMethod(classType.GetFullName(), methodDefinition);
         }
 
@@ -161,4 +163,17 @@ public class SourceCodeMethodVisitor : CSharpSyntaxWalker
     private ISymbol? GetSymbol(ExpressionSyntax expression) => _semanticModels[expression.SyntaxTree].GetSymbolInfo(expression).Symbol;
 
     private ISymbol? GetSymbol(SyntaxNode syntaxNode) => _semanticModels[syntaxNode.SyntaxTree].GetDeclaredSymbol(syntaxNode);
+}
+
+public static class MethodDeclarationSyntaxExtensions
+{
+    public static MethodInfo GetInfo(this MethodDeclarationSyntax syntax)
+    {
+        return new MethodInfo(
+            new MethodName(syntax.Identifier.ToString()),
+            syntax.AttributeLists
+                .Select(x => new MethodAttribute(x.Attributes.ToFullString()))
+                .ToArray()
+        );
+    }
 }

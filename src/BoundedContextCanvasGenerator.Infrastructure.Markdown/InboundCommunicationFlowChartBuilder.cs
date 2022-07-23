@@ -1,5 +1,7 @@
-﻿using BoundedContextCanvasGenerator.Domain;
+﻿using System.Text.RegularExpressions;
+using BoundedContextCanvasGenerator.Domain;
 using BoundedContextCanvasGenerator.Domain.Configuration;
+using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Mermaid.FlowchartDiagram;
 using Grynwald.MarkdownGenerator;
@@ -145,9 +147,13 @@ public record Command(TypeDefinition TypeDefinition)
 public class InboundCommunicationFlowChartBuilder2
 {
     private readonly IEnumerable<CollaboratorDefinition> _collaboratorDefinitions;
-    private Dictionary<string, Node> collaboratorNodes;
+    private readonly IEnumerable<PolicyDefinition> _policyDefinitions;
 
-    public InboundCommunicationFlowChartBuilder2(IEnumerable<CollaboratorDefinition> collaboratorDefinitions) => _collaboratorDefinitions = collaboratorDefinitions;
+    public InboundCommunicationFlowChartBuilder2(IEnumerable<CollaboratorDefinition> collaboratorDefinitions, IEnumerable<PolicyDefinition> policyDefinitions)
+    {
+        _collaboratorDefinitions = collaboratorDefinitions;
+        _policyDefinitions = policyDefinitions;
+    }
 
     public MdContainerBlock Build(IReadOnlyCollection<TypeDefinition> typeDefinitions)
     {
@@ -198,6 +204,18 @@ public class InboundCommunicationFlowChartBuilder2
             yield return collaboratorNode;
             yield return Link.From(collaboratorNode).To(node);
         }
+
+        var policies = command.TypeDefinition.Instanciators
+            .Where(x => _policyDefinitions.Any(c => c.Match(x.Method)))
+            .Select(x => x.Method.Name.Value.ToReadableSentence())
+            .ToArray()
+            .Pipe(Policies.From);
+
+        if (policies.Any()) {
+            var policyNode = BuildNode(policies, command);
+            yield return policyNode;
+            yield return Link.From(node).To(policyNode).WithOptions(LinkOptions.Default.WithHead(LinkHead.None));
+        }
     }
 
     private static Node BuildNode(Command command)
@@ -207,7 +225,13 @@ public class InboundCommunicationFlowChartBuilder2
         => Node
             .Named(new MermaidName(collaborator.NameFor(command), collaborator.FriendlyName))
             .Shaped(NodeShape.Asymmetric)
-            .Styled(new NodeStyleClass("collaborators", new NodeStyle("fill:#FFE5FF")));
+            .Styled(new NodeStyleClass("collaborators", new NodeStyle("fill:#FFE5FF")));    
+    
+    private static Node BuildNode(Policies policies, Command command)
+        => Node
+            .Named(new MermaidName(policies.NameFor(command), policies.FriendlyName))
+            .Shaped(NodeShape.Parallelogram)
+            .Styled(new NodeStyleClass("policies", new NodeStyle("fill:#FFFFAD, font-style:italic")));
 
 
     private static Flowchart Merge(Flowchart flowchart, IMermaidGeneratable element)
@@ -238,4 +262,38 @@ public record CollaboratorDefinition(string Name, TypeDefinitionPredicates Predi
     public bool Match(TypeDefinition typeDefinition) => this.Predicates.AllMatching(typeDefinition);
 
     public string NameFor(Command command) => command.MermaidName + this.MermaidName;
+}
+
+public record PolicyDefinition(MethodAttributeMatch Matcher)
+{
+    public bool Match(MethodInfo method) => method.Attributes.Any(x => Matcher.Match(x));
+}
+
+public record MethodAttributeMatch(string Pattern)
+{
+    private readonly Regex _regex = new(Pattern, RegexOptions.Compiled);
+
+    public bool Match(MethodAttribute attribute)
+        => _regex.IsMatch(attribute.Value);
+
+    public virtual bool Equals(ImplementsInterfaceMatching? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Pattern == other.Pattern;
+    }
+
+    public override int GetHashCode() => Pattern.GetHashCode();
+}
+
+public record Policies(IEnumerable<string> Values)
+{
+    private const string MermaidName = "Policies";
+    public string FriendlyName => Values.JoinWith("<br/>");
+
+    public static Policies From(IEnumerable<string> values) => new(values);
+
+    public bool Any() => this.Values.Any();
+
+    public string NameFor(Command command) => command.MermaidName + MermaidName;
 }

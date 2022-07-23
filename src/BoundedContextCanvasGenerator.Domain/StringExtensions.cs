@@ -29,12 +29,16 @@ public static class StringExtensions
             }
             else
             {
-                char previous = value[i - 1];
-                if (char.IsLower(previous) && (char.IsUpper(current) || char.IsDigit(current)))
-                {
+                var previous = value[i - 1];
+                if (char.IsLower(previous) && (char.IsUpper(current) || char.IsDigit(current))) {
                     yield return ' ';
                 }
-                yield return char.ToLower(current);
+                if (current == '_') {
+                    yield return ' ';
+                }
+                else {
+                    yield return char.ToLower(current);
+                }
             }
         }
     }

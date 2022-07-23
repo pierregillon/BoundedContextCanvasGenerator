@@ -5,6 +5,7 @@ using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Markdown;
+using BoundedContextCanvasGenerator.Infrastructure.Types;
 using FluentAssertions;
 using Xunit;
 
@@ -188,7 +189,10 @@ flowchart LR
         [Fact]
         public void Cannot_generate_flowchart_from_empty_collection()
         {
-            Action action = () => _ = new InboundCommunicationFlowChartBuilder2(Enumerable.Empty<CollaboratorDefinition>()).Build(Array.Empty<TypeDefinition>());
+            Action action = () => _ = new InboundCommunicationFlowChartBuilder2(
+                Enumerable.Empty<CollaboratorDefinition>(), 
+                Enumerable.Empty<PolicyDefinition>()
+            ).Build(Array.Empty<TypeDefinition>());
 
             action
                 .Should()
@@ -313,9 +317,45 @@ flowchart LR
 ```");
         }
 
-        private static string GenerateMermaid(TypeDefinition[] types, IEnumerable<CollaboratorDefinition>? collaborators = null)
+        [Fact]
+        public void A_command_policy_is_a_test_method_name()
         {
-            var builder = new InboundCommunicationFlowChartBuilder2(collaborators ?? Enumerable.Empty<CollaboratorDefinition>());
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy(
+                        new MethodInfo(
+                            new MethodName("Must_contains_at_least_one_item_to_order"), new [] {
+                                new MethodAttribute("Fact"),
+                                new MethodAttribute("Trait(\"Category\", \"BoundedContextCanvasPolicy\")")
+                            }
+                        ),
+                        A.Class("Tests.OrderNewProductCommandTests")
+                    ),
+            };
+
+            GenerateMermaid(
+                    types,
+                    Array.Empty<CollaboratorDefinition>(),
+                    new PolicyDefinition[] { new(new MethodAttributeMatch("Trait\\(\"Category\", \"BoundedContextCanvasPolicy\"\\)")) }
+                )
+                .Should()
+                .Be(
+                    @"```mermaid
+flowchart LR
+    classDef policies fill:#FFFFAD, font-style:italic;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandPolicies[/""Must contains at least one item to order""/]
+    class TestNamespaceOrderNewProductCommandPolicies policies;
+    TestNamespaceOrderNewProductCommand --- TestNamespaceOrderNewProductCommandPolicies
+```");
+        }
+
+        private static string GenerateMermaid(TypeDefinition[] types, IEnumerable<CollaboratorDefinition>? collaborators = null, IEnumerable<PolicyDefinition>? policyDefinitions = null)
+        {
+            var builder = new InboundCommunicationFlowChartBuilder2(
+                collaborators ?? Enumerable.Empty<CollaboratorDefinition>(),
+                policyDefinitions ?? Enumerable.Empty<PolicyDefinition>()
+            );
 
             return builder.Build(types).ToString().Trim('\r', '\n');
         }

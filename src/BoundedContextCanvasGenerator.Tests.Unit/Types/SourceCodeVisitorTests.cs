@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Types;
 using FluentAssertions;
-using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
+using AMethod = BoundedContextCanvasGenerator.Tests.Unit.Types.MethodInfoBuilder;
 using Task = System.Threading.Tasks.Task;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit.Types;
@@ -254,9 +254,54 @@ public class SourceCodeMethodVisitorTests
                 {
                     new TypeFullName("Test.CreateUserService"),
                     new List<MethodDefinition> {
-                        new MethodDefinition("Do", new [] {
-                            new TypeFullName("Test.CreateUser")
-                        })
+                        new(
+                            AMethod.Named("Do"), 
+                            new [] {
+                                new TypeFullName("Test.CreateUser")
+                            }
+                        )
+                    }
+                }
+            });
+    }    
+    
+    [Fact]
+    public void Extract_attributes_of_the_method()
+    {
+        const string sourceCode = @"
+    namespace Test
+    {
+        public record CreateUser;
+       
+        public class CreateUserTests
+        {
+            [Fact]
+            [Trait(""Category"", ""BoundedContextCanvasPolicy"")]
+            public void Creates_a_new_user()
+            {
+                var command = new CreateUser();
+            }
+        }
+    }
+";
+        var data = Visit(sourceCode);
+
+        data
+            .Methods
+            .Should()
+            .BeEquivalentTo(new Dictionary<TypeFullName, List<MethodDefinition>> {
+                {
+                    new TypeFullName("Test.CreateUserTests"),
+                    new List<MethodDefinition> {
+                        new(
+                            AMethod
+                                .Named("Creates_a_new_user")
+                                .WithAttribute("Fact")
+                                .WithAttribute("Trait(\"Category\", \"BoundedContextCanvasPolicy\")"), 
+                            new [] {
+                                new TypeFullName("Test.CreateUser")
+                            }
+                        )
                     }
                 }
             });
@@ -291,11 +336,11 @@ public class SourceCodeMethodVisitorTests
                 {
                     new TypeFullName("CreateUserService"),
                     new List<MethodDefinition> {
-                        new("Do", new [] {
+                        new(AMethod.Named("Do"), new [] {
                             new TypeFullName("CreateUser"),
                             new TypeFullName("DeleteUser")
                         }),
-                        new("Do2", new [] {
+                        new(AMethod.Named("Do2"), new [] {
                             new TypeFullName("CreateUser"),
                             new TypeFullName("DeleteUser")
                         })
@@ -330,7 +375,7 @@ public class SourceCodeMethodVisitorTests
                 {
                     new TypeFullName("CreateUserService"),
                     new List<MethodDefinition> {
-                        new("Do", new [] {
+                        new(AMethod.Named("Do"), new [] {
                             new TypeFullName("CreateUser"),
                         })
                     }
@@ -365,10 +410,10 @@ public class SourceCodeMethodVisitorTests
                 {
                     new TypeFullName("CreateUserService"),
                     new List<MethodDefinition> {
-                        new("Do", new [] {
+                        new(AMethod.Named("Do"), new [] {
                             new TypeFullName("CreateUser"),
                         }),
-                        new("Create", new [] {
+                        new(AMethod.Named("Create"), new [] {
                             new TypeFullName("CreateUser"),
                         })
                     }
@@ -403,10 +448,10 @@ public class SourceCodeMethodVisitorTests
                 {
                     new TypeFullName("CreateUserService"),
                     new List<MethodDefinition> {
-                        new("Do", new [] {
+                        new(AMethod.Named("Do"), new [] {
                             new TypeFullName("CreateUser"),
                         }),
-                        new("Create", new [] {
+                        new(AMethod.Named("Create"), new [] {
                             new TypeFullName("CreateUser"),
                         })
                     }
@@ -472,14 +517,14 @@ public class SourceCodeMethodVisitorTests
                 {
                     new TypeFullName("CreateUserService"),
                     new List<MethodDefinition> {
-                        new("Do", new[] {
+                        new(AMethod.Named("Do"), new[] {
                             new TypeFullName("CreateUser"),
                         }),
                     }
                 }, {
                     new TypeFullName("Builder"),
                     new List<MethodDefinition> {
-                        new("Build", new[] {
+                        new(AMethod.Named("Build"), new[] {
                             new TypeFullName("CreateUser"),
                         }),
                     }
@@ -594,4 +639,28 @@ public class TypeDefinitionFactoryTests
 
         return await new TypeDefinitionFactory().Build(new[] { compilation });
     }
+}
+
+public class MethodInfoBuilder
+{
+    private MethodName _name;
+    private List<MethodAttribute> _attributes = new();
+
+    public static MethodInfoBuilder Named(string name) => new MethodInfoBuilder().WithName(name);
+
+    public MethodInfoBuilder WithName(string name)
+    {
+        this._name = new MethodName(name);
+        return this;
+    }
+
+    public MethodInfoBuilder WithAttribute(string attribute)
+    {
+        this._attributes.Add(new MethodAttribute(attribute));
+        return this;
+    }
+
+    public MethodInfo Build() => new(this._name, this._attributes);
+
+    public static implicit operator MethodInfo(MethodInfoBuilder builder) => builder.Build();
 }

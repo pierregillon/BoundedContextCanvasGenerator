@@ -58,14 +58,21 @@ public class TypeDefinitionFactory
 
     private IEnumerable<TypeDefinition> Merge(VisitedData visitedData, VisitedData2 visited)
     {
+        var allTypes = visitedData.TypeDefinitions.ToDictionary(x => x.FullName);
+
         foreach (var typeDefinition in visitedData.TypeDefinitions) {
             var instanciators = visited.Methods
                 .Where(x => x.Value.Any(m => m.InstanciatedTypes.Contains(typeDefinition.FullName)))
-                .SelectMany(x => x.Value.Select(m => new Instanciator(x.Key, new MethodName(m.Name))))
+                .SelectMany(x => x.Value.Select(m => new Instanciator(allTypes[x.Key], new MethodName(m.Name))))
                 .ToArray();
 
             if (instanciators.Any()) {
-                yield return typeDefinition with { Instanciators = instanciators };
+
+                // WARNING : we are creating a new TypeDefinition so the allTypes dictionary
+                // does not contains this instance anymore. It can leads to multiple instances
+                // with different information.
+
+                yield return typeDefinition with { Instanciators = instanciators }; 
             }
             else {
                 yield return typeDefinition;

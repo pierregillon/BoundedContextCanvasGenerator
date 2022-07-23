@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using BoundedContextCanvasGenerator.Domain.Configuration;
+using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Markdown;
 using FluentAssertions;
@@ -176,6 +180,144 @@ flowchart LR
             var builder = InboundCommunicationFlowChartBuilder.From(types);
 
             return builder.Build(splitIntoLanes).ToString().Trim('\r', '\n');
+        }
+    }
+
+    public class InboundCommunicationFlowChartBuilderTests2
+    {
+        [Fact]
+        public void Cannot_generate_flowchart_from_empty_collection()
+        {
+            Action action = () => _ = new InboundCommunicationFlowChartBuilder2(Enumerable.Empty<CollaboratorDefinition>()).Build(Array.Empty<TypeDefinition>());
+
+            action
+                .Should()
+                .Throw<ArgumentException>();
+        }
+
+        [Fact]
+        public void Generate_flowchart_with_simple_command()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+            };
+
+            GenerateMermaid(types)
+                .Should()
+                .Be(
+@"```mermaid
+flowchart LR
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+```");
+        }
+
+        [Fact]
+        public void A_non_configured_collaborator_ignored()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy("Post", A.Class("UserController"))
+            };
+
+            GenerateMermaid(types)
+                .Should()
+                .Be(
+@"```mermaid
+flowchart LR
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+```");
+        }
+
+        [Fact]
+        public void A_collaborator_is_a_class_instanciating_a_command()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy("Post", A.Class("UserController"))
+            };
+
+            GenerateMermaid(types, new[] {
+                    new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
+                })
+                .Should()
+                .Be(
+                    @"```mermaid
+flowchart LR
+    classDef collaborators fill:#FFE5FF;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator collaborators;
+    TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
+```");
+        }
+
+        [Fact]
+        public void Two_collaborators_of_the_same_command_are_linked_with_the_command()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy("Post", A.Class("UserController"))
+                    .InstanciatedBy("Post", A.Class("MobileController"))
+            };
+
+            GenerateMermaid(types, new [] { 
+                new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike("UserController"))),
+                new CollaboratorDefinition("MobileApp", TypeDefinitionPredicates.From(new NamedLike("MobileController"))),
+            })
+                .Should()
+                .Be(
+@"```mermaid
+flowchart LR
+    classDef collaborators fill:#FFE5FF;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator collaborators;
+    TestNamespaceOrderNewProductCommandMobileAppCollaborator>""Mobile app""]
+    class TestNamespaceOrderNewProductCommandMobileAppCollaborator collaborators;
+    TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
+    TestNamespaceOrderNewProductCommandMobileAppCollaborator --> TestNamespaceOrderNewProductCommand
+```");
+        }
+
+        [Fact]
+        public void The_same_collaborator_is_duplicated_for_each_commands_in_order_to_have_an_horizontal_flow()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy("OrderNewProduct",
+                        A.Class("UserController")
+                    ),
+
+                A.Class("Test.Namespace.CancelOrderCommand")
+                    .InstanciatedBy("CancelOrder",
+                        A.Class("UserController")
+                    )
+            };
+
+            GenerateMermaid(types, new [] { 
+                new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
+            })
+                .Should()
+                .Be(
+@"```mermaid
+flowchart LR
+    classDef collaborators fill:#FFE5FF;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator collaborators;
+    TestNamespaceCancelOrderCommand[""Cancel order""]
+    TestNamespaceCancelOrderCommandWebAppCollaborator>""Web app""]
+    class TestNamespaceCancelOrderCommandWebAppCollaborator collaborators;
+    TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
+    TestNamespaceCancelOrderCommandWebAppCollaborator --> TestNamespaceCancelOrderCommand
+```");
+        }
+
+        private static string GenerateMermaid(TypeDefinition[] types, IEnumerable<CollaboratorDefinition>? collaborators = null)
+        {
+            var builder = new InboundCommunicationFlowChartBuilder2(collaborators ?? Enumerable.Empty<CollaboratorDefinition>());
+
+            return builder.Build(types).ToString().Trim('\r', '\n');
         }
     }
 }

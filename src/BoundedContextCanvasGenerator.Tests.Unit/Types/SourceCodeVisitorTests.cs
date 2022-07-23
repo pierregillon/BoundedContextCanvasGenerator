@@ -564,7 +564,11 @@ public class TypeDefinitionFactoryTests
                 A.Class("CreateUserCommand")
                     .Implementing("System.IEquatable<CreateUserCommand>")
                     .InAssembly("Test")
-                    .InstanciatedBy("UserController", "Post")
+                    .InstanciatedBy("Post", 
+                        A.Class("UserController")
+                            .Implementing("System.IEquatable<UserController>")
+                            .InAssembly("Test")
+                    )
 
             });
     }

@@ -1,4 +1,5 @@
 ﻿using BoundedContextCanvasGenerator.Domain;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Mermaid.FlowchartDiagram;
 using Grynwald.MarkdownGenerator;
@@ -7,8 +8,6 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
 public class InboundCommunicationFlowChartBuilder
 {
-    private const string MERMAID_LANGUAGE = "mermaid";
-
     private readonly IReadOnlyCollection<Command> _commands;
 
     public static InboundCommunicationFlowChartBuilder From(IReadOnlyCollection<TypeDefinition> types) => new(types.Select(x => new Command(x)).ToArray());
@@ -52,10 +51,8 @@ public class InboundCommunicationFlowChartBuilder
             .GenerateNodes(commands)
             .Aggregate(flowChart, Merge);
 
-        return MermaidBlock(flowChart);
+        return new MermaidBlock(flowChart);
     }
-
-    private static MdCodeBlock MermaidBlock(Flowchart flowChart) => new(flowChart.ToMermaid(), MERMAID_LANGUAGE);
 
     private static Flowchart Merge(Flowchart flowchart, IMermaidGeneratable element)
     {
@@ -133,6 +130,7 @@ public record Command(TypeDefinition TypeDefinition)
     public string FullName => TypeDefinition.FullName.Value;
     public string FriendlyName => TypeDefinition.FullName.Name.TrimWord("Command").ToReadableSentence();
     public Namespace Lane => ParentNamespace.TrimStart(TypeDefinition.AssemblyDefinition.Namespace);
+    public string MermaidName => this.FullName;
 
     public IEnumerable<Namespace> GetSubNamespaces(bool splitIntoLanes)
     {
@@ -142,4 +140,102 @@ public record Command(TypeDefinition TypeDefinition)
             .Where(@namespace => !splitIntoLanes || !@namespace.EndWith(Lane))
             ;
     }
+}
+
+public class InboundCommunicationFlowChartBuilder2
+{
+    private readonly IEnumerable<CollaboratorDefinition> _collaboratorDefinitions;
+    private Dictionary<string, Node> collaboratorNodes;
+
+    public InboundCommunicationFlowChartBuilder2(IEnumerable<CollaboratorDefinition> collaboratorDefinitions) => _collaboratorDefinitions = collaboratorDefinitions;
+
+    public MdContainerBlock Build(IReadOnlyCollection<TypeDefinition> typeDefinitions)
+    {
+        if (typeDefinitions.Count == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(typeDefinitions));
+
+        var commands = typeDefinitions.Select(x => new Command(x)).ToArray();
+
+        return new MdContainerBlock(GenerateMermaidBlock(commands, false));
+    }
+
+    private MdCodeBlock GenerateMermaidBlock(IEnumerable<Command> commands, bool splitIntoLanes)
+    {
+        var flowChart = Flowchart.Start(Orientation.LeftToRight);
+
+        //this.collaboratorNodes = _collaboratorDefinitions
+        //    .Select(x => new { x.Name, Node = BuildNode(x) })
+        //    .ToDictionary(x => x.Name, x => x.Node);
+
+        //var root = Node
+        //    .Named(new MermaidName("Collaborators", "WebApp"))
+        //    .Shaped(NodeShape.Asymmetric)
+        //    .Styled(new NodeStyle("fill:#f9f,stroke:#333,stroke-width:2px"));
+
+        //flowChart = flowChart.WithNode(root);
+
+        var allNodes = commands.SelectMany(GenerateCommandNodes);
+
+        flowChart = allNodes.Aggregate(flowChart, Merge);
+
+        return new MermaidBlock(flowChart);
+    }
+
+    private IEnumerable<IMermaidGeneratable> GenerateCommandNodes(Command command)
+    {
+        var node = BuildNode(command);
+
+        yield return node;
+
+        var collaboratorNodes = command.TypeDefinition.Instanciators
+            .Select(x => new {
+                Instanciator = x,
+                Collaborators = _collaboratorDefinitions.Where(c => c.Match(x.Type))
+            })
+            .SelectMany(x => x.Collaborators.Select(c => BuildNode(c, command)))
+            .ToArray();
+
+        foreach (var collaboratorNode in collaboratorNodes) {
+            yield return collaboratorNode;
+            yield return Link.From(collaboratorNode).To(node);
+        }
+    }
+
+    private static Node BuildNode(Command command)
+        => Node.Named(new MermaidName(command.MermaidName, command.FriendlyName));
+
+    private static Node BuildNode(CollaboratorDefinition collaborator, Command command)
+        => Node
+            .Named(new MermaidName(collaborator.NameFor(command), collaborator.FriendlyName))
+            .Shaped(NodeShape.Asymmetric)
+            .Styled(new NodeStyleClass("collaborators", new NodeStyle("fill:#FFE5FF")));
+
+
+    private static Flowchart Merge(Flowchart flowchart, IMermaidGeneratable element)
+    {
+        return element switch
+        {
+            Node node => flowchart.WithNode(node),
+            Link link => flowchart.WithLink(link),
+            _ => throw new NotImplementedException("Not supported element")
+        };
+    }
+}
+
+public record MermaidBlock(Flowchart Flowchart)
+{
+    private const string MERMAID_LANGUAGE = "mermaid";
+    
+    public MdCodeBlock ToCodeBlock() => new(Flowchart.ToMermaid(), MERMAID_LANGUAGE);
+
+    public static implicit operator MdCodeBlock(MermaidBlock block) => block.ToCodeBlock();
+}
+
+public record CollaboratorDefinition(string Name, TypeDefinitionPredicates Predicates)
+{
+    public string FriendlyName => this.Name.ToReadableSentence();
+    public string MermaidName => this.Name + "Collaborator";
+
+    public bool Match(TypeDefinition typeDefinition) => this.Predicates.AllMatching(typeDefinition);
+
+    public string NameFor(Command command) => command.MermaidName + this.MermaidName;
 }

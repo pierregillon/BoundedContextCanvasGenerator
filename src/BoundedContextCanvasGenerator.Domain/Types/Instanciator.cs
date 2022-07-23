@@ -1,3 +1,3 @@
 ﻿namespace BoundedContextCanvasGenerator.Domain.Types;
 
-public record Instanciator(TypeFullName TypeFullName, MethodName MethodName);
+public record Instanciator(TypeDefinition Type, MethodName MethodName);

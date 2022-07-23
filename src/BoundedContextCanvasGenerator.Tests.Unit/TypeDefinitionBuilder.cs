@@ -13,6 +13,7 @@ public class TypeDefinitionBuilder
     private TypeDescription _description = TypeDescription.Empty;
     private TypeModifiers _modifiers = TypeModifiers.None;
     private AssemblyDefinition _assemblyDefinition = new(new Namespace("Some"));
+    private readonly List<Instanciator> _instanciators = new();
 
     private TypeDefinitionBuilder(string className, TypeKind kind)
     {
@@ -58,13 +59,21 @@ public class TypeDefinitionBuilder
         return this;
     }
 
+    public TypeDefinitionBuilder InstanciatedBy(string typeDefinitionName, string methodName)
+    {
+        this._instanciators.Add(new Instanciator(new TypeFullName(typeDefinitionName), new MethodName(methodName)));
+
+        return this;
+    }
+
     private TypeDefinition Build() =>
         new(_className,
             _description,
             _kind,
             _modifiers,
             _interfaces,
-            _assemblyDefinition
+            _assemblyDefinition,
+            _instanciators
         );
 
     public static implicit operator TypeDefinition(TypeDefinitionBuilder builder) => builder.Build();

@@ -6,5 +6,5 @@ public record TypeDefinition(
     TypeKind Kind,
     TypeModifiers Modifiers,
     IEnumerable<TypeFullName> ImplementedInterfaces,
-    AssemblyDefinition AssemblyDefinition
-);
+    AssemblyDefinition AssemblyDefinition,
+    IEnumerable<Instanciator> Instanciators);

@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Types;
 using FluentAssertions;
+using Microsoft.Build.Logging.StructuredLogger;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
 using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
+using Task = System.Threading.Tasks.Task;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit.Types;
 
@@ -521,5 +524,70 @@ public class SourceCodeMethodVisitorTests
         }
 
         return visitedData;
+    }
+}
+
+public class TypeDefinitionFactoryTests
+{
+    [Fact]
+    public async Task Build_type_definition_including_instanciators()
+    {
+        const string sourceCode = @"
+        using System.Threading.Tasks;
+        
+        public record UserController(ICommandDispatcher Dispatcher)
+        {
+            public async Task Post(string name)
+            {
+                var command = new CreateUserCommand(name);
+                await Dispatcher.Dispatch(command);
+            }
+        }
+
+        public record CreateUserCommand(string name);
+
+        public interface ICommandDispatcher
+        {
+            public Task Dispatch(object command);
+        }
+";
+        var data = await Visit(sourceCode);
+
+        data
+            .Should()
+            .BeEquivalentTo(new TypeDefinition[] {
+
+                A.Class("UserController")
+                    .Implementing("System.IEquatable<UserController>")
+                    .InAssembly("Test"),
+
+                A.Class("CreateUserCommand")
+                    .Implementing("System.IEquatable<CreateUserCommand>")
+                    .InAssembly("Test")
+                    .InstanciatedBy("UserController", "Post")
+
+            });
+    }
+
+    public static async Task<IEnumerable<TypeDefinition>> Visit(params string[] sources)
+    {
+        sources
+            .Should()
+            .AllSatisfy(x => x.Should().NotBeNullOrEmpty("without source code there is nothing to test"));
+
+        var trees = sources
+            .Select(x => x.Trim())
+            .Select(x => CSharpSyntaxTree.ParseText(x))
+            .ToArray();
+
+        var compilation = CSharpCompilation.Create("Test")
+            .WithOptions(
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithAllowUnsafe(true)
+            )
+            .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+            .AddSyntaxTrees(trees);
+
+        return await new TypeDefinitionFactory().Build(new[] { compilation });
     }
 }

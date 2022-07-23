@@ -15,7 +15,8 @@ public static class INameTypeSymbolExtensions
             symbol.GetTypeKind(),
             symbol.GetModifiers(),
             symbol.GetAllInterfaces(),
-            symbol.GetAssemblyDefinition()
+            symbol.GetAssemblyDefinition(),
+            Array.Empty<Instanciator>()
         );
     }
 

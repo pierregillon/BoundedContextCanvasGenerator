@@ -22,6 +22,7 @@ public static class DependencyInjection
             .AddScoped<ICanvasSettingsRepository, YamlFileCanvasSettingsRepository>()
             .AddScoped<ITypeDefinitionExtractor, TypeDefinitionExtractor>()
             .AddScoped<IMarkdownGenerator, GrynwaldMarkdownGenerator>()
+            .AddScoped<TypeDefinitionFactory>()
             ;
         
         return services;

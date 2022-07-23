@@ -29,21 +29,45 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
         base.VisitRecordDeclaration(node);
     }
 
+    private void AddVisitedType(BaseTypeDeclarationSyntax node)
+    {
+        var type = _semanticModel.GetDeclaredSymbol(node);
+
+        if (type != null) {
+            _visitedData.AddTypeDefinition(type.ToTypeDefinition());
+        }
+    }
+}
+
+public class SourceCodeMethodVisitor : CSharpSyntaxWalker
+{
+    private readonly VisitedData2 _visitedData;
+    private readonly Dictionary<SyntaxTree, SemanticModel> _semanticModels;
+
+    public SourceCodeMethodVisitor(IEnumerable<SemanticModel> semanticModels, VisitedData2 visitedData)
+    {
+        _visitedData = visitedData;
+        _semanticModels = semanticModels.ToDictionary(x => x.SyntaxTree);
+    }
+
     public override void VisitMethodDeclaration(MethodDeclarationSyntax methodNode)
     {
-        if (methodNode.Parent is null || methodNode.Body is null) {
+        if (methodNode.Parent is null || methodNode.Body is null)
+        {
             base.VisitMethodDeclaration(methodNode);
             return;
         }
 
-        var classType = _semanticModel.GetDeclaredSymbol(methodNode.Parent);
-        if (classType is null) {
+        var classType = GetSymbol(methodNode.Parent);
+        if (classType is null)
+        {
             base.VisitMethodDeclaration(methodNode);
             return;
         }
 
         var results = FindInstanciatedSymbolsFromMethodBody(methodNode).ToArray();
-        if (results.Any()) {
+        if (results.Any())
+        {
             var methodDefinition = new MethodDefinition(methodNode.Identifier.ToString(), results.Select(x => x.GetFullName()).ToArray());
             _visitedData.AddMethod(classType.GetFullName(), methodDefinition);
         }
@@ -51,13 +75,14 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
         base.VisitMethodDeclaration(methodNode);
     }
 
-    private IEnumerable<ISymbol> FindInstanciatedSymbolsFromMethodBody(BaseMethodDeclarationSyntax methodNode) 
-        => methodNode.Parent is null || methodNode.Body is null 
-            ? Enumerable.Empty<ISymbol>() 
+    private IEnumerable<ISymbol> FindInstanciatedSymbolsFromMethodBody(BaseMethodDeclarationSyntax methodNode)
+        => methodNode.Parent is null || methodNode.Body is null
+            ? Enumerable.Empty<ISymbol>()
             : methodNode.Body.Statements.SelectMany(FindSymbolsInStatement);
 
     private IEnumerable<ISymbol> FindSymbolsInStatement(StatementSyntax statement) =>
-        statement switch {
+        statement switch
+        {
             IfStatementSyntax ifStatementSyntax => FindSymbolsInStatement(ifStatementSyntax.Statement),
             BlockSyntax blockSyntax => blockSyntax.Statements.SelectMany(FindSymbolsInStatement),
             LocalDeclarationStatementSyntax localDeclarationStatementSyntax => GetSymbols(localDeclarationStatementSyntax),
@@ -68,17 +93,22 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
 
     private IEnumerable<ISymbol> GetSymbols(LocalDeclarationStatementSyntax localDeclarationStatementSyntax)
     {
-        foreach (var variableDeclaratorSyntax in localDeclarationStatementSyntax.Declaration.Variables) {
-            if (variableDeclaratorSyntax.Initializer?.Value is ObjectCreationExpressionSyntax objectCreationExpressionSyntax) {
+        foreach (var variableDeclaratorSyntax in localDeclarationStatementSyntax.Declaration.Variables)
+        {
+            if (variableDeclaratorSyntax.Initializer?.Value is ObjectCreationExpressionSyntax objectCreationExpressionSyntax)
+            {
                 foreach (var symbol1 in GetSymbols(objectCreationExpressionSyntax))
                     yield return symbol1;
             }
-            else if (variableDeclaratorSyntax.Initializer?.Value is InvocationExpressionSyntax invocationExpressionSyntax) {
-                var symbol = _semanticModel.GetSymbolInfo(invocationExpressionSyntax.Expression).Symbol;
-                if (symbol is not null && symbol.DeclaringSyntaxReferences.Any()) {
+            else if (variableDeclaratorSyntax.Initializer?.Value is InvocationExpressionSyntax invocationExpressionSyntax)
+            {
+                var symbol = GetSymbol(invocationExpressionSyntax.Expression);
+                if (symbol is not null && symbol.DeclaringSyntaxReferences.Any())
+                {
                     var def = (MethodDeclarationSyntax)symbol.DeclaringSyntaxReferences.First().GetSyntax();
                     var results = FindInstanciatedSymbolsFromMethodBody(def);
-                    foreach (var result in results) {
+                    foreach (var result in results)
+                    {
                         yield return result;
                     }
                 }
@@ -88,19 +118,22 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
 
     private IEnumerable<ISymbol> GetSymbols(ExpressionStatementSyntax expressionStatementSyntax)
     {
-        try {
-            var symbolInfo = _semanticModel.GetSymbolInfo(expressionStatementSyntax.Expression);
-            var symbol = symbolInfo.Symbol;
-            if (symbol is null || !symbol.DeclaringSyntaxReferences.Any()) {
+        try
+        {
+            var symbol = GetSymbol(expressionStatementSyntax.Expression);
+            if (symbol is null || !symbol.DeclaringSyntaxReferences.Any())
+            {
                 return Enumerable.Empty<ISymbol>();
             }
             var declarationSyntax = symbol.DeclaringSyntaxReferences.First().GetSyntax();
-            if (declarationSyntax is MethodDeclarationSyntax methodDeclarationSyntax) {
+            if (declarationSyntax is MethodDeclarationSyntax methodDeclarationSyntax)
+            {
                 return FindInstanciatedSymbolsFromMethodBody(methodDeclarationSyntax);
             }
             return Enumerable.Empty<ISymbol>();
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             Console.WriteLine(e.Message);
             return Enumerable.Empty<ISymbol>();
         }
@@ -110,25 +143,22 @@ public class SourceCodeVisitor : CSharpSyntaxWalker
     {
         ISymbol? symbol = null;
 
-        try {
-            symbol = _semanticModel.GetSymbolInfo(objectCreationExpressionSyntax.Type).Symbol;
+        try
+        {
+            symbol = GetSymbol(objectCreationExpressionSyntax.Type);
         }
         catch (ArgumentException e)
         {
             Console.WriteLine(e.Message);
         }
 
-        if (symbol is not null && symbol.DeclaringSyntaxReferences.Any()) {
+        if (symbol is not null && symbol.DeclaringSyntaxReferences.Any())
+        {
             yield return symbol;
         }
     }
 
-    private void AddVisitedType(BaseTypeDeclarationSyntax node)
-    {
-        var type = _semanticModel.GetDeclaredSymbol(node);
+    private ISymbol? GetSymbol(ExpressionSyntax expression) => _semanticModels[expression.SyntaxTree].GetSymbolInfo(expression).Symbol;
 
-        if (type != null) {
-            _visitedData.AddTypeDefinition(type.ToTypeDefinition());
-        }
-    }
-};
+    private ISymbol? GetSymbol(SyntaxNode syntaxNode) => _semanticModels[syntaxNode.SyntaxTree].GetDeclaredSymbol(syntaxNode);
+}

@@ -1,5 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Tests.Unit.Utils;
 using FluentAssertions;
 using Xunit;
 

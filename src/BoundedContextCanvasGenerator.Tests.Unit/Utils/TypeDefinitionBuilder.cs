@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BoundedContextCanvasGenerator.Domain.Types;
 using AssemblyDefinition = BoundedContextCanvasGenerator.Domain.Types.AssemblyDefinition;
 using TypeDefinition = BoundedContextCanvasGenerator.Domain.Types.TypeDefinition;
 
-namespace BoundedContextCanvasGenerator.Tests.Unit;
+namespace BoundedContextCanvasGenerator.Tests.Unit.Utils;
 
 public class TypeDefinitionBuilder
 {
@@ -63,7 +62,7 @@ public class TypeDefinitionBuilder
 
     public TypeDefinitionBuilder InstanciatedBy(string methodName, TypeDefinition typeDefinition)
     {
-        this._instanciators.Add(new Instanciator(typeDefinition, new MethodInfo(new MethodName(methodName), Enumerable.Empty<MethodAttribute>())));
+        this._instanciators.Add(new Instanciator(typeDefinition, new MethodInfo(new MethodName(methodName), Array.Empty<MethodAttribute>())));
 
         return this;
     }    

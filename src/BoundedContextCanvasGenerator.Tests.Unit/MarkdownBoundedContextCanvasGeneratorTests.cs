@@ -8,7 +8,7 @@ using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
-using A = BoundedContextCanvasGenerator.Tests.Unit.TypeDefinitionBuilder;
+using A = BoundedContextCanvasGenerator.Tests.Unit.Utils.TypeDefinitionBuilder;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit
 {

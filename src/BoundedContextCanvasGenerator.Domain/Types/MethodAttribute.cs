@@ -1,3 +1,3 @@
 ﻿namespace BoundedContextCanvasGenerator.Domain.Types;
 
-public record MethodName(string Value);
+public record MethodAttribute(string Value);

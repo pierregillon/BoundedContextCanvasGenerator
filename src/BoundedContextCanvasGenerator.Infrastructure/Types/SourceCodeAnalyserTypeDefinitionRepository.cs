@@ -1,5 +1,4 @@
-﻿using System.Transactions;
-using BoundedContextCanvasGenerator.Domain;
+﻿using BoundedContextCanvasGenerator.Domain;
 using BoundedContextCanvasGenerator.Domain.Types;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
@@ -23,60 +22,16 @@ public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionReposit
             .Select(x => x.GetCompilationAsync())
             .Pipe(Task.WhenAll);
 
-        foreach (var result in await _factory.Build(compilations!)) {
+        foreach (var result in await BuildTypeDefinitions(compilations)) {
             yield return result;
         }
     }
 
-}
+    private async Task<IReadOnlyCollection<TypeDefinition>> BuildTypeDefinitions(Compilation?[] compilations) => await compilations.Pipe(RemoveEmpty).Pipe(_factory.Build);
 
-public class TypeDefinitionFactory
-{
-    public async Task<IReadOnlyCollection<TypeDefinition>> Build(IEnumerable<Compilation> compilations)
-    {
-        var results = compilations
-            .SelectMany(c => c.SyntaxTrees.Select(x => new { Compilation = c, SyntaxTree = x }))
-            .Select(x => new { x.SyntaxTree, SemanticModel = x.Compilation.GetSemanticModel(x.SyntaxTree, true) })
+    private static IEnumerable<Compilation> RemoveEmpty(Compilation?[] compilations) 
+        => compilations
+            .Where(x => x is not null)
+            .Select(x => x!)
             .ToArray();
-
-        var visitedData = new VisitedData();
-
-        foreach (var result in results) {
-            
-            new SourceCodeVisitor(result.SemanticModel, visitedData).Visit(await result.SyntaxTree.GetRootAsync());
-        }
-
-        var visited = new VisitedData2();
-        var visitor = new SourceCodeMethodVisitor(results.Select(x => x.SemanticModel), visited);
-        foreach (var result in results)
-        {
-           visitor.Visit(await result.SyntaxTree.GetRootAsync());
-        }
-
-        return Merge(visitedData, visited).ToArray();
-    }
-
-    private IEnumerable<TypeDefinition> Merge(VisitedData visitedData, VisitedData2 visited)
-    {
-        var allTypes = visitedData.TypeDefinitions.ToDictionary(x => x.FullName);
-
-        foreach (var typeDefinition in visitedData.TypeDefinitions) {
-            var instanciators = visited.Methods
-                .Where(x => x.Value.Any(m => m.InstanciatedTypes.Contains(typeDefinition.FullName)))
-                .SelectMany(x => x.Value.Select(m => new Instanciator(allTypes[x.Key], m.Method)))
-                .ToArray();
-
-            if (instanciators.Any()) {
-
-                // WARNING : we are creating a new TypeDefinition so the allTypes dictionary
-                // does not contains this instance anymore. It can leads to multiple instances
-                // with different information.
-
-                yield return typeDefinition with { Instanciators = instanciators }; 
-            }
-            else {
-                yield return typeDefinition;
-            }
-        }
-    }
 }

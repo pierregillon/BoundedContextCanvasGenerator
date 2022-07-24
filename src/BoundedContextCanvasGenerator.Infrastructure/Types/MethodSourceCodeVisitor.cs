@@ -1,52 +1,15 @@
-﻿using BoundedContextCanvasGenerator.Domain.Types;
-using Microsoft.Build.Logging.StructuredLogger;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 
-public class SourceCodeVisitor : CSharpSyntaxWalker
+public class MethodSourceCodeVisitor : CSharpSyntaxWalker
 {
-    private readonly SemanticModel _semanticModel;
-    private readonly VisitedData _visitedData;
-
-    public SourceCodeVisitor(SemanticModel semanticModel, VisitedData visitedData)
-    {
-        _semanticModel = semanticModel;
-        _visitedData = visitedData;
-    }
-
-    public override void VisitClassDeclaration(ClassDeclarationSyntax node)
-    {
-        AddVisitedType(node);
-
-        base.VisitClassDeclaration(node);
-    }
-
-    public override void VisitRecordDeclaration(RecordDeclarationSyntax node)
-    {
-        AddVisitedType(node);
-
-        base.VisitRecordDeclaration(node);
-    }
-
-    private void AddVisitedType(BaseTypeDeclarationSyntax node)
-    {
-        var type = _semanticModel.GetDeclaredSymbol(node);
-
-        if (type != null) {
-            _visitedData.AddTypeDefinition(type.ToTypeDefinition());
-        }
-    }
-}
-
-public class SourceCodeMethodVisitor : CSharpSyntaxWalker
-{
-    private readonly VisitedData2 _visitedData;
+    private readonly MethodDefinitions _visitedData;
     private readonly Dictionary<SyntaxTree, SemanticModel> _semanticModels;
 
-    public SourceCodeMethodVisitor(IEnumerable<SemanticModel> semanticModels, VisitedData2 visitedData)
+    public MethodSourceCodeVisitor(IEnumerable<SemanticModel> semanticModels, MethodDefinitions visitedData)
     {
         _visitedData = visitedData;
         _semanticModels = semanticModels.ToDictionary(x => x.SyntaxTree);
@@ -163,17 +126,4 @@ public class SourceCodeMethodVisitor : CSharpSyntaxWalker
     private ISymbol? GetSymbol(ExpressionSyntax expression) => _semanticModels[expression.SyntaxTree].GetSymbolInfo(expression).Symbol;
 
     private ISymbol? GetSymbol(SyntaxNode syntaxNode) => _semanticModels[syntaxNode.SyntaxTree].GetDeclaredSymbol(syntaxNode);
-}
-
-public static class MethodDeclarationSyntaxExtensions
-{
-    public static MethodInfo GetInfo(this MethodDeclarationSyntax syntax)
-    {
-        return new MethodInfo(
-            new MethodName(syntax.Identifier.ToString()),
-            syntax.AttributeLists
-                .Select(x => new MethodAttribute(x.Attributes.ToFullString()))
-                .ToArray()
-        );
-    }
 }

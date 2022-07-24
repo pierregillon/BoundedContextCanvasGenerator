@@ -8,3 +8,8 @@ public static class A
     public static TypeDefinitionBuilder Class(string name) => TypeDefinitionBuilder.Class(name);
     public static MethodInfoBuilder Method => new();
 }
+
+public static class An
+{
+    public static InstanciatorBuilder Instanciator => new();
+}

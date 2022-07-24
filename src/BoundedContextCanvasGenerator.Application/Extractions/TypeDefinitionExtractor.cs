@@ -19,7 +19,7 @@ public class TypeDefinitionExtractor : ITypeDefinitionExtractor
 
         await foreach (var typeDefinition in types)
         {
-            if (settings.Commands.IsEnabled && settings.Commands.AllMatching(typeDefinition))
+            if (settings.InboundCommunication.CommandPredicates.IsEnabled && settings.InboundCommunication.CommandPredicates.AllMatching(typeDefinition))
             {
                 commands.Add(typeDefinition);
             }
@@ -36,7 +36,7 @@ public class TypeDefinitionExtractor : ITypeDefinitionExtractor
         }
 
         return new TypeDefinitionExtraction(
-            new ExtractedElements(settings.Commands.IsEnabled, commands), 
+            new ExtractedElements(settings.InboundCommunication.CommandPredicates.IsEnabled, commands), 
             new ExtractedElements(settings.DomainEvents.IsEnabled, domainEvents),
             new ExtractedElements(settings.UbiquitousLanguage.IsEnabled, aggregates)
         );

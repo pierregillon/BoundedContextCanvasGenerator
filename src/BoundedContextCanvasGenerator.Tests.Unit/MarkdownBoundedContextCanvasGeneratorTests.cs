@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BoundedContextCanvasGenerator.Application;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Infrastructure.Markdown;
+using BoundedContextCanvasGenerator.Tests.Unit.Utils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Xunit;
-using A = BoundedContextCanvasGenerator.Tests.Unit.Utils.TypeDefinitionBuilder;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit
 {
@@ -45,8 +47,8 @@ namespace BoundedContextCanvasGenerator.Tests.Unit
                 .Returns(CanvasDefinition.Empty);
             
             _canvasSettings
-                .Commands
-                .Returns(TypeDefinitionPredicates.Empty);
+                .InboundCommunication
+                .Returns(InboundCommunication.Empty);
 
             _canvasSettings
                 .DomainEvents
@@ -258,7 +260,7 @@ No ubiquitous language found
         }
 
         [Fact]
-        public async Task No_commands_configuration_do_not_generate_commands_section()
+        public async Task No_inbound_communication_configuration_do_not_generate_inbound_communication_section()
         {
             Define(new TypeDefinition[] {
                 A.Class("Some.Namespace.MyCommand").Implementing("Some.Namespace.ICommand"),
@@ -271,11 +273,15 @@ No ubiquitous language found
         }
 
         [Fact]
-        public async Task No_commands_renders_not_found()
+        public async Task No_inbound_communication_renders_not_found()
         {
             _canvasSettings
-                .Commands
-                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
+                .InboundCommunication
+                .Returns(new InboundCommunication(
+                    TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")),
+                    Enumerable.Empty<CollaboratorDefinition>(),
+                    Enumerable.Empty<PolicyDefinition>())
+                );
 
             var markdown = await GenerateMarkdown();
 
@@ -287,15 +293,47 @@ No inbound communication found
         }
 
         [Fact]
-        public async Task Inbound_communication_renders_commands_matching_pattern_as_mermaid_graph()
+        public async Task Inbound_communication_renders_mermaid_graph()
         {
             _canvasSettings
-                .Commands
-                .Returns(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")));
+                .InboundCommunication
+                .Returns(new InboundCommunication(
+                    TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand")),
+                    new[] { new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("Some.Namespace.IController"))) },
+                    new[] { new PolicyDefinition(new MethodAttributeMatch("Fact")) }
+                ));
 
+            var transactionController = A.Class("Web.TransactionController").Implementing("Some.Namespace.IController");
+            var unitTests = A.Class("Tests.TransactionTests");
+            
             Define(new TypeDefinition[] {
-                A.Class("Some.Namespace.RegisterNewTransactionCommand").Implementing("Some.Namespace.ICommand"),
-                A.Class("Some.Namespace.RescheduleTransactionCommand").Implementing("Some.Namespace.ICommand"),
+                A.Class("Some.Namespace.RegisterNewTransactionCommand")
+                    .Implementing("Some.Namespace.ICommand")
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(transactionController)
+                        .FromMethod(A.Method.Named("Register"))
+                    )
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(unitTests)
+                        .FromMethod(A.Method
+                            .Named("Transaction_registration_must_contain_a_not_paid_transaction")
+                            .WithAttribute("Fact")
+                        )
+                    ),
+
+                A.Class("Some.Namespace.RescheduleTransactionCommand")
+                    .Implementing("Some.Namespace.ICommand")
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(transactionController)
+                        .FromMethod(A.Method.Named("Reschedule"))
+                    )
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(unitTests)
+                        .FromMethod(A.Method
+                            .Named("Transaction_reschedule_must_be_in_the_future")
+                            .WithAttribute("Fact")
+                        )
+                    ),
             });
 
             var markdown = await GenerateMarkdown();
@@ -303,18 +341,24 @@ No inbound communication found
             markdown.Should().Contain(
 @"## Inbound communication
 
-### Namespace
-
----
-
 ```mermaid
 flowchart LR
-    Collaborators>""WebApp""]
-    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    classDef collaborators fill:#FFE5FF;
+    classDef policies fill:#FFFFAD, font-style:italic;
     SomeNamespaceRegisterNewTransactionCommand[""Register new transaction""]
+    SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator>""Web app""]
+    class SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator collaborators;
+    SomeNamespaceRegisterNewTransactionCommandPolicies[/""Transaction registration must contain a not paid transaction""/]
+    class SomeNamespaceRegisterNewTransactionCommandPolicies policies;
     SomeNamespaceRescheduleTransactionCommand[""Reschedule transaction""]
-    Collaborators --> SomeNamespaceRegisterNewTransactionCommand
-    Collaborators --> SomeNamespaceRescheduleTransactionCommand
+    SomeNamespaceRescheduleTransactionCommandWebAppCollaborator>""Web app""]
+    class SomeNamespaceRescheduleTransactionCommandWebAppCollaborator collaborators;
+    SomeNamespaceRescheduleTransactionCommandPolicies[/""Transaction reschedule must be in the future""/]
+    class SomeNamespaceRescheduleTransactionCommandPolicies policies;
+    SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator --> SomeNamespaceRegisterNewTransactionCommand
+    SomeNamespaceRegisterNewTransactionCommand --- SomeNamespaceRegisterNewTransactionCommandPolicies
+    SomeNamespaceRescheduleTransactionCommandWebAppCollaborator --> SomeNamespaceRescheduleTransactionCommand
+    SomeNamespaceRescheduleTransactionCommand --- SomeNamespaceRescheduleTransactionCommandPolicies
 ```");
         }
 

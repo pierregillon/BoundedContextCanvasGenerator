@@ -4,7 +4,7 @@ using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
-public record CollaboratorDefinition(string Name, TypeDefinitionPredicates Predicates)
+public record CollaboratorDefinition2(string Name, TypeDefinitionPredicates Predicates)
 {
     public string FriendlyName => this.Name.ToReadableSentence();
     public string MermaidName => this.Name + "Collaborator";

@@ -7,10 +7,10 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
 public class InboundCommunicationFlowChartBuilder2
 {
-    private readonly IEnumerable<CollaboratorDefinition> _collaboratorDefinitions;
+    private readonly IEnumerable<CollaboratorDefinition2> _collaboratorDefinitions;
     private readonly IEnumerable<PolicyDefinition> _policyDefinitions;
 
-    public InboundCommunicationFlowChartBuilder2(IEnumerable<CollaboratorDefinition> collaboratorDefinitions, IEnumerable<PolicyDefinition> policyDefinitions)
+    public InboundCommunicationFlowChartBuilder2(IEnumerable<CollaboratorDefinition2> collaboratorDefinitions, IEnumerable<PolicyDefinition> policyDefinitions)
     {
         _collaboratorDefinitions = collaboratorDefinitions;
         _policyDefinitions = policyDefinitions;
@@ -71,7 +71,7 @@ public class InboundCommunicationFlowChartBuilder2
     private static Node BuildNode(Command command)
         => Node.Named(new MermaidName(command.MermaidName, command.FriendlyName));
 
-    private static Node BuildNode(CollaboratorDefinition collaborator, Command command)
+    private static Node BuildNode(CollaboratorDefinition2 collaborator, Command command)
         => Node
             .Named(new MermaidName(collaborator.NameFor(command), collaborator.FriendlyName))
             .Shaped(NodeShape.Asymmetric)

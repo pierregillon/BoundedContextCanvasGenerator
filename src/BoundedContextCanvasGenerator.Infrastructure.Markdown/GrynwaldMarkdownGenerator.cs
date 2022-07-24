@@ -32,7 +32,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
         }
 
         if (extraction.Commands.IsEnabled) {
-            yield return GenerateInboundCommunicationSection(extraction.Commands.Values).ToContainerBlock();
+            yield return GenerateInboundCommunicationSection(extraction.Commands.Values, canvasSettings).ToContainerBlock();
         }
 
         if (extraction.DomainEvents.IsEnabled) {
@@ -91,7 +91,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
         }
     }
 
-    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(IReadOnlyCollection<TypeDefinition> commands)
+    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(IReadOnlyCollection<TypeDefinition> commands, ICanvasSettings canvasSettings)
     {
         yield return new MdHeading(2, "Inbound communication");
 
@@ -99,7 +99,11 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
             yield return new MdParagraph("No inbound communication found");
         }
         else {
-            yield return InboundCommunicationFlowChartBuilder.From(commands).Build(true);
+            //yield return InboundCommunicationFlowChartBuilder.From(commands).Build(true);
+            yield return new InboundCommunicationFlowChartBuilder2(
+                canvasSettings.InboundCommunication.CollaboratorDefinitions.Select(x => new CollaboratorDefinition2(x.Name, x.Predicates)).ToArray(),
+                canvasSettings.InboundCommunication.PolicyDefinitions
+            ).Build(commands);
         }
     }
 

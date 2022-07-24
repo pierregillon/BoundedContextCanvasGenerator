@@ -10,13 +10,13 @@ public class StaticCanvasSettings : ICanvasSettings
         Name = CanvasName.From(dto?.Name);
         Definition = dto?.Definition?.Build() ?? CanvasDefinition.Empty;
         UbiquitousLanguage = dto?.UbiquitousLanguage?.Build() ?? TypeDefinitionPredicates.Empty;
-        Commands = dto?.InboundCommunication?.Build() ?? TypeDefinitionPredicates.Empty;
+        InboundCommunication = dto?.InboundCommunication?.Build() ?? InboundCommunication.Empty;
         DomainEvents = dto?.DomainEvents?.Build() ?? TypeDefinitionPredicates.Empty;
     }
 
     public CanvasName Name { get; }
     public CanvasDefinition Definition { get; }
-    public TypeDefinitionPredicates Commands { get; }
+    public InboundCommunication InboundCommunication { get; }
     public TypeDefinitionPredicates DomainEvents { get; }
     public TypeDefinitionPredicates UbiquitousLanguage { get; }
 }

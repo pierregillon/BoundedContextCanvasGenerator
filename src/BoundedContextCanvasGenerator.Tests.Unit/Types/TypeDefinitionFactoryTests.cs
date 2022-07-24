@@ -45,10 +45,11 @@ public class TypeDefinitionFactoryTests
                 A.Class("CreateUserCommand")
                     .Implementing("System.IEquatable<CreateUserCommand>")
                     .InAssembly("Test")
-                    .InstanciatedBy("Post", 
-                        A.Class("UserController")
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController")
                             .Implementing("System.IEquatable<UserController>")
-                            .InAssembly("Test")
+                            .InAssembly("Test"))
+                        .FromMethod(A.Method.Named("Post"))
                     )
 
             });

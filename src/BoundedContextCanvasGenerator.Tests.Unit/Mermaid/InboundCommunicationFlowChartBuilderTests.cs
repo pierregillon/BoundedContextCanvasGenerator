@@ -5,11 +5,9 @@ using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Markdown;
-using BoundedContextCanvasGenerator.Infrastructure.Types;
+using BoundedContextCanvasGenerator.Tests.Unit.Utils;
 using FluentAssertions;
 using Xunit;
-
-using A = BoundedContextCanvasGenerator.Tests.Unit.Utils.TypeDefinitionBuilder;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit.Mermaid
 {
@@ -190,7 +188,7 @@ flowchart LR
         public void Cannot_generate_flowchart_from_empty_collection()
         {
             Action action = () => _ = new InboundCommunicationFlowChartBuilder2(
-                Enumerable.Empty<CollaboratorDefinition>(), 
+                Enumerable.Empty<CollaboratorDefinition2>(), 
                 Enumerable.Empty<PolicyDefinition>()
             ).Build(Array.Empty<TypeDefinition>());
 
@@ -220,7 +218,10 @@ flowchart LR
         {
             var types = new TypeDefinition[] {
                 A.Class("Test.Namespace.OrderNewProductCommand")
-                    .InstanciatedBy("Post", A.Class("UserController"))
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController"))
+                        .FromMethod(A.Method.Named("Post"))
+                    )
             };
 
             GenerateMermaid(types)
@@ -237,11 +238,14 @@ flowchart LR
         {
             var types = new TypeDefinition[] {
                 A.Class("Test.Namespace.OrderNewProductCommand")
-                    .InstanciatedBy("Post", A.Class("UserController"))
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController"))
+                        .FromMethod(A.Method.Named("Post"))
+                    )
             };
 
             GenerateMermaid(types, new[] {
-                    new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
+                    new CollaboratorDefinition2("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
                 })
                 .Should()
                 .Be(
@@ -260,13 +264,19 @@ flowchart LR
         {
             var types = new TypeDefinition[] {
                 A.Class("Test.Namespace.OrderNewProductCommand")
-                    .InstanciatedBy("Post", A.Class("UserController"))
-                    .InstanciatedBy("Post", A.Class("MobileController"))
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController"))
+                        .FromMethod(A.Method.Named("Post"))
+                    )
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("MobileController"))
+                        .FromMethod(A.Method.Named("Post"))
+                    )
             };
 
             GenerateMermaid(types, new [] { 
-                new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike("UserController"))),
-                new CollaboratorDefinition("MobileApp", TypeDefinitionPredicates.From(new NamedLike("MobileController"))),
+                new CollaboratorDefinition2("WebApp", TypeDefinitionPredicates.From(new NamedLike("UserController"))),
+                new CollaboratorDefinition2("MobileApp", TypeDefinitionPredicates.From(new NamedLike("MobileController"))),
             })
                 .Should()
                 .Be(
@@ -288,18 +298,20 @@ flowchart LR
         {
             var types = new TypeDefinition[] {
                 A.Class("Test.Namespace.OrderNewProductCommand")
-                    .InstanciatedBy("OrderNewProduct",
-                        A.Class("UserController")
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController"))
+                        .FromMethod(A.Method.Named("OrderNewProduct"))
                     ),
 
                 A.Class("Test.Namespace.CancelOrderCommand")
-                    .InstanciatedBy("CancelOrder",
-                        A.Class("UserController")
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController"))
+                        .FromMethod(A.Method.Named("CancelOrder"))
                     )
             };
 
             GenerateMermaid(types, new [] { 
-                new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
+                new CollaboratorDefinition2("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
             })
                 .Should()
                 .Be(
@@ -335,7 +347,7 @@ flowchart LR
 
             GenerateMermaid(
                     types,
-                    Array.Empty<CollaboratorDefinition>(),
+                    Array.Empty<CollaboratorDefinition2>(),
                     new PolicyDefinition[] { new(new MethodAttributeMatch("Trait\\(\"Category\", \"BoundedContextCanvasPolicy\"\\)")) }
                 )
                 .Should()
@@ -350,10 +362,10 @@ flowchart LR
 ```");
         }
 
-        private static string GenerateMermaid(TypeDefinition[] types, IEnumerable<CollaboratorDefinition>? collaborators = null, IEnumerable<PolicyDefinition>? policyDefinitions = null)
+        private static string GenerateMermaid(TypeDefinition[] types, IEnumerable<CollaboratorDefinition2>? collaborators = null, IEnumerable<PolicyDefinition>? policyDefinitions = null)
         {
             var builder = new InboundCommunicationFlowChartBuilder2(
-                collaborators ?? Enumerable.Empty<CollaboratorDefinition>(),
+                collaborators ?? Enumerable.Empty<CollaboratorDefinition2>(),
                 policyDefinitions ?? Enumerable.Empty<PolicyDefinition>()
             );
 

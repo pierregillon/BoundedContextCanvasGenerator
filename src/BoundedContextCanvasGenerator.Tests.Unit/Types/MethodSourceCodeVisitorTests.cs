@@ -242,6 +242,44 @@ public class MethodSourceCodeVisitorTests
     }
 
     [Fact]
+    public void Extract_declared_types_instanciated_by_method_by_traversing_method_invocation2()
+    {
+        const string sourceCode = @"
+    public record CreateUserCommand;
+    
+    [ApiController]
+    [Route(""[controller]"")]
+    public class CatalogController : ControllerBase
+    {
+        private readonly ICommandDispatcher _commandDispatcher;
+
+        public CatalogController(ICommandDispatcher commandDispatcher) => _commandDispatcher = commandDispatcher;
+
+        [HttpPost]
+        public async Task CreateUser([FromBody] CreateUserModel model)
+        {
+            await this._commandDispatcher.Dispatch(new CreateUserCommand(new CatalogName(model.Name), new CatalogDescription(model.Description)));
+        }
+    }
+";
+        var methodDefinitions = Parse(sourceCode);
+        
+        methodDefinitions
+            .Should()
+            .Be(
+                A.MethodDefinitions
+                    .With(A.Type
+                        .Named("CatalogController")
+                        .WithMethod(A.MethodDefinition
+                            .WithInfo(A.Method.Named("CreateUser").WithAttribute("HttpPost"))
+                            .Instanciating("CreateUserCommand")
+                        )
+                    )
+                    .Build()
+            );
+    }
+
+    [Fact]
     public void Extract_declared_types_instanciated_by_method_by_traversing_return_method_invocation()
     {
         const string sourceCode = @"
@@ -280,7 +318,6 @@ public class MethodSourceCodeVisitorTests
                     .Build()
             );
     }
-
 
     [Fact]
     public void Extract_declared_types_instanciated_by_method_by_traversing_different_source_codes()

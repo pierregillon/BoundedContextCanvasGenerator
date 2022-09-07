@@ -1,5 +1,8 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Types;
+﻿using System.Diagnostics;
 
+namespace BoundedContextCanvasGenerator.Domain.Types;
+
+[DebuggerDisplay("{Path}")]
 public record Namespace(string Path)
 {
     private const char SEPARATOR = '.';

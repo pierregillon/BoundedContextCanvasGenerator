@@ -1,8 +1,10 @@
-﻿using BoundedContextCanvasGenerator.Domain.Types;
+﻿using System.Diagnostics;
+using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 
-public record MethodDefinition(MethodInfo Method, IEnumerable<TypeFullName> InstanciatedTypes)
+[DebuggerDisplay("Method={Method}, InstanciatedTypes={InstanciatedTypes.Count}")]
+public record MethodDefinition(MethodInfo Method, IReadOnlyCollection<TypeFullName> InstanciatedTypes)
 {
     public virtual bool Equals(MethodDefinition? other)
     {
@@ -12,4 +14,6 @@ public record MethodDefinition(MethodInfo Method, IEnumerable<TypeFullName> Inst
     }
 
     public override int GetHashCode() => HashCode.Combine(Method, InstanciatedTypes);
+
+    public bool IsInstanciating(TypeFullName typeFullName) => InstanciatedTypes.Contains(typeFullName);
 }

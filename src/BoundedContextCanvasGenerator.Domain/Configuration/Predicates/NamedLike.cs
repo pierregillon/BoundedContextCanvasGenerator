@@ -10,7 +10,7 @@ public record NamedLike(string Pattern) : ITypeDefinitionPredicate
     public bool IsMatching(TypeDefinition type)
         => _regex.IsMatch(type.FullName.Value);
 
-    public virtual bool Equals(ImplementsInterfaceMatching? other)
+    public virtual bool Equals(NamedLike? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;

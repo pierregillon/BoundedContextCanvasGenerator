@@ -1,4 +1,5 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
+﻿using System;
+using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 using FluentAssertions;
@@ -21,6 +22,24 @@ public class TypeDefinitionPredicatesDtoTests
             .Values
             .Should()
             .Equal(new OfType(TypeKind.Class));
+    }
+
+    [Fact]
+    public void Parse_a_named_class()
+    {
+        var dto = new TypeDefinitionPredicatesDto {
+            Selector = "class named '.*Controller$'"
+        };
+
+        var predicates = dto.Build();
+
+        predicates
+            .Values
+            .Should()
+            .Equal(
+                new OfType(TypeKind.Class), 
+                new NamedLike(".*Controller$")
+            );
     }
 
     [Fact]

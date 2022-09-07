@@ -11,8 +11,9 @@ public class PredicateAnalyser
     private static readonly string KindRegex = $"(?<Kind>{Enum.GetValues<TypeKind>().Select(x => x.ToString().ToLower()).JoinWith('|')})";
     private const string ModifierRegex = "((?<Modifier>\\w*) )?";
     private const string ImplementingRegex = "( implementing '(?<Implementing>\\S*)')?";
+    private const string Named = "( named '(?<Named>\\S*)')?";
 
-    private readonly Regex _regex = new($"{ModifierRegex}{KindRegex}{ImplementingRegex}");
+    private readonly Regex _regex = new($"{ModifierRegex}{KindRegex}{Named}{ImplementingRegex}");
 
     public IEnumerable<ITypeDefinitionPredicate> Analyse(string selector)
     {
@@ -30,6 +31,10 @@ public class PredicateAnalyser
 
         if (TryGetGroup(match, "Implementing", out var pattern)) {
             yield return new ImplementsInterfaceMatching(pattern);
+        }
+
+        if (TryGetGroup(match, "Named", out var named)) {
+            yield return new NamedLike(named);
         }
     }
 

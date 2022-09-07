@@ -65,43 +65,51 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
                 foreach (var symbol1 in GetSymbols(objectCreationExpressionSyntax))
                     yield return symbol1;
             }
-            else if (variableDeclaratorSyntax.Initializer?.Value is InvocationExpressionSyntax invocationExpressionSyntax)
-            {
-                var symbol = GetSymbol(invocationExpressionSyntax.Expression);
-                if (symbol is not null && symbol.DeclaringSyntaxReferences.Any())
-                {
-                    var def = (MethodDeclarationSyntax)symbol.DeclaringSyntaxReferences.First().GetSyntax();
-                    var results = FindInstanciatedSymbolsFromMethodBody(def);
-                    foreach (var result in results)
-                    {
-                        yield return result;
-                    }
-                }
+            else if (variableDeclaratorSyntax.Initializer?.Value is InvocationExpressionSyntax invocationExpressionSyntax) {
+                foreach (var symbol2 in GetSymbols(invocationExpressionSyntax)) yield return symbol2;
+            }
+        }
+    }
+
+    private IReadOnlyCollection<ISymbol> FindSymbolsInExpressionSyntax(ExpressionSyntax syntax) =>
+        syntax switch
+        {
+            ObjectCreationExpressionSyntax objectCreationExpressionSyntax => GetSymbols(objectCreationExpressionSyntax).ToArray(),
+            InvocationExpressionSyntax invocationExpressionSyntax => GetSymbols(invocationExpressionSyntax).ToArray(),
+            AwaitExpressionSyntax awaitExpressionSyntax => FindSymbolsInExpressionSyntax(awaitExpressionSyntax.Expression),
+            _ => Enumerable.Empty<ISymbol>().ToArray()
+        };
+
+    private IEnumerable<ISymbol> GetSymbols(InvocationExpressionSyntax invocationExpressionSyntax)
+    {
+        foreach (ArgumentSyntax argument in invocationExpressionSyntax.ArgumentList.Arguments) {
+            foreach (var symbol1 in FindSymbolsInExpressionSyntax(argument.Expression)) {
+                yield return symbol1;
+            }
+        }
+
+        var symbol = GetSymbol(invocationExpressionSyntax.Expression);
+        if (symbol is not null && symbol.DeclaringSyntaxReferences.Any()) {
+            var def = (MethodDeclarationSyntax)symbol.DeclaringSyntaxReferences.First().GetSyntax();
+            var results = FindInstanciatedSymbolsFromMethodBody(def);
+            foreach (var result in results) {
+                yield return result;
             }
         }
     }
 
     private IEnumerable<ISymbol> GetSymbols(ExpressionStatementSyntax expressionStatementSyntax)
     {
-        try
-        {
-            var symbol = GetSymbol(expressionStatementSyntax.Expression);
-            if (symbol is null || !symbol.DeclaringSyntaxReferences.Any())
-            {
-                return Enumerable.Empty<ISymbol>();
-            }
-            var declarationSyntax = symbol.DeclaringSyntaxReferences.First().GetSyntax();
-            if (declarationSyntax is MethodDeclarationSyntax methodDeclarationSyntax)
-            {
-                return FindInstanciatedSymbolsFromMethodBody(methodDeclarationSyntax);
-            }
-            return Enumerable.Empty<ISymbol>();
+        var symbol = GetSymbol(expressionStatementSyntax.Expression);
+        if (symbol is null || !symbol.DeclaringSyntaxReferences.Any()) {
+            return FindSymbolsInExpressionSyntax(expressionStatementSyntax.Expression);
         }
-        catch (Exception e)
+        var declarationSyntax = symbol.DeclaringSyntaxReferences.First().GetSyntax();
+        if (declarationSyntax is MethodDeclarationSyntax methodDeclarationSyntax)
         {
-            Console.WriteLine(e.Message);
-            return Enumerable.Empty<ISymbol>();
+            return FindInstanciatedSymbolsFromMethodBody(methodDeclarationSyntax);
         }
+        return Enumerable.Empty<ISymbol>();
     }
 
     private IEnumerable<ISymbol> GetSymbols(ObjectCreationExpressionSyntax objectCreationExpressionSyntax)

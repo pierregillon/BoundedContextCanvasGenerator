@@ -24,14 +24,50 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ## Inbound communication
 
+### Catalog
+
+---
+
 ```mermaid
 flowchart LR
-    CatalogApplicationCatalogDeleteCatalog["Delete catalog"]
+    classDef collaborators fill:#FFE5FF;
+    classDef policies fill:#FFFFAD, font-style:italic;
+    CatalogApplicationCatalogDeleteCatalogCommand["Delete catalog"]
+    CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>"Web app"]
+    class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator collaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommand["Register new catalog"]
+    CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>"Web app"]
+    class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator collaborators;
+    CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/"A catalog name is unique&lt;br/&gt;Registering a catalog raises registered event"/]
+    class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
+    CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogDeleteCatalogCommand
+    CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogRegisterNewCatalogCommand
+    CatalogApplicationCatalogRegisterNewCatalogCommand --- CatalogApplicationCatalogRegisterNewCatalogCommandPolicies
+```
+
+### Items
+
+---
+
+```mermaid
+flowchart LR
+    classDef collaborators fill:#FFE5FF;
     CatalogApplicationItemsAddItemToCatalogCommand["Add item to catalog"]
+    CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>"Web app"]
+    class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator collaborators;
     CatalogApplicationItemsAdjustItemPriceCommand["Adjust item price"]
+    CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>"Web app"]
+    class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator collaborators;
     CatalogApplicationItemsEntitleItemCommand["Entitle item"]
+    CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>"Web app"]
+    class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator collaborators;
     CatalogApplicationItemsRemoveFromCatalogCommand["Remove from catalog"]
+    CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>"Web app"]
+    class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator collaborators;
+    CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator --> CatalogApplicationItemsAddItemToCatalogCommand
+    CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator --> CatalogApplicationItemsAdjustItemPriceCommand
+    CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand
+    CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator --> CatalogApplicationItemsRemoveFromCatalogCommand
 ```
 
 ## Domain events

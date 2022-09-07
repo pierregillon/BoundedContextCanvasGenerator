@@ -1,5 +1,8 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Types;
+﻿using System.Diagnostics;
 
+namespace BoundedContextCanvasGenerator.Domain.Types;
+
+[DebuggerDisplay("Name={Name}, Attributes={Attributes.Count}")]
 public record MethodInfo(MethodName Name, IReadOnlyCollection<MethodAttribute> Attributes)
 {
     public virtual bool Equals(MethodInfo? other)

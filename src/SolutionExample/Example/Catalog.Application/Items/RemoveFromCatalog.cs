@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Items;
 
-public record RemoveFromCatalogCommand(CatalogItemId Id, Title NewTitle) : ICommand;
+public record RemoveFromCatalogCommand(CatalogItemId Id) : ICommand;
 
 public class RemoveFromCatalogCommandHandler : ICommandHandler<RemoveFromCatalogCommand>
 {

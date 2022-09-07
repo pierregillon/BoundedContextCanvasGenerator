@@ -2,15 +2,15 @@
 
 namespace Catalog.Application.Catalog;
 
-public record DeleteCatalog(CatalogId Id) : ICommand;
+public record DeleteCatalogCommand(CatalogId Id) : ICommand;
 
-public class DeleteCatalogHandler : ICommandHandler<DeleteCatalog>
+public class DeleteCatalogHandler : ICommandHandler<DeleteCatalogCommand>
 {
     private readonly ICatalogRepository _repository;
 
     public DeleteCatalogHandler(ICatalogRepository repository) => _repository = repository;
 
-    public async Task Handle(DeleteCatalog command)
+    public async Task Handle(DeleteCatalogCommand command)
     {
         var catalog = await _repository.Get(command.Id);
 

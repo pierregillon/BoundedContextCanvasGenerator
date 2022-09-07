@@ -22,10 +22,24 @@ public class InboundCommunicationFlowChartBuilder2
 
         var commands = typeDefinitions.Select(x => new Command(x)).ToArray();
 
-        return new MdContainerBlock(GenerateMermaidBlock(commands, false));
+        return new MdContainerBlock(GenerateLanes(commands));
     }
 
-    private MdCodeBlock GenerateMermaidBlock(IEnumerable<Command> commands, bool splitIntoLanes)
+    private IEnumerable<MdBlock> GenerateLanes(IEnumerable<Command> commands)
+    {
+        var commandByLanes = commands.GroupBy(x => x.Lane).ToArray();
+        if (commandByLanes.Length == 1) {
+            return new MdBlock[]{ GenerateAllCommands(commandByLanes.Single()) };
+        }
+        return commandByLanes
+            .SelectMany(x => new MdBlock[] {
+                new MdHeading(3, x.Key.Name),
+                new MdParagraph(new MdRawMarkdownSpan("---")),
+                GenerateAllCommands(x)
+            });
+    }
+
+    private MdCodeBlock GenerateAllCommands(IEnumerable<Command> commands)
     {
         var flowChart = Flowchart.Start(Orientation.LeftToRight);
 
@@ -48,6 +62,7 @@ public class InboundCommunicationFlowChartBuilder2
                 Collaborators = _collaboratorDefinitions.Where(c => c.Match(x.Type))
             })
             .SelectMany(x => x.Collaborators.Select(c => BuildNode(c, command)))
+            .Distinct()
             .ToArray();
 
         foreach (var collaboratorNode in collaboratorNodes) {
@@ -56,8 +71,8 @@ public class InboundCommunicationFlowChartBuilder2
         }
 
         var policies = command.TypeDefinition.Instanciators
-            .Where(x => _policyDefinitions.Any(c => c.Match(x.Method)))
-            .Select(x => x.Method.Name.Value.ToReadableSentence())
+            .SelectMany(instanciator => instanciator.GetMethodsMatching(_policyDefinitions))
+            .Select(method => method.Name.Value.ToReadableSentence())
             .ToArray()
             .Pipe(Policies.From);
 

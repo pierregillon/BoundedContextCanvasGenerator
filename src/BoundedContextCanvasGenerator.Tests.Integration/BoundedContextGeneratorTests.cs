@@ -186,14 +186,19 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
     }
 
     [Fact]
-    public async Task Generating_BCC_with_inbound_communication_configuration_lists_commands_grouped_by_folders()
+    public async Task Generating_BCC_with_inbound_communication_configuration_lists_commands_collaborators_and_policies()
     {
         var plainText = await A
             .Generator()
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"inbound_communication:
-    selector: class implementing '.*ICommand$'
+    command_selector: class implementing '.*ICommand$'
+    collaborators:
+        - name: WebApp
+          selector: class named '.*Controller$'
+    policies:
+        - method_attribute_pattern: 'Fact'
 ")
             .Execute();
 
@@ -206,12 +211,19 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    Collaborators>""WebApp""]
-    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
-    CatalogApplicationCatalogDeleteCatalog[""Delete catalog""]
+    classDef collaborators fill:#FFE5FF;
+    classDef policies fill:#FFFFAD, font-style:italic;
+    CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
+    CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>""Web app""]
+    class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator collaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
-    Collaborators --> CatalogApplicationCatalogDeleteCatalog
-    Collaborators --> CatalogApplicationCatalogRegisterNewCatalogCommand
+    CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>""Web app""]
+    class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator collaborators;
+    CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/""A catalog name is unique&lt;br/&gt;Registering a catalog raises registered event""/]
+    class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
+    CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogDeleteCatalogCommand
+    CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogRegisterNewCatalogCommand
+    CatalogApplicationCatalogRegisterNewCatalogCommand --- CatalogApplicationCatalogRegisterNewCatalogCommandPolicies
 ```
 
 ### Items
@@ -220,16 +232,23 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    Collaborators>""WebApp""]
-    style Collaborators fill:#f9f,stroke:#333,stroke-width:2px
+    classDef collaborators fill:#FFE5FF;
     CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
+    CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>""Web app""]
+    class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator collaborators;
     CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
+    CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>""Web app""]
+    class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator collaborators;
     CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
+    CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>""Web app""]
+    class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator collaborators;
     CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
-    Collaborators --> CatalogApplicationItemsAddItemToCatalogCommand
-    Collaborators --> CatalogApplicationItemsAdjustItemPriceCommand
-    Collaborators --> CatalogApplicationItemsEntitleItemCommand
-    Collaborators --> CatalogApplicationItemsRemoveFromCatalogCommand
+    CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>""Web app""]
+    class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator collaborators;
+    CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator --> CatalogApplicationItemsAddItemToCatalogCommand
+    CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator --> CatalogApplicationItemsAdjustItemPriceCommand
+    CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand
+    CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator --> CatalogApplicationItemsRemoveFromCatalogCommand
 ```";
         plainText
             .Should()

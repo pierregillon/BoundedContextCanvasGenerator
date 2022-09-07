@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit.Utils;
@@ -5,7 +6,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Utils;
 public class InstanciatorBuilder
 {
     private TypeDefinition _typeDefinition;
-    private MethodInfo _methodInfo;
+    private List<MethodInfo> _methodInfos = new List<MethodInfo>();
 
     public InstanciatorBuilder OfType(TypeDefinition typeDefinition)
     {
@@ -15,11 +16,11 @@ public class InstanciatorBuilder
 
     public InstanciatorBuilder FromMethod(MethodInfo methodInfo)
     {
-        _methodInfo = methodInfo;
+        _methodInfos.Add(methodInfo);
         return this;
     }
 
-    public Instanciator Build() => new Instanciator(_typeDefinition, _methodInfo);
+    public Instanciator Build() => new(_typeDefinition, _methodInfos);
 
     public static implicit operator Instanciator(InstanciatorBuilder builder) => builder.Build();
 

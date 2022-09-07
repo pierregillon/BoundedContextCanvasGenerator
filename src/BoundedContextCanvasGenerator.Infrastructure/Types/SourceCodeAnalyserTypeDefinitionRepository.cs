@@ -27,7 +27,8 @@ public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionReposit
         }
     }
 
-    private async Task<IReadOnlyCollection<TypeDefinition>> BuildTypeDefinitions(Compilation?[] compilations) => await compilations.Pipe(RemoveEmpty).Pipe(_factory.Build);
+    private async Task<IReadOnlyCollection<TypeDefinition>> BuildTypeDefinitions(Compilation?[] compilations) 
+        => await compilations.Pipe(RemoveEmpty).Pipe(_factory.Build);
 
     private static IEnumerable<Compilation> RemoveEmpty(Compilation?[] compilations) 
         => compilations

@@ -69,7 +69,7 @@ public class TypeDefinitionBuilder
     
     public TypeDefinitionBuilder InstanciatedBy(MethodInfo methodInfo, TypeDefinition typeDefinition)
     {
-        this._instanciators.Add(new Instanciator(typeDefinition, methodInfo));
+        this._instanciators.Add(new Instanciator(typeDefinition, new []{ methodInfo }));
 
         return this;
     }

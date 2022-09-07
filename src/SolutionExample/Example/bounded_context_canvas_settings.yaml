@@ -11,6 +11,11 @@ definition:
 ubiquitous_language:
     selector: concrete class implementing '.*IAggregateRoot<.*>'
 inbound_communication:
-    selector: class implementing '.*ICommand$'
+    command_selector: class implementing '.*ICommand$'
+    collaborators:
+        - name: WebApp
+          selector: class named '.*Controller$'
+    policies:
+        - method_attribute_pattern: 'Fact'
 domain_events:
     selector: class implementing '.*IDomainEvent$'

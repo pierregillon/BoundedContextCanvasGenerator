@@ -1,7 +1,9 @@
-﻿using BoundedContextCanvasGenerator.Domain.Types;
+﻿using System.Diagnostics;
+using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 
+[DebuggerDisplay("MethodDefinitions : {_methods.Count}")]
 public class MethodDefinitions
 {
     private readonly Dictionary<TypeFullName, List<MethodDefinition>> _methods;
@@ -20,11 +22,18 @@ public class MethodDefinitions
         }
     }
 
-    public IEnumerable<(TypeFullName, MethodInfo)> FindInstanciators(TypeDefinition typeDefinition)
+    public IEnumerable<(TypeFullName, IEnumerable<MethodInfo>)> FindInstanciators(TypeDefinition typeDefinition)
     {
         return _methods
-            .Where(x => x.Value.Any(m => m.InstanciatedTypes.Contains(typeDefinition.FullName)))
-            .SelectMany(x => x.Value.Select(m => (x.Key, m.Method)))
+            .Select(x => new {
+                Name = x.Key,
+                MatchingMethods = x.Value
+                    .Where(method => method.IsInstanciating(typeDefinition.FullName))
+                    .Select(definition => definition.Method)
+                    .ToArray()
+            })
+            .Where(x => x.MatchingMethods.Length > 0)
+            .Select(x => (x.Name, x.MatchingMethods.AsEnumerable()))
             .ToArray();
     }
 

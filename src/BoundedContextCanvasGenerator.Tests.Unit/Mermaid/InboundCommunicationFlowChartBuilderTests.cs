@@ -310,9 +310,11 @@ flowchart LR
                     )
             };
 
-            GenerateMermaid(types, new [] { 
+            var mermaid = GenerateMermaid(types, new [] { 
                 new CollaboratorDefinition2("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
-            })
+            });
+
+            mermaid
                 .Should()
                 .Be(
 @"```mermaid
@@ -345,11 +347,13 @@ flowchart LR
                     ),
             };
 
-            GenerateMermaid(
-                    types,
-                    Array.Empty<CollaboratorDefinition2>(),
-                    new PolicyDefinition[] { new(new MethodAttributeMatch("Trait\\(\"Category\", \"BoundedContextCanvasPolicy\"\\)")) }
-                )
+            var mermaid = GenerateMermaid(
+                types,
+                Array.Empty<CollaboratorDefinition2>(),
+                new PolicyDefinition[] { new(new MethodAttributeMatch("Trait\\(\"Category\", \"BoundedContextCanvasPolicy\"\\)")) }
+            );
+
+            mermaid
                 .Should()
                 .Be(
                     @"```mermaid
@@ -359,6 +363,75 @@ flowchart LR
     TestNamespaceOrderNewProductCommandPolicies[/""Must contains at least one item to order""/]
     class TestNamespaceOrderNewProductCommandPolicies policies;
     TestNamespaceOrderNewProductCommand --- TestNamespaceOrderNewProductCommandPolicies
+```");
+        }
+
+        [Fact]
+        public void Split_into_lanes()
+        {
+            var types = new TypeDefinition[] {
+                A
+                    .Class("Test.Namespace.Order.OrderNewProductCommand")
+                    .InAssembly("Test.Namespace"),
+                A
+                    .Class("Test.Namespace.Contact.EditContactDetailsCommand")
+                    .InAssembly("Test.Namespace"),
+            };
+
+            var mermaid = GenerateMermaid(types);
+
+            mermaid
+                .Should()
+                .Be(
+@"### Order
+
+---
+
+```mermaid
+flowchart LR
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+```
+
+### Contact
+
+---
+
+```mermaid
+flowchart LR
+    TestNamespaceContactEditContactDetailsCommand[""Edit contact details""]
+```");
+        }
+
+
+        [Fact]
+        public void Two_different_collaborators_instanciating_the_same_command_create_a_single_link()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("UserController"))
+                        .FromMethod(A.Method.Named("OrderNewProduct"))
+                    )
+                    .InstanciatedBy(An.Instanciator
+                        .OfType(A.Class("AdminController"))
+                        .FromMethod(A.Method.Named("OrderNewProduct"))
+                    ),
+            };
+
+            var mermaid = GenerateMermaid(types, new[] {
+                new CollaboratorDefinition2("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
+            });
+
+            mermaid
+                .Should()
+                .Be(
+                    @"```mermaid
+flowchart LR
+    classDef collaborators fill:#FFE5FF;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator collaborators;
+    TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
 ```");
         }
 

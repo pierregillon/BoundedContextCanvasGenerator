@@ -1,5 +1,8 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Types;
+﻿using System.Diagnostics;
 
+namespace BoundedContextCanvasGenerator.Domain.Types;
+
+[DebuggerDisplay("{Value}")]
 public record TypeFullName(string Value)
 {
     public Namespace Namespace { get; } = Namespace.FromResourcePath(Value);

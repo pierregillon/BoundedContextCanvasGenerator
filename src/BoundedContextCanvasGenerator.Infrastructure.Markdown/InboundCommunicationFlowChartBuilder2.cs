@@ -94,7 +94,7 @@ public class InboundCommunicationFlowChartBuilder2
     
     private static Node BuildNode(Policies policies, Command command)
         => Node
-            .Named(new MermaidName(policies.NameFor(command), policies.FriendlyName))
+            .Named(new MermaidName(policies.NameFor(command), policies.FriendlyName, true))
             .Shaped(NodeShape.Parallelogram)
             .Styled(new NodeStyleClass("policies", new NodeStyle("fill:#FFFFAD, font-style:italic")));
 

@@ -38,7 +38,7 @@ flowchart LR
     CatalogApplicationCatalogRegisterNewCatalogCommand["Register new catalog"]
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator collaborators;
-    CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/"A catalog name is unique&lt;br/&gt;Registering a catalog raises registered event"/]
+    CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/"A catalog name is unique<br/>Registering a catalog raises registered event"/]
     class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogDeleteCatalogCommand
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogRegisterNewCatalogCommand

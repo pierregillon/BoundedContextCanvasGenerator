@@ -336,15 +336,12 @@ flowchart LR
         {
             var types = new TypeDefinition[] {
                 A.Class("Test.Namespace.OrderNewProductCommand")
-                    .InstanciatedBy(
-                        new MethodInfo(
-                            new MethodName("Must_contains_at_least_one_item_to_order"), new [] {
-                                new MethodAttribute("Fact"),
-                                new MethodAttribute("Trait(\"Category\", \"BoundedContextCanvasPolicy\")")
-                            }
-                        ),
-                        A.Class("Tests.OrderNewProductCommandTests")
-                    ),
+                    .InstanciatedBy(A.Class("Tests.OrderNewProductCommandTests"), new MethodInfo(
+                        new MethodName("Must_contains_at_least_one_item_to_order"), new [] {
+                            new MethodAttribute("Fact"),
+                            new MethodAttribute("Trait(\"Category\", \"BoundedContextCanvasPolicy\")")
+                        }
+                    )),
             };
 
             var mermaid = GenerateMermaid(
@@ -361,6 +358,44 @@ flowchart LR
     classDef policies fill:#FFFFAD, font-style:italic;
     TestNamespaceOrderNewProductCommand[""Order new product""]
     TestNamespaceOrderNewProductCommandPolicies[/""Must contains at least one item to order""/]
+    class TestNamespaceOrderNewProductCommandPolicies policies;
+    TestNamespaceOrderNewProductCommand --- TestNamespaceOrderNewProductCommandPolicies
+```");
+        }
+
+        [Fact]
+        public void Command_policies_are_separated_with_html_new_line_tag()
+        {
+            var types = new TypeDefinition[] {
+                A.Class("Test.Namespace.OrderNewProductCommand")
+                    .InstanciatedBy(A.Class("Tests.OrderNewProductCommandTests"), 
+                        new MethodInfo(
+                            new MethodName("Must_contains_at_least_one_item_to_order"), new[] {
+                                new MethodAttribute("Fact"),
+                                new MethodAttribute("Trait(\"Category\", \"BoundedContextCanvasPolicy\")")
+                            }
+                        ), new MethodInfo(
+                            new MethodName("Cannot_be_altered"), new[] {
+                                new MethodAttribute("Fact"),
+                                new MethodAttribute("Trait(\"Category\", \"BoundedContextCanvasPolicy\")")
+                            })
+                        ),
+            };
+
+            var mermaid = GenerateMermaid(
+                types,
+                Array.Empty<CollaboratorDefinition2>(),
+                new PolicyDefinition[] { new(new MethodAttributeMatch("Trait\\(\"Category\", \"BoundedContextCanvasPolicy\"\\)")) }
+            );
+
+            mermaid
+                .Should()
+                .Be(
+                    @"```mermaid
+flowchart LR
+    classDef policies fill:#FFFFAD, font-style:italic;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandPolicies[/""Must contains at least one item to order<br/>Cannot be altered""/]
     class TestNamespaceOrderNewProductCommandPolicies policies;
     TestNamespaceOrderNewProductCommand --- TestNamespaceOrderNewProductCommandPolicies
 ```");
@@ -401,7 +436,6 @@ flowchart LR
     TestNamespaceContactEditContactDetailsCommand[""Edit contact details""]
 ```");
         }
-
 
         [Fact]
         public void Two_different_collaborators_instanciating_the_same_command_create_a_single_link()

@@ -1,6 +1,6 @@
 ﻿namespace BoundedContextCanvasGenerator.Application.Extractions;
 
-public record TypeDefinitionExtraction(
+public record BoundedContextCanvas(
     ExtractedElements Commands,
     ExtractedElements DomainEvents, 
     ExtractedElements Aggregates

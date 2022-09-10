@@ -8,25 +8,25 @@ namespace BoundedContextCanvasGenerator.Application;
 public class MarkdownBoundedContextCanvasGenerator
 {
     private readonly ICanvasSettingsRepository _canvasSettingsRepository;
-    private readonly ITypeDefinitionExtractor _extractor;
+    private readonly IBoundedContextCanvasAnalyser _boundedContextCanvasAnalyser;
     private readonly IMarkdownGenerator _markdownGenerator;
 
     public MarkdownBoundedContextCanvasGenerator(
         ICanvasSettingsRepository canvasSettingsRepository,
-        ITypeDefinitionExtractor extractor,
+        IBoundedContextCanvasAnalyser boundedContextCanvasAnalyser,
         IMarkdownGenerator markdownGenerator)
     {
         _canvasSettingsRepository = canvasSettingsRepository;
-        _extractor = extractor;
+        _boundedContextCanvasAnalyser = boundedContextCanvasAnalyser;
         _markdownGenerator = markdownGenerator;
     }
 
     public async Task<string> Generate(SolutionPath solutionPath, CanvasSettingsPath canvasSettingsPath)
     {
-        var configuration = await _canvasSettingsRepository.Get(canvasSettingsPath);
+        var canvasSettings = await _canvasSettingsRepository.Get(canvasSettingsPath);
 
-        var extraction = await _extractor.Extract(solutionPath, configuration);
+        var boundedContextCanvas = await _boundedContextCanvasAnalyser.Analyse(solutionPath, canvasSettings);
 
-        return await _markdownGenerator.Generate(extraction, configuration);
+        return await _markdownGenerator.Render(boundedContextCanvas, canvasSettings);
     }
 }

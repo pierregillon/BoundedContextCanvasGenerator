@@ -3,13 +3,13 @@ using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Application.Extractions;
 
-public class TypeDefinitionExtractor : ITypeDefinitionExtractor
+public class BoundedContextCanvasSourceCodeAnalyser : IBoundedContextCanvasAnalyser
 {
     private readonly ITypeDefinitionRepository _repository;
 
-    public TypeDefinitionExtractor(ITypeDefinitionRepository repository) => _repository = repository;
+    public BoundedContextCanvasSourceCodeAnalyser(ITypeDefinitionRepository repository) => _repository = repository;
 
-    public async Task<TypeDefinitionExtraction> Extract(SolutionPath solutionPath, ICanvasSettings settings)
+    public async Task<BoundedContextCanvas> Analyse(SolutionPath solutionPath, ICanvasSettings settings)
     {
         var types = _repository.GetAll(solutionPath);
 
@@ -35,7 +35,7 @@ public class TypeDefinitionExtractor : ITypeDefinitionExtractor
             }
         }
 
-        return new TypeDefinitionExtraction(
+        return new BoundedContextCanvas(
             new ExtractedElements(settings.InboundCommunication.CommandPredicates.IsEnabled, commands), 
             new ExtractedElements(settings.DomainEvents.IsEnabled, domainEvents),
             new ExtractedElements(settings.UbiquitousLanguage.IsEnabled, aggregates)

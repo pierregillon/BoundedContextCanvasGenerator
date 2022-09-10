@@ -5,5 +5,5 @@ namespace BoundedContextCanvasGenerator.Application.Markdown;
 
 public interface IMarkdownGenerator
 {
-    Task<string> Generate(TypeDefinitionExtraction extraction, ICanvasSettings canvasSettings);
+    Task<string> Render(BoundedContextCanvas extraction, ICanvasSettings canvasSettings);
 }

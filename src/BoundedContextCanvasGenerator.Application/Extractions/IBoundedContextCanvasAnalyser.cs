@@ -3,7 +3,7 @@ using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Application.Extractions;
 
-public interface ITypeDefinitionExtractor
+public interface IBoundedContextCanvasAnalyser
 {
-    Task<TypeDefinitionExtraction> Extract(SolutionPath solutionPath, ICanvasSettings settings);
+    Task<BoundedContextCanvas> Analyse(SolutionPath solutionPath, ICanvasSettings settings);
 }

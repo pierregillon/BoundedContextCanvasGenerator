@@ -9,7 +9,7 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
 public class GrynwaldMarkdownGenerator : IMarkdownGenerator
 {
-    public Task<string> Generate(TypeDefinitionExtraction extraction, ICanvasSettings canvasSettings)
+    public Task<string> Render(BoundedContextCanvas extraction, ICanvasSettings canvasSettings)
     {
         var document = new MdDocument();
         
@@ -21,7 +21,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
             .Pipe(Task.FromResult);
     }
 
-    private static IEnumerable<MdContainerBlock> GenerateSections(TypeDefinitionExtraction extraction, ICanvasSettings canvasSettings)
+    private static IEnumerable<MdContainerBlock> GenerateSections(BoundedContextCanvas extraction, ICanvasSettings canvasSettings)
     {
         if (canvasSettings.Definition.IsEnabled) {
             yield return GenerateDefinitionSection(canvasSettings.Definition).ToContainerBlock();

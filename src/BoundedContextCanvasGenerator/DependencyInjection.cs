@@ -20,7 +20,7 @@ public static class DependencyInjection
             .AddScoped<MarkdownBoundedContextCanvasGenerator>()
             .AddScoped<ITypeDefinitionRepository, SourceCodeAnalyserTypeDefinitionRepository>()
             .AddScoped<ICanvasSettingsRepository, YamlFileCanvasSettingsRepository>()
-            .AddScoped<ITypeDefinitionExtractor, TypeDefinitionExtractor>()
+            .AddScoped<IBoundedContextCanvasAnalyser, BoundedContextCanvasSourceCodeAnalyser>()
             .AddScoped<IMarkdownGenerator, GrynwaldMarkdownGenerator>()
             .AddScoped<TypeDefinitionFactory>()
             ;
@@ -33,7 +33,7 @@ public static class DependencyInjection
         services
             .Decorate<ITypeDefinitionRepository, MonitorTypeDefinitionRepository>()
             .Decorate<ICanvasSettingsRepository, MonitorCanvasSettingsRepository>()
-            .Decorate<ITypeDefinitionExtractor, MonitorTypeDefinitionExtractor>()
+            .Decorate<IBoundedContextCanvasAnalyser, MonitorBoundedContextCanvasAnalyser>()
             .Decorate<IMarkdownGenerator, MonitorMarkdownGenerator>()
             .AddLogging(x => x.AddConsole())
             ;

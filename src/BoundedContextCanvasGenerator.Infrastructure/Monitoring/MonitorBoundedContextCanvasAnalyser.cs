@@ -6,20 +6,20 @@ using Microsoft.Extensions.Logging;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Monitoring
 {
-    public class MonitorTypeDefinitionExtractor : ITypeDefinitionExtractor
+    public class MonitorBoundedContextCanvasAnalyser : IBoundedContextCanvasAnalyser
     {
-        private readonly ITypeDefinitionExtractor _decorated;
-        private readonly ILogger<MonitorTypeDefinitionExtractor> _logger;
+        private readonly IBoundedContextCanvasAnalyser _decorated;
+        private readonly ILogger<MonitorBoundedContextCanvasAnalyser> _logger;
 
-        public MonitorTypeDefinitionExtractor(ITypeDefinitionExtractor decorated, ILogger<MonitorTypeDefinitionExtractor> logger)
+        public MonitorBoundedContextCanvasAnalyser(IBoundedContextCanvasAnalyser decorated, ILogger<MonitorBoundedContextCanvasAnalyser> logger)
         {
             _decorated = decorated;
             _logger = logger;
         }
-        public async Task<TypeDefinitionExtraction> Extract(SolutionPath solutionPath, ICanvasSettings settings)
+        public async Task<BoundedContextCanvas> Analyse(SolutionPath solutionPath, ICanvasSettings settings)
         {
             _logger.LogInformation("Starting type definition extraction");
-            var extraction = await this._decorated.Extract(solutionPath, settings);
+            var extraction = await this._decorated.Analyse(solutionPath, settings);
             _logger.LogInformation($"Commands: {extraction.Commands.Count}, Domain events: {extraction.DomainEvents.Count}");
             return extraction;
         }

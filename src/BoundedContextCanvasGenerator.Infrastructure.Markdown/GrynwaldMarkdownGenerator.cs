@@ -9,34 +9,34 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
 public class GrynwaldMarkdownGenerator : IMarkdownGenerator
 {
-    public Task<string> Render(BoundedContextCanvas extraction, ICanvasSettings canvasSettings)
+    public Task<string> Render(BoundedContextCanvas boundedContextCanvas)
     {
         var document = new MdDocument();
         
-        document.Root.Add(new MdHeading(1, canvasSettings.Name.Value));
-        document.Root.AddRange(GenerateSections(extraction, canvasSettings));
+        document.Root.Add(new MdHeading(1, boundedContextCanvas.Name.Value));
+        document.Root.AddRange(GenerateSections(boundedContextCanvas));
         
         return document
             .ToString()
             .Pipe(Task.FromResult);
     }
 
-    private static IEnumerable<MdContainerBlock> GenerateSections(BoundedContextCanvas extraction, ICanvasSettings canvasSettings)
+    private static IEnumerable<MdContainerBlock> GenerateSections(BoundedContextCanvas boundedContextCanvas)
     {
-        if (canvasSettings.Definition.IsEnabled) {
-            yield return GenerateDefinitionSection(canvasSettings.Definition).ToContainerBlock();
+        if (boundedContextCanvas.Definition.IsEnabled) {
+            yield return GenerateDefinitionSection(boundedContextCanvas.Definition).ToContainerBlock();
         }
 
-        if (extraction.Aggregates.IsEnabled) {
-            yield return GenerateUbiquitousLanguageSection(extraction.Aggregates.Values).ToContainerBlock();
+        if (boundedContextCanvas.Aggregates.IsEnabled) {
+            yield return GenerateUbiquitousLanguageSection(boundedContextCanvas.Aggregates.Values).ToContainerBlock();
         }
 
-        if (extraction.Commands.IsEnabled) {
-            yield return GenerateInboundCommunicationSection(extraction.Commands.Values, canvasSettings).ToContainerBlock();
+        if (boundedContextCanvas.Commands.IsEnabled) {
+            yield return GenerateInboundCommunicationSection(boundedContextCanvas).ToContainerBlock();
         }
 
-        if (extraction.DomainEvents.IsEnabled) {
-            yield return GenerateDomainEventsSection(extraction.DomainEvents.Values).ToContainerBlock();
+        if (boundedContextCanvas.DomainEvents.IsEnabled) {
+            yield return GenerateDomainEventsSection(boundedContextCanvas.DomainEvents.Values).ToContainerBlock();
         }
     }
 
@@ -91,17 +91,19 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
         }
     }
 
-    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(IReadOnlyCollection<TypeDefinition> commands, ICanvasSettings canvasSettings)
+    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(BoundedContextCanvas boundedContextCanvas)
     {
         yield return new MdHeading(2, "Inbound communication");
+
+        var commands = boundedContextCanvas.Commands.Values;
 
         if (!commands.Any()) {
             yield return new MdParagraph("No inbound communication found");
         }
         else {
             yield return new InboundCommunicationFlowChartBuilder(
-                canvasSettings.InboundCommunication.CollaboratorDefinitions.Select(x => new MermaidCollaboratorDefinition(x.Name, x.Predicates)).ToArray(),
-                canvasSettings.InboundCommunication.PolicyDefinitions
+                boundedContextCanvas.InboundCommunication.CollaboratorDefinitions.Select(x => new MermaidCollaboratorDefinition(x.Name, x.Predicates)).ToArray(),
+                boundedContextCanvas.InboundCommunication.PolicyDefinitions
             ).Build(commands);
         }
     }

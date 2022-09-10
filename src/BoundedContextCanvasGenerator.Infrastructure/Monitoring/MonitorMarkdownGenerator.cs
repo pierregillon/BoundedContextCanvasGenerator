@@ -16,10 +16,10 @@ public class MonitorMarkdownGenerator : IMarkdownGenerator
         _logger = logger;
     }
 
-    public async Task<string> Render(BoundedContextCanvas extraction, ICanvasSettings canvasSettings)
+    public async Task<string> Render(BoundedContextCanvas boundedContextCanvas)
     {
         _logger.LogInformation("Generating markdown from extraction");
-        var markdown = await _decorated.Render(extraction, canvasSettings);
+        var markdown = await _decorated.Render(boundedContextCanvas);
         _logger.LogInformation($"Markdown generated: {markdown.Length} char");
         return markdown;
     }

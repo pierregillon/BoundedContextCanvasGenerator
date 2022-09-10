@@ -27,6 +27,6 @@ public class MarkdownBoundedContextCanvasGenerator
 
         var boundedContextCanvas = await _boundedContextCanvasAnalyser.Analyse(solutionPath, canvasSettings);
 
-        return await _markdownGenerator.Render(boundedContextCanvas, canvasSettings);
+        return await _markdownGenerator.Render(boundedContextCanvas);
     }
 }

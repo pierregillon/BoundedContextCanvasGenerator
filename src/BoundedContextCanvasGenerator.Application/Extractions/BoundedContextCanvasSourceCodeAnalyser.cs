@@ -36,9 +36,12 @@ public class BoundedContextCanvasSourceCodeAnalyser : IBoundedContextCanvasAnaly
         }
 
         return new BoundedContextCanvas(
+            settings.Name,
+            settings.Definition,
             new ExtractedElements(settings.InboundCommunication.CommandPredicates.IsEnabled, commands), 
             new ExtractedElements(settings.DomainEvents.IsEnabled, domainEvents),
-            new ExtractedElements(settings.UbiquitousLanguage.IsEnabled, aggregates)
+            new ExtractedElements(settings.UbiquitousLanguage.IsEnabled, aggregates),
+            settings.InboundCommunication
         );
     }
 }

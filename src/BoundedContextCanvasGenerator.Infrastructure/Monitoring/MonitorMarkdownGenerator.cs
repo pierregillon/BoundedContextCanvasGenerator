@@ -1,5 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Application.Extractions;
 using BoundedContextCanvasGenerator.Application.Markdown;
+using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using Microsoft.Extensions.Logging;
 

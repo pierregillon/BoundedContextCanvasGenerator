@@ -2,7 +2,7 @@
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
 
-namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
+namespace BoundedContextCanvasGenerator.Domain.Configuration;
 
 public record MethodAttributeMatch(string Pattern)
 {

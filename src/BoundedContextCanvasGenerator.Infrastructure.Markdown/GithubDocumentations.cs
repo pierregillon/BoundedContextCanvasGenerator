@@ -1,4 +1,5 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration;
+﻿using BoundedContextCanvasGenerator.Domain.BC.Definition;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 

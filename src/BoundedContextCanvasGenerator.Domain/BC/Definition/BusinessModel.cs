@@ -1,4 +1,4 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Configuration;
+﻿namespace BoundedContextCanvasGenerator.Domain.BC.Definition;
 
 public enum BusinessModel
 {

@@ -1,5 +1,4 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration;
-using BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 
@@ -9,7 +8,7 @@ public record InboundCommunicationDto
     public IEnumerable<CollaboratorDto>? Collaborators { get; set; }
     public IEnumerable<PolicyDto>? Policies { get; set; }
 
-    public InboundCommunication Build()
+    public InboundCommunicationSettings Build()
     {
         if (CommandSelector is null)
         {
@@ -17,7 +16,7 @@ public record InboundCommunicationDto
         }
         var analyser = new PredicateAnalyser();
 
-        return new InboundCommunication(
+        return new InboundCommunicationSettings(
             TypeDefinitionPredicates.From(analyser.Analyse(CommandSelector)),
             Collaborators?
                 .Where(x => x.IsNotEmpty)

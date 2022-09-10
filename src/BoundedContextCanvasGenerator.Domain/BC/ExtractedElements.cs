@@ -1,6 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Types;
 
-namespace BoundedContextCanvasGenerator.Application.Extractions;
+namespace BoundedContextCanvasGenerator.Domain.BC;
 
 public record ExtractedElements(bool IsEnabled, IReadOnlyCollection<TypeDefinition> Values)
 {

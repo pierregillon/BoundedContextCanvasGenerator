@@ -1,4 +1,6 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration;
+﻿using BoundedContextCanvasGenerator.Domain.BC;
+using BoundedContextCanvasGenerator.Domain.BC.Definition;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 
@@ -12,8 +14,8 @@ public class CanvasDefinitionDto
 
     public CanvasDefinition Build() => new(
         Text.From(Description),
-        this.StrategicClassification?.Build() ?? Domain.Configuration.StrategicClassification.Empty,
-        this.DomainRole?.Build() ?? Domain.Configuration.DomainRole.Empty
+        this.StrategicClassification?.Build() ?? Domain.BC.Definition.StrategicClassification.Empty,
+        this.DomainRole?.Build() ?? Domain.BC.Definition.DomainRole.Empty
     );
 }
 

@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BoundedContextCanvasGenerat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8ABBF8D8-47D5-40C9-B6FB-77319A260B80}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoundedContextCanvasGenerator.Tests.Acceptance", "BoundedContextCanvasGenerator.Tests.Acceptance\BoundedContextCanvasGenerator.Tests.Acceptance.csproj", "{23738914-A330-4096-B49B-36FA77DF4FAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{50D44168-B592-40A2-8F57-9D0888B72C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50D44168-B592-40A2-8F57-9D0888B72C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50D44168-B592-40A2-8F57-9D0888B72C8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23738914-A330-4096-B49B-36FA77DF4FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23738914-A330-4096-B49B-36FA77DF4FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23738914-A330-4096-B49B-36FA77DF4FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23738914-A330-4096-B49B-36FA77DF4FAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +77,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{45833E34-ABA1-48D4-9CFF-A190AD52BC7E} = {8ABBF8D8-47D5-40C9-B6FB-77319A260B80}
 		{E3C08B61-D966-4A11-AE40-471E28E4D274} = {8ABBF8D8-47D5-40C9-B6FB-77319A260B80}
+		{23738914-A330-4096-B49B-36FA77DF4FAE} = {8ABBF8D8-47D5-40C9-B6FB-77319A260B80}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {66B3BD1A-E0E8-4EDB-B017-D3687B116498}

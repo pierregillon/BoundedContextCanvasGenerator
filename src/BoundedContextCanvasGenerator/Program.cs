@@ -27,16 +27,15 @@ static async Task RunApplicationAsync(Options options)
         .RegisterMonitoring()
         .BuildServiceProvider();
 
-    var generator = serviceProvider.GetRequiredService<MarkdownBoundedContextCanvasGenerator>();
-
     var solutionPath = new SolutionPath(options.SolutionPath);
     var canvasSettingsPath = options.GetCanvasSettingsPathOrDefault();
     var outputPath = options.GetOutputPathOrDefault();
 
-    var markdown = await generator.Generate(
-        solutionPath,
-        canvasSettingsPath
-    );
+    var generator = serviceProvider.GetRequiredService<GenerateBoundedContextCanvasFromSolutionPath>();
+    var exporter = serviceProvider.GetRequiredService<ExportBoundedContextCanvasToMarkdown>();
+
+    var boundedContextCanvas = await generator.Generate(solutionPath, canvasSettingsPath);
+    var markdown = await exporter.Export(boundedContextCanvas);
 
     await WriteAllText(outputPath, markdown);
 }

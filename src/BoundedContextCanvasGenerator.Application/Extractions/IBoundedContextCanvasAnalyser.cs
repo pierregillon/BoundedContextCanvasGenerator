@@ -1,9 +1,8 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration;
-using BoundedContextCanvasGenerator.Domain.Types;
+﻿using BoundedContextCanvasGenerator.Domain.BC;
 
 namespace BoundedContextCanvasGenerator.Application.Extractions;
 
 public interface IBoundedContextCanvasAnalyser
 {
-    Task<BoundedContextCanvas> Analyse(SolutionPath solutionPath, ICanvasSettings settings);
+    Task<BoundedContextCanvas> Analyse(TypeDefinitionExtract typeDefinitionExtract);
 }

@@ -1,4 +1,4 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Configuration;
+﻿namespace BoundedContextCanvasGenerator.Domain.BC.Definition;
 
 public record CanvasDefinition(
     Text Description, 
@@ -7,5 +7,5 @@ public record CanvasDefinition(
 )
 {
     public static CanvasDefinition Empty => new(Text.Empty, StrategicClassification.Empty, DomainRole.Empty);
-    public bool IsEnabled => !Description.IsEmpty || !StrategicClassification.IsEmpty || !DomainRole.IsEmpty;
+    public bool IsNotEmpty => !Description.IsEmpty || !StrategicClassification.IsEmpty || !DomainRole.IsEmpty;
 }

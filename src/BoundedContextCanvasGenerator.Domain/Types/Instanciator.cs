@@ -1,4 +1,4 @@
-﻿using BoundedContextCanvasGenerator.Infrastructure.Markdown;
+﻿using BoundedContextCanvasGenerator.Domain.Configuration;
 
 namespace BoundedContextCanvasGenerator.Domain.Types;
 

@@ -1,7 +1,9 @@
-﻿using BoundedContextCanvasGenerator.Application.Extractions;
-using BoundedContextCanvasGenerator.Application.Markdown;
+﻿using BoundedContextCanvasGenerator.Application.Markdown;
 using BoundedContextCanvasGenerator.Domain;
-using BoundedContextCanvasGenerator.Domain.Configuration;
+using BoundedContextCanvasGenerator.Domain.BC;
+using BoundedContextCanvasGenerator.Domain.BC.Definition;
+using BoundedContextCanvasGenerator.Domain.BC.Inbound;
+using BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
 using BoundedContextCanvasGenerator.Domain.Types;
 using Grynwald.MarkdownGenerator;
 
@@ -23,21 +25,22 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
 
     private static IEnumerable<MdContainerBlock> GenerateSections(BoundedContextCanvas boundedContextCanvas)
     {
-        if (boundedContextCanvas.Definition.IsEnabled) {
+        if (boundedContextCanvas.Definition.IsNotEmpty) {
             yield return GenerateDefinitionSection(boundedContextCanvas.Definition).ToContainerBlock();
         }
 
-        if (boundedContextCanvas.Aggregates.IsEnabled) {
-            yield return GenerateUbiquitousLanguageSection(boundedContextCanvas.Aggregates.Values).ToContainerBlock();
+        if (boundedContextCanvas.UbiquitousLanguage.IsNotEmpty) {
+            yield return GenerateUbiquitousLanguageSection(boundedContextCanvas.UbiquitousLanguage).ToContainerBlock();
         }
 
-        if (boundedContextCanvas.Commands.IsEnabled) {
-            yield return GenerateInboundCommunicationSection(boundedContextCanvas).ToContainerBlock();
+        if (boundedContextCanvas.InboundCommunication.IsNotEmpty)
+        {
+            yield return GenerateInboundCommunicationSection(boundedContextCanvas.InboundCommunication).ToContainerBlock();
         }
 
-        if (boundedContextCanvas.DomainEvents.IsEnabled) {
-            yield return GenerateDomainEventsSection(boundedContextCanvas.DomainEvents.Values).ToContainerBlock();
-        }
+        //if (boundedContextCanvas.DomainEvents.IsEnabled) {
+        //    yield return GenerateDomainEventsSection(boundedContextCanvas.DomainEvents.Values).ToContainerBlock();
+        //}
     }
 
     private static IEnumerable<MdBlock> GenerateDefinitionSection(CanvasDefinition canvasDefinition)
@@ -76,36 +79,19 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
         yield return new MdParagraph(domainRole.Description.Value);
     }
 
-    private static IEnumerable<MdBlock> GenerateUbiquitousLanguageSection(IReadOnlyCollection<TypeDefinition> aggregates)
+    private static IEnumerable<MdBlock> GenerateUbiquitousLanguageSection(UbiquitousLanguage ubiquitousLanguage)
     {
         yield return new MdHeading(2, "Ubiquitous language (Context-specific domain terminology)");
-
-        if (aggregates.Any()) {
-            yield return new MdTable(
-                aggregates.Select(x => x.FullName.Name.ToReadableSentence()).Pipe(x => new MdTableRow(x)),
-                aggregates.Select(x => x.Description.Value).Pipe(x => new MdTableRow(x))
-            );
-        }
-        else {
-            yield return new MdParagraph("No ubiquitous language found");
-        }
+        yield return new MdTable(
+            ubiquitousLanguage.Concepts.Select(x => x.Name).Pipe(x => new MdTableRow(x)),
+            ubiquitousLanguage.Concepts.Select(x => x.Description).Pipe(x => new MdTableRow(x))
+        );
     }
 
-    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(BoundedContextCanvas boundedContextCanvas)
+    private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(InboundCommunication inboundCommunication)
     {
         yield return new MdHeading(2, "Inbound communication");
-
-        var commands = boundedContextCanvas.Commands.Values;
-
-        if (!commands.Any()) {
-            yield return new MdParagraph("No inbound communication found");
-        }
-        else {
-            yield return new InboundCommunicationFlowChartBuilder(
-                boundedContextCanvas.InboundCommunication.CollaboratorDefinitions.Select(x => new MermaidCollaboratorDefinition(x.Name, x.Predicates)).ToArray(),
-                boundedContextCanvas.InboundCommunication.PolicyDefinitions
-            ).Build(commands);
-        }
+        yield return new InboundCommunicationFlowChartBuilder2(inboundCommunication).Build();
     }
 
     private static IEnumerable<MdBlock> GenerateDomainEventsSection(IReadOnlyCollection<TypeDefinition> domainEvents)

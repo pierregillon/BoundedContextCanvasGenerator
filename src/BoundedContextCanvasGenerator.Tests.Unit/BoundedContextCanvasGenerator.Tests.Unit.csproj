@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BoundedContextCanvasGenerator.Domain\BoundedContextCanvasGenerator.Domain.csproj" />
+    <ProjectReference Include="..\BoundedContextCanvasGenerator.Tests.Acceptance\BoundedContextCanvasGenerator.Tests.Acceptance.csproj" />
     <ProjectReference Include="..\BoundedContextCanvasGenerator\BoundedContextCanvasGenerator.csproj" />
   </ItemGroup>
 

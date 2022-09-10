@@ -1,6 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Types;
 
-namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
+namespace BoundedContextCanvasGenerator.Domain.Configuration;
 
 public record PolicyDefinition(MethodAttributeMatch Matcher)
 {

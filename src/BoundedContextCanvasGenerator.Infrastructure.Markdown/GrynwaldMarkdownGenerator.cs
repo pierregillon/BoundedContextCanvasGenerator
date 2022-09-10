@@ -99,8 +99,8 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
             yield return new MdParagraph("No inbound communication found");
         }
         else {
-            yield return new InboundCommunicationFlowChartBuilder2(
-                canvasSettings.InboundCommunication.CollaboratorDefinitions.Select(x => new CollaboratorDefinition2(x.Name, x.Predicates)).ToArray(),
+            yield return new InboundCommunicationFlowChartBuilder(
+                canvasSettings.InboundCommunication.CollaboratorDefinitions.Select(x => new MermaidCollaboratorDefinition(x.Name, x.Predicates)).ToArray(),
                 canvasSettings.InboundCommunication.PolicyDefinitions
             ).Build(commands);
         }

@@ -4,7 +4,6 @@ using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.BC.Definition;
 using BoundedContextCanvasGenerator.Domain.BC.Inbound;
 using BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
-using BoundedContextCanvasGenerator.Domain.Types;
 using Grynwald.MarkdownGenerator;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
@@ -13,14 +12,12 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
 {
     public Task<string> Render(BoundedContextCanvas boundedContextCanvas)
     {
-        var document = new MdDocument();
-        
-        document.Root.Add(new MdHeading(1, boundedContextCanvas.Name.Value));
-        document.Root.AddRange(GenerateSections(boundedContextCanvas));
-        
-        return document
-            .ToString()
-            .Pipe(Task.FromResult);
+        return Task.Factory.StartNew(() => {
+            var document = new MdDocument();
+            document.Root.Add(new MdHeading(1, boundedContextCanvas.Name.Value));
+            document.Root.AddRange(GenerateSections(boundedContextCanvas));
+            return document.ToString();
+        });
     }
 
     private static IEnumerable<MdContainerBlock> GenerateSections(BoundedContextCanvas boundedContextCanvas)
@@ -33,14 +30,9 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
             yield return GenerateUbiquitousLanguageSection(boundedContextCanvas.UbiquitousLanguage).ToContainerBlock();
         }
 
-        if (boundedContextCanvas.InboundCommunication.IsNotEmpty)
-        {
+        if (boundedContextCanvas.InboundCommunication.IsNotEmpty) {
             yield return GenerateInboundCommunicationSection(boundedContextCanvas.InboundCommunication).ToContainerBlock();
         }
-
-        //if (boundedContextCanvas.DomainEvents.IsEnabled) {
-        //    yield return GenerateDomainEventsSection(boundedContextCanvas.DomainEvents.Values).ToContainerBlock();
-        //}
     }
 
     private static IEnumerable<MdBlock> GenerateDefinitionSection(CanvasDefinition canvasDefinition)
@@ -91,19 +83,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
     private static IEnumerable<MdBlock> GenerateInboundCommunicationSection(InboundCommunication inboundCommunication)
     {
         yield return new MdHeading(2, "Inbound communication");
-        yield return new InboundCommunicationFlowChartBuilder2(inboundCommunication).Build();
-    }
-
-    private static IEnumerable<MdBlock> GenerateDomainEventsSection(IReadOnlyCollection<TypeDefinition> domainEvents)
-    {
-        yield return new MdHeading(2, "Domain events");
-
-        if (!domainEvents.Any()) {
-            yield return new MdParagraph("No domain event found");
-        }
-        else {
-            yield return new MdBulletList(domainEvents.Select(x => new MdListItem(x.FullName.Value)));
-        }
+        yield return new InboundCommunicationFlowChartBuilder(inboundCommunication).Build();
     }
 
     private static MdCompositeSpan GetNameAndDefinition(Enum @enum) =>
@@ -112,7 +92,7 @@ public class GrynwaldMarkdownGenerator : IMarkdownGenerator
             SpecialSpan.NewLine,
             new MdTextSpan(FindDocumentation(@enum))
         );
-    
+
     private static string FindDocumentation(Enum @enum)
     {
         var documentation = GithubDocumentations.StrategicClassificationDefinitions.TryGetValue(@enum, out var result) ? result : string.Empty;

@@ -4,9 +4,10 @@ namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 
 internal class InboundCommunicationSettingsBuilder
 {
-    private TypeDefinitionPredicates _commandPredicates;
+    private TypeDefinitionPredicates _commandPredicates = TypeDefinitionPredicates.Empty;
     private readonly List<CollaboratorDefinition> _collaboratorDefinitions = new();
     private readonly List<PolicyDefinition> _policyDefinitions = new();
+    private TypeDefinitionPredicates _domainEventDefinition = TypeDefinitionPredicates.Empty;
 
     public InboundCommunicationSettingsBuilder WithCommandMatching(TypeDefinitionPredicates commandTypeDefinitionPredicates)
     {
@@ -26,11 +27,18 @@ internal class InboundCommunicationSettingsBuilder
         return this;
     }
 
+    public InboundCommunicationSettingsBuilder WithDomainEventDefinition(TypeDefinitionPredicates typeDefinitionPredicates)
+    {
+        this._domainEventDefinition = typeDefinitionPredicates;
+        return this;
+    }
+
     private InboundCommunicationSettings Build() =>
         new(
             _commandPredicates,
             _collaboratorDefinitions,
-            _policyDefinitions
+            _policyDefinitions,
+            _domainEventDefinition
         );
 
     public static implicit operator InboundCommunicationSettings(InboundCommunicationSettingsBuilder builder) => builder.Build();

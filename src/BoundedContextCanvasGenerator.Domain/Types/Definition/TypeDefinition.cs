@@ -7,4 +7,10 @@ public record TypeDefinition(
     TypeModifiers Modifiers,
     IEnumerable<TypeFullName> ImplementedInterfaces,
     AssemblyDefinition AssemblyDefinition,
-    IEnumerable<Instanciator> Instanciators);
+    IEnumerable<Instanciator> Instanciators)
+{
+    public bool IsInstanciatedBy(TypeFullName other) 
+        => Instanciators.Any(i => i.Type.FullName == other);
+
+
+}

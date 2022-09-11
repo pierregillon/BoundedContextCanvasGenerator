@@ -1,4 +1,5 @@
-﻿using BoundedContextCanvasGenerator.Domain.Configuration;
+﻿using BoundedContextCanvasGenerator.Domain;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 
@@ -7,6 +8,7 @@ public record InboundCommunicationDto
     public string? CommandSelector { get; set; }
     public IEnumerable<CollaboratorDto>? Collaborators { get; set; }
     public IEnumerable<PolicyDto>? Policies { get; set; }
+    public string? DomainEventSelector { get; set; }
 
     public InboundCommunicationSettings Build()
     {
@@ -14,6 +16,7 @@ public record InboundCommunicationDto
         {
             throw new InvalidOperationException("Unable to select types : selector is null");
         }
+
         var analyser = new PredicateAnalyser();
 
         return new InboundCommunicationSettings(
@@ -25,7 +28,11 @@ public record InboundCommunicationDto
             Policies?
                 .Where(x => x.IsNotEmpty)
                 .Select(x => new PolicyDefinition(new MethodAttributeMatch(x.MethodAttributePattern)))
-                .ToArray() ?? Enumerable.Empty<PolicyDefinition>()
+                .ToArray() ?? Enumerable.Empty<PolicyDefinition>(),
+            DomainEventSelector?
+                .Pipe(analyser.Analyse)
+                .Pipe(TypeDefinitionPredicates.From) 
+                ?? TypeDefinitionPredicates.Empty
         );
     }
 }

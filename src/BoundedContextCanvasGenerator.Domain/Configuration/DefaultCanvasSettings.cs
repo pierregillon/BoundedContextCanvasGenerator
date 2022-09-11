@@ -10,7 +10,8 @@ public class DefaultCanvasSettings : ICanvasSettings
     public InboundCommunicationSettings InboundCommunicationSettings =>
         new(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand$")),
             Enumerable.Empty<CollaboratorDefinition>(),
-            Enumerable.Empty<PolicyDefinition>()
+            Enumerable.Empty<PolicyDefinition>(),
+            TypeDefinitionPredicates.Empty
         );
     public TypeDefinitionPredicates DomainEvents => new(new[] { new ImplementsInterfaceMatching(".*IDomainEvent$") });
     public TypeDefinitionPredicates UbiquitousLanguage => TypeDefinitionPredicates.Empty;

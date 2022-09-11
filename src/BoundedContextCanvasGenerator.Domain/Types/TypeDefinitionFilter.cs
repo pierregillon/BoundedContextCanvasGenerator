@@ -16,7 +16,7 @@ public class TypeDefinitionFilter
                 commands.Add(typeDefinition);
             }
 
-            if (settings.DomainEvents.IsEnabled && settings.DomainEvents.AllMatching(typeDefinition)) {
+            if (settings.InboundCommunicationSettings.DomainEventDefinitions.IsEnabled && settings.InboundCommunicationSettings.DomainEventDefinitions.AllMatching(typeDefinition)) {
                 domainEvents.Add(typeDefinition);
             }
 
@@ -27,7 +27,7 @@ public class TypeDefinitionFilter
 
         return new TypeDefinitionExtract(
             new ExtractedElements(settings.InboundCommunicationSettings.CommandPredicates.IsEnabled, commands),
-            new ExtractedElements(settings.DomainEvents.IsEnabled, domainEvents),
+            new ExtractedElements(settings.InboundCommunicationSettings.DomainEventDefinitions.IsEnabled, domainEvents),
             new ExtractedElements(settings.UbiquitousLanguage.IsEnabled, aggregates)
         );
     }

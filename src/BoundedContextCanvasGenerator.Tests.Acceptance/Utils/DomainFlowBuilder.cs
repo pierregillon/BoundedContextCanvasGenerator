@@ -4,10 +4,10 @@ namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 
 public class DomainFlowBuilder
 {
-    private List<DomainFlow> domainFlows = new();
-    private List<Collaborator> collaborators = new();
+    private readonly List<Collaborator> collaborators = new();
     private Command command = null;
-    private List<Policy> policies = new();
+    private readonly List<Policy> policies = new();
+    private readonly List<DomainEvent> _domainEvents = new();
 
     public DomainFlowBuilder WithCommand(Command command)
     {
@@ -27,7 +27,13 @@ public class DomainFlowBuilder
         return this;
     }
 
-    private DomainFlow Build() => new(collaborators, command, policies);
+    public DomainFlowBuilder WithDomainEvent(DomainEvent domainEvent)
+    {
+        _domainEvents.Add(domainEvent);
+        return this;
+    }
+
+    private DomainFlow Build() => new(collaborators, command, policies, this._domainEvents);
 
     public static implicit operator DomainFlow(DomainFlowBuilder builder) => builder.Build();
 }

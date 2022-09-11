@@ -31,52 +31,59 @@ public class BoundedContextCanvasAnalyser
             .GroupBy(x => x.ModuleName)
             .ToArray();
 
-        var modules = GenerateDomainModules(commandsGroupedByModule, canvasSettings.InboundCommunicationSettings);
+        var modules = GenerateDomainModules(
+            commandsGroupedByModule,
+            typeDefinitionExtract.DomainEvents.Values,
+            canvasSettings.InboundCommunicationSettings
+        );
 
         return new InboundCommunication(modules);
     }
 
-    private static IEnumerable<DomainModule> GenerateDomainModules(IEnumerable<IGrouping<Namespace, CommandWrapper>> commandsGroupedByModule, InboundCommunicationSettings inboundCommunicationSettings)
+    private static IEnumerable<DomainModule> GenerateDomainModules(
+        IEnumerable<IGrouping<Namespace, CommandWrapper>> commandsGroupedByModule,
+        IReadOnlyCollection<TypeDefinition> domainEventTypes,
+        InboundCommunicationSettings inboundCommunicationSettings
+    )
         => commandsGroupedByModule.Select(commandsFromSameModule =>
             new DomainModule(
                 commandsFromSameModule.Key.Name.ToReadableSentence(),
-                GetDomainFlows(commandsFromSameModule, inboundCommunicationSettings)
+                GetDomainFlows(commandsFromSameModule, domainEventTypes, inboundCommunicationSettings)
             )
         );
 
-    private static IEnumerable<DomainFlow> GetDomainFlows(IEnumerable<CommandWrapper> commands, InboundCommunicationSettings inboundCommunicationSettings)
-        => commands.Select(command => command.BuildDomainFlow(inboundCommunicationSettings));
+    private static IEnumerable<DomainFlow> GetDomainFlows(IEnumerable<CommandWrapper> commands, IReadOnlyCollection<TypeDefinition> domainEventTypes, InboundCommunicationSettings inboundCommunicationSettings)
+        => commands.Select(command => command.BuildDomainFlow(domainEventTypes, inboundCommunicationSettings));
 
-    private record CommandWrapper(TypeDefinition TypeDefinition)
+    private record CommandWrapper(TypeDefinition CommandTypeDefinition)
     {
-        private const string COMMAND_SUFFIX = "Command";
+        private Namespace ParentNamespace { get; } = CommandTypeDefinition.FullName.Namespace;
+        public Namespace ModuleName => ParentNamespace.TrimStart(CommandTypeDefinition.AssemblyDefinition.Namespace);
 
-        private Namespace ParentNamespace { get; } = TypeDefinition.FullName.Namespace;
-        public Namespace ModuleName => ParentNamespace.TrimStart(TypeDefinition.AssemblyDefinition.Namespace);
-
-        public DomainFlow BuildDomainFlow(InboundCommunicationSettings inboundCommunicationSettings)
+        public DomainFlow BuildDomainFlow(IEnumerable<TypeDefinition> domainEventTypes, InboundCommunicationSettings inboundCommunicationSettings)
             => new(
                 GetCollaborators(inboundCommunicationSettings.CollaboratorDefinitions),
-                BuildCommand(),
-                GetPolicies(inboundCommunicationSettings.PolicyDefinitions)
+                Command.FromType(CommandTypeDefinition),
+                GetPolicies(inboundCommunicationSettings.PolicyDefinitions),
+                GetDomainEvents(domainEventTypes)
             );
 
         private IEnumerable<Collaborator> GetCollaborators(IEnumerable<CollaboratorDefinition> collaboratorDefinitions)
-            => TypeDefinition.Instanciators
+            => CommandTypeDefinition.Instanciators
                 .SelectMany(i => i.FilterCollaboratorDefinitionsMatching(collaboratorDefinitions))
                 .Select(Collaborator.FromCollaboratorDefinition)
                 .ToArray();
 
-        private Command BuildCommand()
-            => new(
-                TypeDefinition.FullName.Name.TrimWord(COMMAND_SUFFIX).ToReadableSentence(),
-                TypeDefinition.FullName
-            );
-
         private IEnumerable<Policy> GetPolicies(IEnumerable<PolicyDefinition> policyDefinitions)
-            => TypeDefinition.Instanciators
+            => CommandTypeDefinition.Instanciators
                 .SelectMany(i => i.FilterMethodsMatching(policyDefinitions))
                 .Select(Policy.FromMethod)
+                .ToArray();
+
+        private IEnumerable<DomainEvent> GetDomainEvents(IEnumerable<TypeDefinition> domainEventTypes)
+            => domainEventTypes
+                .Where(domainEvent => domainEvent.IsInstanciatedBy(CommandTypeDefinition.FullName))
+                .Select(DomainEvent.FromType)
                 .ToArray();
     }
 }

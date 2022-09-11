@@ -185,6 +185,65 @@ flowchart LR
 ```");
     }
 
+    [Fact]
+    public void Renders_command_and_domain_event()
+    {
+        InboundCommunication inboundCommunication = A.InboundCommunication
+            .WithModule(A.DomainModule
+                .Named("Order")
+                .WithFlow(A.DomainFlow
+                    .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.Order.OrderNewProductCommand")))
+                    .WithDomainEvent(new DomainEvent("Product ordered", new TypeFullName("Test.Namespace.Order.ProductOrdered")))
+                )
+            );
+
+        var mermaid = GenerateMermaid(inboundCommunication);
+
+        mermaid
+            .Should()
+            .Be(
+@"```mermaid
+flowchart LR
+    classDef domainEvents fill:#FFA431;
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderProductOrdered[""Product ordered""]
+    class TestNamespaceOrderProductOrdered domainEvents;
+    TestNamespaceOrderOrderNewProductCommand -.-> TestNamespaceOrderProductOrdered
+```");
+    }
+
+    [Fact]
+    public void Renders_command_policy_and_domain_event()
+    {
+        InboundCommunication inboundCommunication = A.InboundCommunication
+            .WithModule(A.DomainModule
+                .Named("Order")
+                .WithFlow(A.DomainFlow
+                    .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.Order.OrderNewProductCommand")))
+                    .WithPolicy(new Policy("Must contains at least one item to order"))
+                    .WithDomainEvent(new DomainEvent("Product ordered", new TypeFullName("Test.Namespace.Order.ProductOrdered")))
+                )
+            );
+
+        var mermaid = GenerateMermaid(inboundCommunication);
+
+        mermaid
+            .Should()
+            .Be(
+@"```mermaid
+flowchart LR
+    classDef policies fill:#FFFFAD, font-style:italic;
+    classDef domainEvents fill:#FFA431;
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderOrderNewProductCommandPolicies[/""Must contains at least one item to order""/]
+    class TestNamespaceOrderOrderNewProductCommandPolicies policies;
+    TestNamespaceOrderProductOrdered[""Product ordered""]
+    class TestNamespaceOrderProductOrdered domainEvents;
+    TestNamespaceOrderOrderNewProductCommand --- TestNamespaceOrderOrderNewProductCommandPolicies
+    TestNamespaceOrderOrderNewProductCommandPolicies -.-> TestNamespaceOrderProductOrdered
+```");
+    }
+
     private static string GenerateMermaid(InboundCommunication inboundCommunication)
     {
         var builder = new InboundCommunicationFlowChartBuilder(inboundCommunication);

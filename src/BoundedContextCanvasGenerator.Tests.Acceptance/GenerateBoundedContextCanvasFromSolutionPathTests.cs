@@ -31,7 +31,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
         _canvasSettings.Name.Returns(CanvasName.Default);
         _canvasSettings.Definition.Returns(A.CanvasDefinition);
         _canvasSettings.UbiquitousLanguage.Returns(TypeDefinitionPredicates.Empty);
-        _canvasSettings.DomainEvents.Returns(TypeDefinitionPredicates.Empty);
+        _canvasSettings.InboundCommunicationSettings.Returns(InboundCommunicationSettings.Empty);
         _canvasSettings.InboundCommunicationSettings.Returns(InboundCommunicationSettings.Empty);
 
         canvasSettingsRepository
@@ -289,6 +289,42 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
                     .Named("Contact")
                     .WithFlow(
                         A.DomainFlow.WithCommand(new Command("Add contact", new TypeFullName("Some.Namespace.Contact.AddContactCommand")))
+                    )
+            });
+    }
+
+    [Fact]
+    public async Task Generates_domain_event_instanciated_by_command()
+    {
+        _canvasSettings
+            .InboundCommunicationSettings
+            .Returns(An.InboundCommunicationSettings
+                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithDomainEventDefinition(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IDomainEvent")))
+            );
+
+        _typeDefinitionRepository
+            .GetAll(SolutionPath)
+            .Returns(CollectionFrom(
+                A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"),
+                A.Class("Some.Namespace.Catalog.CatalogRegistered")
+                    .Implementing("IDomainEvent")
+                    .InstanciatedBy(A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"))
+            ));
+
+        var boundedContextCanvas = await Generate();
+
+        boundedContextCanvas
+            .InboundCommunication
+            .Modules
+            .Should()
+            .BeEquivalentTo(new DomainModule[] {
+                A.DomainModule
+                    .Named("Catalog")
+                    .WithFlow(
+                        A.DomainFlow
+                            .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.Catalog.RegisterCatalogCommand")))
+                            .WithDomainEvent(new DomainEvent("Catalog registered", new TypeFullName("Some.Namespace.Catalog.CatalogRegistered")))
                     )
             });
     }

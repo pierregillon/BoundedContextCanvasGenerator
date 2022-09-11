@@ -47,6 +47,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Configuration
           selector: class named '.*Controller$'
     policies:
         - method_attribute_pattern: 'Fact'
+    domain_event_selector: class implementing 'IDomainEvent'
     ";
 
             var configuration = _deserializer.Deserialize(yaml);
@@ -58,6 +59,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.Configuration
             configuration.InboundCommunication.Policies!.Should().BeEquivalentTo(new[] {
                 new PolicyDto { MethodAttributePattern = "Fact" }
             });
+            configuration.InboundCommunication.DomainEventSelector!.Should().Be("class implementing 'IDomainEvent'");
         }
     }
 }

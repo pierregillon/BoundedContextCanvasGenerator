@@ -3,12 +3,14 @@
 public record InboundCommunicationSettings(
     TypeDefinitionPredicates CommandPredicates,
     IEnumerable<CollaboratorDefinition> CollaboratorDefinitions,
-    IEnumerable<PolicyDefinition> PolicyDefinitions
+    IEnumerable<PolicyDefinition> PolicyDefinitions,
+    TypeDefinitionPredicates DomainEventDefinitions
 )
 {
     public static InboundCommunicationSettings Empty => new(
         TypeDefinitionPredicates.Empty, 
         Enumerable.Empty<CollaboratorDefinition>(), 
-        Enumerable.Empty<PolicyDefinition>()
+        Enumerable.Empty<PolicyDefinition>(),
+        TypeDefinitionPredicates.Empty
     );
 }

@@ -1,6 +1,6 @@
-using BoundedContextCanvasGenerator.Domain.Types;
-using AssemblyDefinition = BoundedContextCanvasGenerator.Domain.Types.AssemblyDefinition;
-using TypeDefinition = BoundedContextCanvasGenerator.Domain.Types.TypeDefinition;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
+using AssemblyDefinition = BoundedContextCanvasGenerator.Domain.Types.Definition.AssemblyDefinition;
+using TypeDefinition = BoundedContextCanvasGenerator.Domain.Types.Definition.TypeDefinition;
 
 namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 

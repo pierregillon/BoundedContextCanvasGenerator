@@ -1,6 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration;
 
-namespace BoundedContextCanvasGenerator.Domain.Types;
+namespace BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 public record Instanciator(TypeDefinition Type, IEnumerable<MethodInfo> Methods)
 {

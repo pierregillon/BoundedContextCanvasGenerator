@@ -1,5 +1,3 @@
-﻿using BoundedContextCanvasGenerator.Domain.BC;
-
-namespace BoundedContextCanvasGenerator.Application.Extractions;
+﻿namespace BoundedContextCanvasGenerator.Domain.Types;
 
 public record TypeDefinitionExtract(ExtractedElements Commands, ExtractedElements DomainEvents, ExtractedElements Aggregates);

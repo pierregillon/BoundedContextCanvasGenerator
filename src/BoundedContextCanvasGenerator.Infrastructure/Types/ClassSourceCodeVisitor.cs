@@ -1,4 +1,4 @@
-﻿using BoundedContextCanvasGenerator.Domain.Types;
+﻿using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 

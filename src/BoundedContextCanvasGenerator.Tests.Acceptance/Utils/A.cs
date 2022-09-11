@@ -1,6 +1,4 @@
-﻿using BoundedContextCanvasGenerator.Domain.Types;
-
-namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
+﻿namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 
 internal class A
 {

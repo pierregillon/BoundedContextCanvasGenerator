@@ -1,6 +1,5 @@
 ﻿using BoundedContextCanvasGenerator.Application;
-using BoundedContextCanvasGenerator.Application.Extractions;
-using BoundedContextCanvasGenerator.Application.Markdown;
+using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration;
@@ -17,14 +16,14 @@ public static class DependencyInjection
     public static IServiceCollection RegisterApplication(this IServiceCollection services)
     {
         services
-            .AddScoped<ExportBoundedContextCanvasToMarkdown>()
+            .AddScoped<RenderBoundedContextCanvas>()
             .AddScoped<GenerateBoundedContextCanvasFromSolutionPath>()
-            .AddScoped<ITypeDefinitionRepository, SourceCodeAnalyserTypeDefinitionRepository>()
-            .AddScoped<ITypeDefinitionExtractor, SourceCodeTypeDefinitionExtractor>()
-            .AddScoped<ICanvasSettingsRepository, YamlFileCanvasSettingsRepository>()
-            .AddScoped<IBoundedContextCanvasAnalyser, BoundedContextCanvasSourceCodeAnalyser>()
-            .AddScoped<IMarkdownGenerator, GrynwaldMarkdownGenerator>()
+            .AddScoped<BoundedContextCanvasAnalyser>()
             .AddScoped<TypeDefinitionFactory>()
+            .AddScoped<ITypeDefinitionRepository, SourceCodeAnalyserTypeDefinitionRepository>()
+            .AddScoped<TypeDefinitionFilter>()
+            .AddScoped<ICanvasSettingsRepository, YamlFileCanvasSettingsRepository>()
+            .AddScoped<IBoundedContextCanvasRenderer, GrynwaldMarkdownBoundedContextCanvasRenderer>()
             ;
         
         return services;
@@ -35,8 +34,7 @@ public static class DependencyInjection
         services
             .Decorate<ITypeDefinitionRepository, MonitorTypeDefinitionRepository>()
             .Decorate<ICanvasSettingsRepository, MonitorCanvasSettingsRepository>()
-            .Decorate<ITypeDefinitionExtractor, MonitorTypeDefinitionExtractor>()
-            .Decorate<IMarkdownGenerator, MonitorMarkdownGenerator>()
+            .Decorate<IBoundedContextCanvasRenderer, MonitorBoundedContextCanvasRenderer>()
             .AddLogging(x => x.AddConsole())
             ;
 

@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 namespace BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 

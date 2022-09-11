@@ -1,24 +1,17 @@
-﻿using BoundedContextCanvasGenerator.Domain.BC;
-using BoundedContextCanvasGenerator.Domain.Configuration;
-using BoundedContextCanvasGenerator.Domain.Types;
+﻿using BoundedContextCanvasGenerator.Domain.Configuration;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
-namespace BoundedContextCanvasGenerator.Application.Extractions;
+namespace BoundedContextCanvasGenerator.Domain.Types;
 
-public class SourceCodeTypeDefinitionExtractor : ITypeDefinitionExtractor
+public class TypeDefinitionFilter
 {
-    private readonly ITypeDefinitionRepository _repository;
-
-    public SourceCodeTypeDefinitionExtractor(ITypeDefinitionRepository repository) => _repository = repository;
-
-    public async Task<TypeDefinitionExtract> Extract(SolutionPath solutionPath, ICanvasSettings settings)
+    public TypeDefinitionExtract Filter(IReadOnlyCollection<TypeDefinition> types, ICanvasSettings settings)
     {
-        var types = _repository.GetAll(solutionPath);
-
         var commands = new List<TypeDefinition>();
         var domainEvents = new List<TypeDefinition>();
         var aggregates = new List<TypeDefinition>();
 
-        await foreach (var typeDefinition in types) {
+        foreach (var typeDefinition in types) {
             if (settings.InboundCommunicationSettings.CommandPredicates.IsEnabled && settings.InboundCommunicationSettings.CommandPredicates.AllMatching(typeDefinition)) {
                 commands.Add(typeDefinition);
             }

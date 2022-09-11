@@ -1,7 +1,7 @@
 ﻿using BoundedContextCanvasGenerator.Domain;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using Microsoft.CodeAnalysis;
-using TypeKind = BoundedContextCanvasGenerator.Domain.Types.TypeKind;
+using TypeKind = BoundedContextCanvasGenerator.Domain.Types.Definition.TypeKind;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Types;
 

@@ -1,5 +1,4 @@
-﻿using BoundedContextCanvasGenerator.Application.Markdown;
-using BoundedContextCanvasGenerator.Domain;
+﻿using BoundedContextCanvasGenerator.Domain;
 using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.BC.Definition;
 using BoundedContextCanvasGenerator.Domain.BC.Inbound;
@@ -8,15 +7,15 @@ using Grynwald.MarkdownGenerator;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Markdown;
 
-public class GrynwaldMarkdownGenerator : IMarkdownGenerator
+public class GrynwaldMarkdownBoundedContextCanvasRenderer : IBoundedContextCanvasRenderer
 {
-    public Task<string> Render(BoundedContextCanvas boundedContextCanvas)
+    public Task<Bytes> Render(BoundedContextCanvas boundedContextCanvas)
     {
         return Task.Factory.StartNew(() => {
             var document = new MdDocument();
             document.Root.Add(new MdHeading(1, boundedContextCanvas.Name.Value));
             document.Root.AddRange(GenerateSections(boundedContextCanvas));
-            return document.ToString();
+            return Bytes.FromString(document.ToString());
         });
     }
 

@@ -1,13 +1,12 @@
-﻿using BoundedContextCanvasGenerator.Domain;
-using BoundedContextCanvasGenerator.Domain.BC;
-using BoundedContextCanvasGenerator.Domain.BC.Inbound;
+﻿using BoundedContextCanvasGenerator.Domain.BC.Inbound;
 using BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
-namespace BoundedContextCanvasGenerator.Application.Extractions;
+namespace BoundedContextCanvasGenerator.Domain.BC;
 
-public class BoundedContextCanvasSourceCodeAnalyser : IBoundedContextCanvasAnalyser
+public class BoundedContextCanvasAnalyser
 {
     public async Task<BoundedContextCanvas> Analyse(TypeDefinitionExtract typeDefinitionExtract, ICanvasSettings canvasSettings) =>
         new(
@@ -64,8 +63,8 @@ public class BoundedContextCanvasSourceCodeAnalyser : IBoundedContextCanvasAnaly
 
         private IEnumerable<Collaborator> GetCollaborators(IEnumerable<CollaboratorDefinition> collaboratorDefinitions)
             => TypeDefinition.Instanciators
-                .SelectMany(instanciator => instanciator.FilterCollaboratorDefinitionsMatching(collaboratorDefinitions))
-                .Select(x => new Collaborator(x.Name.ToReadableSentence()))
+                .SelectMany(i => i.FilterCollaboratorDefinitionsMatching(collaboratorDefinitions))
+                .Select(Collaborator.FromCollaboratorDefinition)
                 .ToArray();
 
         private Command BuildCommand()
@@ -77,7 +76,7 @@ public class BoundedContextCanvasSourceCodeAnalyser : IBoundedContextCanvasAnaly
         private IEnumerable<Policy> GetPolicies(IEnumerable<PolicyDefinition> policyDefinitions)
             => TypeDefinition.Instanciators
                 .SelectMany(i => i.FilterMethodsMatching(policyDefinitions))
-                .Select(x => new Policy(x.Name.Value.ToReadableSentence()))
+                .Select(Policy.FromMethod)
                 .ToArray();
     }
 }

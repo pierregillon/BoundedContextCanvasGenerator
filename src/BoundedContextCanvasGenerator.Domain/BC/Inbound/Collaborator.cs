@@ -1,3 +1,8 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.BC.Inbound;
+﻿using BoundedContextCanvasGenerator.Domain.Configuration;
 
-public record Collaborator(string Name);
+namespace BoundedContextCanvasGenerator.Domain.BC.Inbound;
+
+public record Collaborator(string Name)
+{
+    public static Collaborator FromCollaboratorDefinition(CollaboratorDefinition collaboratorDefinition) => new(collaboratorDefinition.Name.ToReadableSentence());
+}

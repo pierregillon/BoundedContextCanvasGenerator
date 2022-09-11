@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace BoundedContextCanvasGenerator.Domain.Types;
+namespace BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 [DebuggerDisplay("Name={Name}, Attributes={Attributes.Count}")]
 public record MethodInfo(MethodName Name, IReadOnlyCollection<MethodAttribute> Attributes)

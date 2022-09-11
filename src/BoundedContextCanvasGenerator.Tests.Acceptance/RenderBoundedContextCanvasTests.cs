@@ -3,7 +3,7 @@ using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.BC.Definition;
 using BoundedContextCanvasGenerator.Domain.BC.Inbound;
 using BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,17 +12,17 @@ using Command = BoundedContextCanvasGenerator.Domain.BC.Inbound.Command;
 
 namespace BoundedContextCanvasGenerator.Tests.Acceptance
 {
-    public class ExportBoundedContextCanvasToMarkdownTests
+    public class RenderBoundedContextCanvasTests
     {
-        private readonly ExportBoundedContextCanvasToMarkdown _exporter;
+        private readonly RenderBoundedContextCanvas _exporter;
 
-        public ExportBoundedContextCanvasToMarkdownTests()
+        public RenderBoundedContextCanvasTests()
         {
             var serviceProvider = new ServiceCollection()
                 .RegisterApplication()
                 .BuildServiceProvider();
 
-            _exporter = serviceProvider.GetRequiredService<ExportBoundedContextCanvasToMarkdown>();
+            _exporter = serviceProvider.GetRequiredService<RenderBoundedContextCanvas>();
         }
 
         [Fact]
@@ -200,6 +200,6 @@ flowchart LR
 
         // ----- Private
 
-        private Task<string> GenerateMarkdown(BoundedContextCanvas boundedContextCanvas) => _exporter.Export(boundedContextCanvas);
+        private async Task<string> GenerateMarkdown(BoundedContextCanvas boundedContextCanvas) => (await _exporter.Export(boundedContextCanvas)).ToString();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Domain;
 using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using Buildalyzer;
 using Buildalyzer.Workspaces;
 using Microsoft.CodeAnalysis;
@@ -12,7 +13,7 @@ public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionReposit
 
     public SourceCodeAnalyserTypeDefinitionRepository(TypeDefinitionFactory factory) => _factory = factory;
 
-    public async IAsyncEnumerable<TypeDefinition> GetAll(SolutionPath path)
+    public async Task<IReadOnlyCollection<TypeDefinition>> GetAll(SolutionPath path)
     {
         var manager = new AnalyzerManager(path.Value);
 
@@ -22,9 +23,7 @@ public class SourceCodeAnalyserTypeDefinitionRepository : ITypeDefinitionReposit
             .Select(x => x.GetCompilationAsync())
             .Pipe(Task.WhenAll);
 
-        foreach (var result in await BuildTypeDefinitions(compilations)) {
-            yield return result;
-        }
+        return await BuildTypeDefinitions(compilations);
     }
 
     private async Task<IReadOnlyCollection<TypeDefinition>> BuildTypeDefinitions(Compilation?[] compilations) 

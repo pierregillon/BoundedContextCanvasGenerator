@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using BoundedContextCanvasGenerator;
 using BoundedContextCanvasGenerator.Application;
+using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.Types;
 using CommandLine;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,7 +33,7 @@ static async Task RunApplicationAsync(Options options)
     var outputPath = options.GetOutputPathOrDefault();
 
     var generator = serviceProvider.GetRequiredService<GenerateBoundedContextCanvasFromSolutionPath>();
-    var exporter = serviceProvider.GetRequiredService<ExportBoundedContextCanvasToMarkdown>();
+    var exporter = serviceProvider.GetRequiredService<RenderBoundedContextCanvas>();
 
     var boundedContextCanvas = await generator.Generate(solutionPath, canvasSettingsPath);
     var markdown = await exporter.Export(boundedContextCanvas);
@@ -40,5 +41,5 @@ static async Task RunApplicationAsync(Options options)
     await WriteAllText(outputPath, markdown);
 }
 
-static Task WriteAllText(OutputPath outputFilePath, string content) 
-    => File.WriteAllTextAsync(outputFilePath.Value, content);
+static Task WriteAllText(OutputPath outputFilePath, Bytes bytes) 
+    => File.WriteAllBytesAsync(outputFilePath.Value, bytes.Content);

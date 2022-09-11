@@ -6,6 +6,7 @@ using BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)
-            .Returns(AsyncEnumerableExtensions.Empty<TypeDefinition>());
+            .Returns(Array.Empty<TypeDefinition>());
 
         var serviceProvider = new ServiceCollection()
             .RegisterApplication()
@@ -98,7 +99,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)
-            .Returns(AsyncEnumerableExtensions.From(
+            .Returns(CollectionFrom(
                 A.Class("Catalog")
                     .WithDescription("This is a simple product catalog")
                     .Implementing("IAggregateRoot"),
@@ -135,7 +136,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)
-            .Returns(AsyncEnumerableExtensions.From(
+            .Returns(CollectionFrom(
                 A.Class("Some.Namespace.RegisterCatalogCommand")
                     .InstanciatedBy(A.Class("Some.Namespace.CatalogController"), A.Method.Named("RegisterCatalog"))
                     .InstanciatedBy(A.Class("Some.Namespace.RegisterCatalogCommandTests"), A.Method.Named("A_catalog_must_have_at_least_one_item").WithAttribute("Fact")),
@@ -174,7 +175,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)
-            .Returns(AsyncEnumerableExtensions.From(
+            .Returns(CollectionFrom(
                 A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"),
                 A.Class("Some.Namespace.Contact.AddContactCommand")
             ));
@@ -201,23 +202,5 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
     }
 
     private Task<BoundedContextCanvas> Generate() => _generator.Generate(SolutionPath, CanvasSettingsPath);
-}
-
-public class AsyncEnumerableExtensions
-{
-    public static async IAsyncEnumerable<T> Empty<T>()
-    {
-        await Task.Delay(0);
-
-        yield break;
-    }
-
-    public static async IAsyncEnumerable<TypeDefinition> From(params TypeDefinition[] typeDefinitions)
-    {
-        await Task.Delay(0);
-
-        foreach (var typeDefinition in typeDefinitions) {
-            yield return typeDefinition;
-        }
-    }
+    public static IReadOnlyCollection<TypeDefinition> CollectionFrom(params TypeDefinition[] typeDefinitions) => typeDefinitions;
 }

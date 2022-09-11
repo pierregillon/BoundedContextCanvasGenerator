@@ -2,7 +2,4 @@
 
 namespace BoundedContextCanvasGenerator.Domain.Types;
 
-public interface ITypeDefinitionRepository
-{
-    Task<IReadOnlyCollection<TypeDefinition>> GetAll(SolutionPath path);
-}
+public record ExtractedElements(bool IsEnabled, IReadOnlyCollection<TypeDefinition> Values);

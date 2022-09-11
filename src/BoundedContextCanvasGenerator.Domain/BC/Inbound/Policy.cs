@@ -1,3 +1,8 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.BC.Inbound;
+﻿using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
-public record Policy(string Description);
+namespace BoundedContextCanvasGenerator.Domain.BC.Inbound;
+
+public record Policy(string Description)
+{
+    public static Policy FromMethod(MethodInfo methodInfo) => new(methodInfo.Name.Value.ToReadableSentence());
+}

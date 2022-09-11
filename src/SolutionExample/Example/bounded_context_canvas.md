@@ -69,12 +69,3 @@ flowchart LR
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator --> CatalogApplicationItemsRemoveFromCatalogCommand
 ```
-
-## Domain events
-
-- Catalog.Domain.Catalog.Events.CatalogDeleted
-- Catalog.Domain.Catalog.Events.CatalogRegistered
-- Catalog.Domain.Items.Events.CatalogItemAdded
-- Catalog.Domain.Items.Events.CatalogItemEntitled
-- Catalog.Domain.Items.Events.CatalogItemPriceAdjusted
-- Catalog.Domain.Items.Events.CatalogItemRemoved

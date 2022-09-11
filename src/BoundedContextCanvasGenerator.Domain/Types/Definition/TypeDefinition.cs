@@ -1,4 +1,4 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Types;
+﻿namespace BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 public record TypeDefinition(
     TypeFullName FullName, 

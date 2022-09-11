@@ -2,7 +2,7 @@
 using BoundedContextCanvasGenerator.Domain;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 

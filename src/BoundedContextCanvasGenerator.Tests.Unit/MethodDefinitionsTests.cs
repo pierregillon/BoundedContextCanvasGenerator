@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using BoundedContextCanvasGenerator.Infrastructure.Types;
 using BoundedContextCanvasGenerator.Tests.Unit.Utils;
 using FluentAssertions;

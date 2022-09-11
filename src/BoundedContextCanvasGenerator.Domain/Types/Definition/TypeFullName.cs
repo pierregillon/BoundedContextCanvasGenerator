@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace BoundedContextCanvasGenerator.Domain.Types;
+namespace BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 [DebuggerDisplay("{Value}")]
 public record TypeFullName(string Value)

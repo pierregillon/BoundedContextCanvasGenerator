@@ -109,7 +109,7 @@ public class InboundCommunicationFlowChartBuilder
 
     private record MermaidCommand(Command Command)
     {
-        public MermaidName MermaidName => new(this.FullName, this.Command.Name);
+        public MermaidName MermaidName => new(this.FullName, this.Command.FriendlyName);
         public string FullName => Command.TypeFullName.Value;
     }
 

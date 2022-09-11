@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BoundedContextCanvasGenerator.Domain.Types;
+using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
 namespace BoundedContextCanvasGenerator.Tests.Unit.Utils;
 

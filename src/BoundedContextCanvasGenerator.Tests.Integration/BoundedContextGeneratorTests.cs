@@ -137,32 +137,6 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
     }
 
     [Fact]
-    public async Task Generating_BCC_with_domain_events_configuration_lists_them_that_matches_predicates()
-    {
-        var plainText = await A
-            .Generator()
-            .TargetingSolution(ExampleSolution)
-            .WithConfiguration(
-@"domain_events:
-    selector: class implementing '.*IDomainEvent$'")
-            .Execute();
-
-        const string commandsSection =
-@"## Domain events
-
-- Catalog.Domain.Catalog.Events.CatalogDeleted
-- Catalog.Domain.Catalog.Events.CatalogRegistered
-- Catalog.Domain.Items.Events.CatalogItemAdded
-- Catalog.Domain.Items.Events.CatalogItemEntitled
-- Catalog.Domain.Items.Events.CatalogItemPriceAdjusted
-- Catalog.Domain.Items.Events.CatalogItemRemoved
-";
-        plainText
-            .Should()
-            .Contain(commandsSection);
-    }
-
-    [Fact]
     public async Task Generating_BCC_with_ubiquitous_language_configuration_lists_context_specific_terminology()
     {
         var plainText = await A

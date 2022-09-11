@@ -1,3 +1,9 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
+﻿using BoundedContextCanvasGenerator.Domain.Types;
 
-public record CoreConcept(string Name, string Description);
+namespace BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
+
+public record CoreConcept(string Name, string Description)
+{
+    public static CoreConcept FromTypeDefinition(TypeDefinition typeDefinition) 
+        => new(typeDefinition.FullName.Name.ToReadableSentence(), typeDefinition.Description.Value);
+}

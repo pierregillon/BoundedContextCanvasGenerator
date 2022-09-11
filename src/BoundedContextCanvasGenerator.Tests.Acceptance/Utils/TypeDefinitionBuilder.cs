@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
 using BoundedContextCanvasGenerator.Domain.Types;
 using AssemblyDefinition = BoundedContextCanvasGenerator.Domain.Types.AssemblyDefinition;
 using TypeDefinition = BoundedContextCanvasGenerator.Domain.Types.TypeDefinition;
 
-namespace BoundedContextCanvasGenerator.Tests.Unit.Utils;
+namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 
 public class TypeDefinitionBuilder
 {

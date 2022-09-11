@@ -27,6 +27,6 @@ public class GenerateBoundedContextCanvasFromSolutionPath
 
         var typeDefinitionExtract = await _typeDefinitionExtractor.Extract(solutionPath, canvasSettings);
 
-        return await _boundedContextCanvasAnalyser.Analyse(typeDefinitionExtract);
+        return await _boundedContextCanvasAnalyser.Analyse(typeDefinitionExtract, canvasSettings);
     }
 }

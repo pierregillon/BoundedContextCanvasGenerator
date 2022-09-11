@@ -1,3 +1,8 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Configuration;
+﻿using BoundedContextCanvasGenerator.Domain.Types;
 
-public record CollaboratorDefinition(string Name, TypeDefinitionPredicates Predicates);
+namespace BoundedContextCanvasGenerator.Domain.Configuration;
+
+public record CollaboratorDefinition(string Name, TypeDefinitionPredicates Predicates)
+{
+    public bool Match(TypeDefinition type) => Predicates.AllMatching(type);
+}

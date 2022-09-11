@@ -12,11 +12,11 @@ using Command = BoundedContextCanvasGenerator.Domain.BC.Inbound.Command;
 
 namespace BoundedContextCanvasGenerator.Tests.Acceptance
 {
-    public class MarkdownBoundedContextCanvasGeneratorTests
+    public class ExportBoundedContextCanvasToMarkdownTests
     {
         private readonly ExportBoundedContextCanvasToMarkdown _exporter;
 
-        public MarkdownBoundedContextCanvasGeneratorTests()
+        public ExportBoundedContextCanvasToMarkdownTests()
         {
             var serviceProvider = new ServiceCollection()
                 .RegisterApplication()

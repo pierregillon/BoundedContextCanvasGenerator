@@ -1,12 +1,11 @@
-using System.Collections.Generic;
 using BoundedContextCanvasGenerator.Domain.Types;
 
-namespace BoundedContextCanvasGenerator.Tests.Unit.Utils;
+namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 
 public class MethodInfoBuilder
 {
     private MethodName _name;
-    private List<MethodAttribute> _attributes = new();
+    private readonly List<MethodAttribute> _attributes = new();
 
     public MethodInfoBuilder Named(string name)
     {

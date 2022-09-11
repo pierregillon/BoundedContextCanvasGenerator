@@ -19,7 +19,7 @@ public class DomainModuleBuilder
         return this;
     }
 
-    private DomainModule Build() => new(this._name, _domainFlows);
+    public DomainModule Build() => new(this._name, _domainFlows);
 
     public static implicit operator DomainModule(DomainModuleBuilder builder) => builder.Build();
 }

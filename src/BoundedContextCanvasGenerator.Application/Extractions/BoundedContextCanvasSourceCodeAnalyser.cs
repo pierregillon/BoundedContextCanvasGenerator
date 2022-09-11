@@ -1,16 +1,83 @@
-﻿using BoundedContextCanvasGenerator.Domain.BC;
+﻿using BoundedContextCanvasGenerator.Domain;
+using BoundedContextCanvasGenerator.Domain.BC;
+using BoundedContextCanvasGenerator.Domain.BC.Inbound;
+using BoundedContextCanvasGenerator.Domain.BC.Ubiquitous;
+using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types;
 
 namespace BoundedContextCanvasGenerator.Application.Extractions;
 
 public class BoundedContextCanvasSourceCodeAnalyser : IBoundedContextCanvasAnalyser
 {
-    private readonly ITypeDefinitionRepository _repository;
+    public async Task<BoundedContextCanvas> Analyse(TypeDefinitionExtract typeDefinitionExtract, ICanvasSettings canvasSettings) =>
+        new(
+            canvasSettings.Name,
+            canvasSettings.Definition,
+            GenerateUbiquitousLanguage(typeDefinitionExtract),
+            GenerateInboundCommunication(typeDefinitionExtract, canvasSettings)
+        );
 
-    public BoundedContextCanvasSourceCodeAnalyser(ITypeDefinitionRepository repository) => _repository = repository;
+    private static UbiquitousLanguage GenerateUbiquitousLanguage(TypeDefinitionExtract typeDefinitionExtract)
+        => typeDefinitionExtract
+            .Aggregates
+            .Values
+            .Select(CoreConcept.FromTypeDefinition)
+            .ToArray()
+            .Pipe(UbiquitousLanguage.FromConcepts);
 
-    public async Task<BoundedContextCanvas> Analyse(TypeDefinitionExtract typeDefinitionExtract)
+    private static InboundCommunication GenerateInboundCommunication(TypeDefinitionExtract typeDefinitionExtract, ICanvasSettings canvasSettings)
     {
-        throw new NotImplementedException();
+        var commandsGroupedByModule = typeDefinitionExtract.Commands.Values
+            .Select(x => new CommandWrapper(x))
+            .GroupBy(x => x.ModuleName)
+            .ToArray();
+
+        var modules = GenerateDomainModules(commandsGroupedByModule, canvasSettings.InboundCommunicationSettings);
+
+        return new InboundCommunication(modules);
+    }
+
+    private static IEnumerable<DomainModule> GenerateDomainModules(IEnumerable<IGrouping<Namespace, CommandWrapper>> commandsGroupedByModule, InboundCommunicationSettings inboundCommunicationSettings)
+        => commandsGroupedByModule.Select(commandsFromSameModule =>
+            new DomainModule(
+                commandsFromSameModule.Key.Name.ToReadableSentence(),
+                GetDomainFlows(commandsFromSameModule, inboundCommunicationSettings)
+            )
+        );
+
+    private static IEnumerable<DomainFlow> GetDomainFlows(IEnumerable<CommandWrapper> commands, InboundCommunicationSettings inboundCommunicationSettings)
+        => commands.Select(command => command.BuildDomainFlow(inboundCommunicationSettings));
+
+    private record CommandWrapper(TypeDefinition TypeDefinition)
+    {
+        private const string COMMAND_SUFFIX = "Command";
+
+        private Namespace ParentNamespace { get; } = TypeDefinition.FullName.Namespace;
+        public Namespace ModuleName => ParentNamespace.TrimStart(TypeDefinition.AssemblyDefinition.Namespace);
+
+        public DomainFlow BuildDomainFlow(InboundCommunicationSettings inboundCommunicationSettings)
+            => new(
+                GetCollaborators(inboundCommunicationSettings.CollaboratorDefinitions),
+                BuildCommand(),
+                GetPolicies(inboundCommunicationSettings.PolicyDefinitions)
+            );
+
+        private IEnumerable<Collaborator> GetCollaborators(IEnumerable<CollaboratorDefinition> collaboratorDefinitions)
+            => TypeDefinition.Instanciators
+                .SelectMany(instanciator => instanciator.FilterCollaboratorDefinitionsMatching(collaboratorDefinitions))
+                .Select(x => new Collaborator(x.Name.ToReadableSentence()))
+                .ToArray();
+
+        private Command BuildCommand()
+            => new(
+                TypeDefinition.FullName.Name.TrimWord(COMMAND_SUFFIX).ToReadableSentence(),
+                TypeDefinition.FullName
+            );
+
+        private IEnumerable<Policy> GetPolicies(IEnumerable<PolicyDefinition> policyDefinitions)
+            => TypeDefinition.Instanciators
+                .SelectMany(i => i.FilterMethodsMatching(policyDefinitions))
+                .Select(x => new Policy(x.Name.Value.ToReadableSentence()))
+                .ToArray();
     }
 }

@@ -73,7 +73,7 @@ public class InboundCommunicationFlowChartBuilder
         }
 
         var policies = command.TypeDefinition.Instanciators
-            .SelectMany(instanciator => instanciator.GetMethodsMatching(_policyDefinitions))
+            .SelectMany(instanciator => instanciator.FilterMethodsMatching(_policyDefinitions))
             .Select(method => method.Name.Value.ToReadableSentence())
             .ToArray()
             .Pipe(Policies.From);

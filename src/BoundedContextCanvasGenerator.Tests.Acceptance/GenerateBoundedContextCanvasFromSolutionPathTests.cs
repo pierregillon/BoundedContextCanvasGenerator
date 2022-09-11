@@ -120,28 +120,83 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
     }
 
     [Fact]
-    public async Task Generates_inbound_communication_with_domain_flow()
+    public async Task Generates_a_domain_flow_from_command()
     {
         _canvasSettings
             .InboundCommunicationSettings
-            .Returns(new InboundCommunicationSettings(
-                TypeDefinitionPredicates.From(new NamedLike(".*Command$")),
-                new[] {
-                    new CollaboratorDefinition("WebApp", TypeDefinitionPredicates.From(new NamedLike(".*Controller$")))
-                },
-                new[] {
-                    new PolicyDefinition(new MethodAttributeMatch("Fact"))
-                }
-            ));
+            .Returns(An.InboundCommunicationSettings
+                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+            );
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)
             .Returns(CollectionFrom(
                 A.Class("Some.Namespace.RegisterCatalogCommand")
-                    .InstanciatedBy(A.Class("Some.Namespace.CatalogController"), A.Method.Named("RegisterCatalog"))
-                    .InstanciatedBy(A.Class("Some.Namespace.RegisterCatalogCommandTests"), A.Method.Named("A_catalog_must_have_at_least_one_item").WithAttribute("Fact")),
-                A.Class("Some.Namespace.CatalogController"),
-                A.Class("Some.Namespace.RegisterCatalogCommandTests")
+            ));
+
+        var boundedContextCanvas = await Generate();
+
+        boundedContextCanvas
+            .InboundCommunication
+            .Modules
+            .Should()
+            .BeEquivalentTo(new DomainModule[] {
+                A.DomainModule
+                    .Named("Namespace")
+                    .WithFlow(
+                        A.DomainFlow
+                            .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.RegisterCatalogCommand")))
+                    )
+            });
+    }
+
+    [Fact]
+    public async Task Do_not_generates_collaborators_when_no_settings_defined()
+    {
+        _canvasSettings
+            .InboundCommunicationSettings
+            .Returns(An.InboundCommunicationSettings
+                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+            );
+
+        _typeDefinitionRepository
+            .GetAll(SolutionPath)
+            .Returns(CollectionFrom(
+                A.Class("Some.Namespace.RegisterCatalogCommand")
+                    .InstanciatedBy(A.Class("Some.Namespace.CatalogController"))
+            ));
+
+        var boundedContextCanvas = await Generate();
+
+        boundedContextCanvas
+            .InboundCommunication
+            .Modules
+            .Should()
+            .BeEquivalentTo(new DomainModule[] {
+                A.DomainModule
+                    .Named("Namespace")
+                    .WithFlow(
+                        A.DomainFlow
+                            .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.RegisterCatalogCommand")))
+                    )
+            });
+    }
+
+    [Fact]
+    public async Task Generates_collaborator_from_command_instanciator()
+    {
+        _canvasSettings
+            .InboundCommunicationSettings
+            .Returns(An.InboundCommunicationSettings
+                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithCollaboratorDefinition(new CollaboratorDefinition("Web app", TypeDefinitionPredicates.From(new NamedLike(".*Controller$"))))
+            );
+
+        _typeDefinitionRepository
+            .GetAll(SolutionPath)
+            .Returns(CollectionFrom(
+                A.Class("Some.Namespace.RegisterCatalogCommand")
+                    .InstanciatedBy(A.Class("Some.Namespace.CatalogController"))
             ));
 
         var boundedContextCanvas = await Generate();
@@ -157,7 +212,46 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
                         A.DomainFlow
                             .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.RegisterCatalogCommand")))
                             .WithCollaborator(new Collaborator("Web app"))
+                    )
+            });
+    }
+
+    [Fact]
+    public async Task Generates_policies_from_command_instanciators()
+    {
+        _canvasSettings
+            .InboundCommunicationSettings
+            .Returns(An.InboundCommunicationSettings
+                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithPolicyDefinition(new PolicyDefinition(new MethodAttributeMatch("Fact"))
+            ));
+
+        _typeDefinitionRepository
+            .GetAll(SolutionPath)
+            .Returns(CollectionFrom(
+                A.Class("Some.Namespace.RegisterCatalogCommand")
+                    .InstanciatedBy(
+                        A.Class("Some.Namespace.RegisterCatalogCommandTests"), 
+                        A.Method.Named("A_catalog_must_have_at_least_one_item").WithAttribute("Fact"),
+                        A.Method.Named("A_catalog_must_have_a_non_empty_name").WithAttribute("Fact")
+                    ),
+                A.Class("Some.Namespace.RegisterCatalogCommandTests")
+            ));
+
+        var boundedContextCanvas = await Generate();
+
+        boundedContextCanvas
+            .InboundCommunication
+            .Modules
+            .Should()
+            .BeEquivalentTo(new DomainModule[] {
+                A.DomainModule
+                    .Named("Namespace")
+                    .WithFlow(
+                        A.DomainFlow
+                            .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.RegisterCatalogCommand")))
                             .WithPolicy(new Policy("A catalog must have at least one item"))
+                            .WithPolicy(new Policy("A catalog must have a non empty name"))
                     )
             });
     }
@@ -167,11 +261,9 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
     {
         _canvasSettings
             .InboundCommunicationSettings
-            .Returns(new InboundCommunicationSettings(
-                TypeDefinitionPredicates.From(new NamedLike(".*Command$")),
-                Enumerable.Empty<CollaboratorDefinition>(),
-                Enumerable.Empty<PolicyDefinition>()
-            ));
+            .Returns(An.InboundCommunicationSettings
+                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+            );
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)

@@ -14,13 +14,13 @@ public class TypeDefinitionBuilder
     private AssemblyDefinition _assemblyDefinition = new(new Namespace("Some"));
     private readonly List<Instanciator> _instanciators = new();
 
-    private TypeDefinitionBuilder(string className, TypeKind kind)
+    private TypeDefinitionBuilder(string classFullName, TypeKind kind)
     {
         _kind = kind;
-        _className = new TypeFullName(className);
+        _className = new TypeFullName(classFullName);
     }
 
-    public static TypeDefinitionBuilder Class(string className) => new TypeDefinitionBuilder(className, TypeKind.Class).Concrete();
+    public static TypeDefinitionBuilder Class(string classFullName) => new TypeDefinitionBuilder(classFullName, TypeKind.Class).Concrete();
 
     public TypeDefinitionBuilder WithDescription(string value)
     {

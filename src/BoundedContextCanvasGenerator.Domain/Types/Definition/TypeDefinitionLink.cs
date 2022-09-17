@@ -15,6 +15,7 @@ public record TypeDefinitionLink
         _expression = match.Groups["expr"].Value;
     }
 
+    public static TypeDefinitionLink Parse(string? value) => value is null ? Empty : From(value);
     public static TypeDefinitionLink From(string value)
     {
         if (string.IsNullOrWhiteSpace(value)) {
@@ -25,7 +26,6 @@ public record TypeDefinitionLink
         }
         return new TypeDefinitionLink(value);
     }
-
     public static TypeDefinitionLink Empty => new(string.Empty);
 
     public bool AreLinked(TypeDefinition source, TypeDefinition destination)
@@ -34,4 +34,5 @@ public record TypeDefinitionLink
         var regex = new Regex(regexValue, RegexOptions.Compiled);
         return destination.ImplementedInterfaces.Any(x => regex.IsMatch(x.Value));
     }
+
 }

@@ -1,6 +1,6 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration;
 
-namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 
 public class TypeDefinitionPredicatesDto
 {

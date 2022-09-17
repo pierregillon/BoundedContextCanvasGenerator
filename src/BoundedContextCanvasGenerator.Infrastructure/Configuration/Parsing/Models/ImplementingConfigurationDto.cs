@@ -1,7 +1,7 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 
-namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 
 public class ImplementingConfigurationDto
 {

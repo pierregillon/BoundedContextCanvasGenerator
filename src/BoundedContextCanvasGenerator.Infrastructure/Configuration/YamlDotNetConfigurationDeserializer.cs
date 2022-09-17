@@ -1,4 +1,5 @@
 ﻿using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration;

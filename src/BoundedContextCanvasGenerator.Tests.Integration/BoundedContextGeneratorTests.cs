@@ -167,7 +167,8 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
             .TargetingSolution(ExampleSolution)
             .WithConfiguration(
 @"inbound_communication:
-    command_selector: class implementing '.*ICommand$'
+    commands: 
+        selector: class implementing '.*ICommand$'
     collaborators:
         - name: WebApp
           selector: class named '.*Controller$'
@@ -223,6 +224,70 @@ flowchart LR
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator --> CatalogApplicationItemsAdjustItemPriceCommand
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator --> CatalogApplicationItemsRemoveFromCatalogCommand
+```";
+        plainText
+            .Should()
+            .Contain(commandsSection);
+    }
+
+    [Fact]
+    public async Task Generating_BCC_with_inbound_communication_configuration_lists_commands_and_domain_event_through_command_handler()
+    {
+        var plainText = await A
+            .Generator()
+            .TargetingSolution(ExampleSolution)
+            .WithConfiguration(
+@"inbound_communication:
+    commands: 
+        selector: class implementing '.*ICommand$'
+        handler: 
+            selector: class implementing '.*ICommandHandler<.*>$'
+            link: T -> .*ICommandHandler<T>$
+    domain_events:
+        selector: class implementing 'IDomainEvent'
+")
+            .Execute();
+
+        const string commandsSection =
+@"## Inbound communication
+
+### Catalog
+
+---
+
+```mermaid
+flowchart LR
+    classDef domainEvents fill:#FFA431;
+    CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
+    CatalogDomainCatalogEventsCatalogDeleted[""Catalog deleted""]
+    class CatalogDomainCatalogEventsCatalogDeleted domainEvents;
+    CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
+    CatalogDomainCatalogEventsCatalogRegistered[""Catalog registered""]
+    class CatalogDomainCatalogEventsCatalogRegistered domainEvents;
+    CatalogApplicationCatalogDeleteCatalogCommand -.-> CatalogDomainCatalogEventsCatalogDeleted
+    CatalogApplicationCatalogRegisterNewCatalogCommand -.-> CatalogDomainCatalogEventsCatalogRegistered
+```
+
+### Items
+
+---
+
+```mermaid
+flowchart LR
+    classDef domainEvents fill:#FFA431;
+    CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
+    CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
+    CatalogDomainItemsEventsCatalogItemPriceAdjusted[""Catalog item price adjusted""]
+    class CatalogDomainItemsEventsCatalogItemPriceAdjusted domainEvents;
+    CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
+    CatalogDomainItemsEventsCatalogItemEntitled[""Catalog item entitled""]
+    class CatalogDomainItemsEventsCatalogItemEntitled domainEvents;
+    CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
+    CatalogDomainItemsEventsCatalogItemRemoved[""Catalog item removed""]
+    class CatalogDomainItemsEventsCatalogItemRemoved domainEvents;
+    CatalogApplicationItemsAdjustItemPriceCommand -.-> CatalogDomainItemsEventsCatalogItemPriceAdjusted
+    CatalogApplicationItemsEntitleItemCommand -.-> CatalogDomainItemsEventsCatalogItemEntitled
+    CatalogApplicationItemsRemoveFromCatalogCommand -.-> CatalogDomainItemsEventsCatalogItemRemoved
 ```";
         plainText
             .Should()

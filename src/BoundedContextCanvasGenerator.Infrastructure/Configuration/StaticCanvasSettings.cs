@@ -1,6 +1,7 @@
 ﻿using BoundedContextCanvasGenerator.Domain.BC.Definition;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 
 namespace BoundedContextCanvasGenerator.Infrastructure.Configuration;
 

@@ -1,7 +1,7 @@
 ﻿using BoundedContextCanvasGenerator.Domain.BC;
 using BoundedContextCanvasGenerator.Domain.BC.Definition;
 
-namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 
 public class CanvasDefinitionDto
 {
@@ -16,21 +16,4 @@ public class CanvasDefinitionDto
         this.StrategicClassification?.Build() ?? Domain.BC.Definition.StrategicClassification.Empty,
         this.DomainRole?.Build() ?? Domain.BC.Definition.DomainRole.Empty
     );
-}
-
-public class StrategicClassificationDto
-{
-    public string? Domain { get; set; }
-    public string? BusinessModel { get; set; }
-    public string? Evolution { get; set; }
-
-    public StrategicClassification Build() => new(Domain.ToDomainType(), BusinessModel.ToBusinessModel(), Evolution.ToEvolution());
-}
-
-public class DomainRoleDto
-{
-    public string? Name { get; set; }
-    public string? Description{ get; set; }
-
-    public DomainRole Build() => new(Text.From(Name), Text.From(Description));
 }

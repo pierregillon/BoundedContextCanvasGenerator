@@ -1,4 +1,6 @@
-﻿namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+﻿using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
+
+namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 
 public class ConfigurationDto
 {

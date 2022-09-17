@@ -1,6 +1,7 @@
 ﻿using BoundedContextCanvasGenerator.Domain.Configuration.Predicates;
 using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
+using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 using FluentAssertions;
 using Xunit;
 

@@ -49,6 +49,7 @@ public class YamlDotNetConfigurationDeserializerTests
             link: T -> .*ICommandHandler<T>$
     collaborators:
         - name: WebApp
+          type: front
           selector: class named '.*Controller$'
     policies:
         - method_attribute_pattern: 'Fact'
@@ -71,7 +72,7 @@ public class YamlDotNetConfigurationDeserializerTests
         configuration.InboundCommunication.Collaborators!
             .Should()
             .BeEquivalentTo(new[] {
-                new CollaboratorDto { Name = "WebApp", Selector = "class named '.*Controller$'" }
+                new CollaboratorDefinitionDto { Name = "WebApp", Type = "front", Selector = "class named '.*Controller$'" }
             });
 
         configuration.InboundCommunication.Policies!

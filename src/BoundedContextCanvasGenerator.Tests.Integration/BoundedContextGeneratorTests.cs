@@ -171,6 +171,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
         selector: class implementing '.*ICommand$'
     collaborators:
         - name: WebApp
+          type: front
           selector: class named '.*Controller$'
     policies:
         - method_attribute_pattern: 'Fact'
@@ -186,14 +187,14 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     classDef policies fill:#FFFFAD, font-style:italic;
     CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>""Web app""]
-    class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>""Web app""]
-    class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/""A catalog name is unique<br/>Registering a catalog raises registered event""/]
     class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogDeleteCatalogCommand
@@ -207,19 +208,19 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>""Web app""]
-    class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>""Web app""]
-    class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>""Web app""]
-    class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>""Web app""]
-    class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator --> CatalogApplicationItemsAddItemToCatalogCommand
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator --> CatalogApplicationItemsAdjustItemPriceCommand
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand

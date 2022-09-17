@@ -41,13 +41,13 @@ flowchart LR
     }
 
     [Fact]
-    public void Renders_command_collaborator()
+    public void Renders_front_as_collaborator()
     {
         InboundCommunication inboundCommunication = A.InboundCommunication
             .WithModule(A.DomainModule
                 .WithFlow(A.DomainFlow
                     .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.OrderNewProductCommand")))
-                    .WithCollaborator(new Collaborator("Web app"))
+                    .WithCollaborator(new Collaborator("Web app", CollaboratorType.Front))
                 )
             );
 
@@ -56,10 +56,34 @@ flowchart LR
             .Be(
 @"```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     TestNamespaceOrderNewProductCommand[""Order new product""]
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
-    class TestNamespaceOrderNewProductCommandWebAppCollaborator collaborators;
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator frontCollaborators;
+    TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
+```");
+
+    }
+    [Fact]
+    public void Renders_other_bounded_context_as_collaborator()
+    {
+        InboundCommunication inboundCommunication = A.InboundCommunication
+            .WithModule(A.DomainModule
+                .WithFlow(A.DomainFlow
+                    .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.OrderNewProductCommand")))
+                    .WithCollaborator(new Collaborator("Web app", CollaboratorType.BoundedContext))
+                )
+            );
+
+        GenerateMermaid(inboundCommunication)
+            .Should()
+            .Be(
+@"```mermaid
+flowchart LR
+    classDef boundedContextCollaborators fill:#FF5C5C;
+    TestNamespaceOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator boundedContextCollaborators;
     TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
 ```");
     }
@@ -71,8 +95,8 @@ flowchart LR
             .WithModule(A.DomainModule
                 .WithFlow(A.DomainFlow
                     .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.OrderNewProductCommand")))
-                    .WithCollaborator(new Collaborator("Web app"))
-                    .WithCollaborator(new Collaborator("Mobile app"))
+                    .WithCollaborator(new Collaborator("Web app", CollaboratorType.Front))
+                    .WithCollaborator(new Collaborator("Mobile app", CollaboratorType.Front))
                 )
             );
 
@@ -81,12 +105,12 @@ flowchart LR
             .Be(
                 @"```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     TestNamespaceOrderNewProductCommand[""Order new product""]
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
-    class TestNamespaceOrderNewProductCommandWebAppCollaborator collaborators;
+    class TestNamespaceOrderNewProductCommandWebAppCollaborator frontCollaborators;
     TestNamespaceOrderNewProductCommandMobileAppCollaborator>""Mobile app""]
-    class TestNamespaceOrderNewProductCommandMobileAppCollaborator collaborators;
+    class TestNamespaceOrderNewProductCommandMobileAppCollaborator frontCollaborators;
     TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
     TestNamespaceOrderNewProductCommandMobileAppCollaborator --> TestNamespaceOrderNewProductCommand
 ```");

@@ -1,6 +1,4 @@
-﻿using Catalog.Application.Catalog;
-using Catalog.Domain.Catalog;
-using Catalog.Domain.Catalog.Events;
+﻿using Catalog.Domain.Catalog.Events;
 using Catalog.Domain.Items;
 
 namespace Catalog.Application.Items;

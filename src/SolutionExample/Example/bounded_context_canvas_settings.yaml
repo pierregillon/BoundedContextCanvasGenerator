@@ -18,7 +18,11 @@ inbound_communication:
             link: T -> .*ICommandHandler<T>$
     collaborators:
         - name: WebApp
+          type: front
           selector: class named '.*Controller$'
+        - name: Order
+          type: bounded_context
+          selector: class implementing 'IBusListener<Catalog\.Infrastructure\.Order.*>'
     policies:
         - method_attribute_pattern: 'Fact'
     domain_events:

@@ -161,14 +161,14 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
                         .WithFlow(
                             A.DomainFlow
                                 .WithCommand(new Command("Register new transaction", new TypeFullName("Some.Namespace.RegisterNewTransactionCommand")))
-                                .WithCollaborator(new Collaborator("Web app"))
+                                .WithCollaborator(new Collaborator("Web app", CollaboratorType.Front))
                                 .WithPolicy(new Policy("Transaction registration must contain a not paid transaction"))
                                 .WithDomainEvent(new DomainEvent("Transaction registered", new TypeFullName("Some.Namespace.TransactionRegistered")))
                             )
                         .WithFlow(
                             A.DomainFlow
                                 .WithCommand(new Command("Reschedule transaction", new TypeFullName("Some.Namespace.RescheduleTransactionCommand")))
-                                .WithCollaborator(new Collaborator("Web app"))
+                                .WithCollaborator(new Collaborator("Order", CollaboratorType.BoundedContext))
                                 .WithPolicy(new Policy("Transaction reschedule must be in the future"))
                         ))
                 );
@@ -180,25 +180,26 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     classDef policies fill:#FFFFAD, font-style:italic;
     classDef domainEvents fill:#FFA431;
+    classDef boundedContextCollaborators fill:#FF5C5C;
     SomeNamespaceRegisterNewTransactionCommand[""Register new transaction""]
     SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator>""Web app""]
-    class SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator collaborators;
+    class SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator frontCollaborators;
     SomeNamespaceRegisterNewTransactionCommandPolicies[/""Transaction registration must contain a not paid transaction""/]
     class SomeNamespaceRegisterNewTransactionCommandPolicies policies;
     SomeNamespaceTransactionRegistered[""Transaction registered""]
     class SomeNamespaceTransactionRegistered domainEvents;
     SomeNamespaceRescheduleTransactionCommand[""Reschedule transaction""]
-    SomeNamespaceRescheduleTransactionCommandWebAppCollaborator>""Web app""]
-    class SomeNamespaceRescheduleTransactionCommandWebAppCollaborator collaborators;
+    SomeNamespaceRescheduleTransactionCommandOrderCollaborator>""Order""]
+    class SomeNamespaceRescheduleTransactionCommandOrderCollaborator boundedContextCollaborators;
     SomeNamespaceRescheduleTransactionCommandPolicies[/""Transaction reschedule must be in the future""/]
     class SomeNamespaceRescheduleTransactionCommandPolicies policies;
     SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator --> SomeNamespaceRegisterNewTransactionCommand
     SomeNamespaceRegisterNewTransactionCommand --- SomeNamespaceRegisterNewTransactionCommandPolicies
     SomeNamespaceRegisterNewTransactionCommandPolicies -.-> SomeNamespaceTransactionRegistered
-    SomeNamespaceRescheduleTransactionCommandWebAppCollaborator --> SomeNamespaceRescheduleTransactionCommand
+    SomeNamespaceRescheduleTransactionCommandOrderCollaborator --> SomeNamespaceRescheduleTransactionCommand
     SomeNamespaceRescheduleTransactionCommand --- SomeNamespaceRescheduleTransactionCommandPolicies
 ```
 ");

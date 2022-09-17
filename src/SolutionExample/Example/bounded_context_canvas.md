@@ -30,17 +30,17 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     classDef domainEvents fill:#FFA431;
     classDef policies fill:#FFFFAD, font-style:italic;
     CatalogApplicationCatalogDeleteCatalogCommand["Delete catalog"]
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>"Web app"]
-    class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogDomainCatalogEventsCatalogDeleted["Catalog deleted"]
     class CatalogDomainCatalogEventsCatalogDeleted domainEvents;
     CatalogApplicationCatalogRegisterNewCatalogCommand["Register new catalog"]
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>"Web app"]
-    class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/"A catalog name is unique<br/>Registering a catalog raises registered event"/]
     class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
     CatalogDomainCatalogEventsCatalogRegistered["Catalog registered"]
@@ -58,24 +58,30 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    classDef collaborators fill:#FFE5FF;
+    classDef frontCollaborators fill:#FFE5FF;
     classDef domainEvents fill:#FFA431;
+    classDef boundedContextCollaborators fill:#FF5C5C;
     CatalogApplicationItemsAddItemToCatalogCommand["Add item to catalog"]
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>"Web app"]
-    class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsAdjustItemPriceCommand["Adjust item price"]
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>"Web app"]
-    class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemPriceAdjusted["Catalog item price adjusted"]
     class CatalogDomainItemsEventsCatalogItemPriceAdjusted domainEvents;
     CatalogApplicationItemsEntitleItemCommand["Entitle item"]
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>"Web app"]
-    class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemEntitled["Catalog item entitled"]
     class CatalogDomainItemsEventsCatalogItemEntitled domainEvents;
+    CatalogApplicationItemsReduceItemQuantityCommand["Reduce item quantity"]
+    CatalogApplicationItemsReduceItemQuantityCommandOrderCollaborator>"Order"]
+    class CatalogApplicationItemsReduceItemQuantityCommandOrderCollaborator boundedContextCollaborators;
+    CatalogDomainItemsEventsCatalogItemQuantityAdjusted["Catalog item quantity adjusted"]
+    class CatalogDomainItemsEventsCatalogItemQuantityAdjusted domainEvents;
     CatalogApplicationItemsRemoveFromCatalogCommand["Remove from catalog"]
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>"Web app"]
-    class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator collaborators;
+    class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemRemoved["Catalog item removed"]
     class CatalogDomainItemsEventsCatalogItemRemoved domainEvents;
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator --> CatalogApplicationItemsAddItemToCatalogCommand
@@ -83,6 +89,8 @@ flowchart LR
     CatalogApplicationItemsAdjustItemPriceCommand -.-> CatalogDomainItemsEventsCatalogItemPriceAdjusted
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand
     CatalogApplicationItemsEntitleItemCommand -.-> CatalogDomainItemsEventsCatalogItemEntitled
+    CatalogApplicationItemsReduceItemQuantityCommandOrderCollaborator --> CatalogApplicationItemsReduceItemQuantityCommand
+    CatalogApplicationItemsReduceItemQuantityCommand -.-> CatalogDomainItemsEventsCatalogItemQuantityAdjusted
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator --> CatalogApplicationItemsRemoveFromCatalogCommand
     CatalogApplicationItemsRemoveFromCatalogCommand -.-> CatalogDomainItemsEventsCatalogItemRemoved
 ```

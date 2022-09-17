@@ -1,4 +1,5 @@
 ﻿using BoundedContextCanvasGenerator.Domain;
+using BoundedContextCanvasGenerator.Domain.BC.Inbound;
 using BoundedContextCanvasGenerator.Domain.Configuration;
 using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
@@ -7,7 +8,7 @@ namespace BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Mod
 public record InboundCommunicationDto
 {
     public CommandDefinitionDto? Commands { get; set; }
-    public IEnumerable<CollaboratorDto>? Collaborators { get; set; }
+    public IEnumerable<CollaboratorDefinitionDto>? Collaborators { get; set; }
     public IEnumerable<PolicyDto>? Policies { get; set; }
     public DomainEventDefinitionDto? DomainEvents { get; set; }
 
@@ -46,9 +47,12 @@ public record InboundCommunicationDto
     {
         return Collaborators?
             .Where(x => x.IsNotEmpty)
-            .Select(x => new CollaboratorDefinition(x.Name, x.BuildPredicates()))
+            .Select(x => new CollaboratorDefinition(x.Name, ParseCollaboratorType(x.Type) ,x.BuildPredicates()))
             .ToArray() ?? Enumerable.Empty<CollaboratorDefinition>();
     }
+
+    private static CollaboratorType ParseCollaboratorType(string? type) 
+        => type is null ? CollaboratorType.Front : Enum.Parse<CollaboratorType>(type.Replace("_", string.Empty), true);
 
     private IEnumerable<PolicyDefinition> ParsePolicyDefinitions()
     {

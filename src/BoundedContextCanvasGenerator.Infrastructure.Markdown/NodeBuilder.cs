@@ -47,7 +47,7 @@ internal class NodeBuilder
         => Node
             .Named(mermaidCollaborator.MermaidNameFor(_mermaidCommand))
             .Shaped(NodeShape.Asymmetric)
-            .Styled(new NodeStyleClass("collaborators", new NodeStyle("fill:#FFE5FF")));
+            .Styled(mermaidCollaborator.GetNodeStyle());
 
     private Node BuildPolicyNode(MermaidPolicies policies)
         => Node
@@ -80,6 +80,15 @@ internal class NodeBuilder
         private string NameFor(MermaidCommand command) => command.FullName + MermaidName;
         private string MermaidName => Collaborator.Name.ToPascalCase() + "Collaborator";
         private string FriendlyName => Collaborator.Name;
+
+        public NodeStyleClass GetNodeStyle()
+        {
+            return Collaborator.Type switch {
+                CollaboratorType.Front => new NodeStyleClass("frontCollaborators", new NodeStyle("fill:#FFE5FF")),
+                CollaboratorType.BoundedContext => new NodeStyleClass("boundedContextCollaborators", new NodeStyle("fill:#FF5C5C")),
+                _ => throw new InvalidOperationException("Unknown collaborator: enable to choose node style")
+            };
+        }
     }
 
     private record MermaidDomainEvent(DomainEvent DomainEvent)

@@ -194,7 +194,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
             .InboundCommunicationSettings
             .Returns(An.InboundCommunicationSettings
                 .WithCommandDefinition(A.CommandDefinition.WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$"))))
-                .WithCollaboratorDefinition(new CollaboratorDefinition("Web app", TypeDefinitionPredicates.From(new NamedLike(".*Controller$"))))
+                .WithCollaboratorDefinition(new CollaboratorDefinition("Web app", CollaboratorType.Front, TypeDefinitionPredicates.From(new NamedLike(".*Controller$"))))
             );
 
         _typeDefinitionRepository
@@ -216,7 +216,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
                     .WithFlow(
                         A.DomainFlow
                             .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.RegisterCatalogCommand")))
-                            .WithCollaborator(new Collaborator("Web app"))
+                            .WithCollaborator(new Collaborator("Web app", CollaboratorType.Front))
                     )
             });
     }

@@ -11,6 +11,7 @@ public class CatalogItem : AggregatorRoot<CatalogItemId>
     public CatalogId CatalogId { get; }
     public Title Title { get; }
     public Price Price { get; }
+    public Quantity CurrentQuantity { get; }
 
     public static CatalogItem Add(CatalogId catalogId, Title title, Price price)
     {
@@ -41,6 +42,11 @@ public class CatalogItem : AggregatorRoot<CatalogItemId>
         {
             this.StoreEvent(new CatalogItemPriceAdjusted(this.Id, this.Price, newPrice));
         }
+    }
+
+    public void AdjustQuantity(Quantity quantity)
+    {
+        this.StoreEvent(new CatalogItemQuantityAdjusted(this.Id, quantity));
     }
 
     public void Remove()

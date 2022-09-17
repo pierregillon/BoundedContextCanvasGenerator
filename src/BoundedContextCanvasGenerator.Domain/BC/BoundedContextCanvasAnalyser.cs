@@ -27,7 +27,11 @@ public class BoundedContextCanvasAnalyser
     private static InboundCommunication GenerateInboundCommunication(TypeDefinitionExtract typeDefinitionExtract, ICanvasSettings canvasSettings)
     {
         var commandsGroupedByModule = typeDefinitionExtract.Commands.Values
-            .Select(x => new CommandWrapper(x))
+            .Select(command => new CommandWrapper(command, typeDefinitionExtract.CommandHandlers
+                .Where(handler => handler.Match(command))
+                .Select(x => x.TypeDefinition)
+                .FirstOrDefault()
+            ))
             .GroupBy(x => x.ModuleName)
             .ToArray();
 
@@ -55,7 +59,7 @@ public class BoundedContextCanvasAnalyser
     private static IEnumerable<DomainFlow> GetDomainFlows(IEnumerable<CommandWrapper> commands, IReadOnlyCollection<TypeDefinition> domainEventTypes, InboundCommunicationSettings inboundCommunicationSettings)
         => commands.Select(command => command.BuildDomainFlow(domainEventTypes, inboundCommunicationSettings));
 
-    private record CommandWrapper(TypeDefinition CommandTypeDefinition)
+    private record CommandWrapper(TypeDefinition CommandTypeDefinition, TypeDefinition? CommandHandlerTypeDefinition)
     {
         private Namespace ParentNamespace { get; } = CommandTypeDefinition.FullName.Namespace;
         public Namespace ModuleName => ParentNamespace.TrimStart(CommandTypeDefinition.AssemblyDefinition.Namespace);
@@ -81,9 +85,26 @@ public class BoundedContextCanvasAnalyser
                 .ToArray();
 
         private IEnumerable<DomainEvent> GetDomainEvents(IEnumerable<TypeDefinition> domainEventTypes)
+            => GetDomainEventInstanciatedByCommand(domainEventTypes)
+                .Concat(GetDomainEventInstanciatedByCommandHandler(domainEventTypes))
+                .Distinct();
+
+        private IEnumerable<DomainEvent> GetDomainEventInstanciatedByCommand(IEnumerable<TypeDefinition> domainEventTypes) 
             => domainEventTypes
                 .Where(domainEvent => domainEvent.IsInstanciatedBy(CommandTypeDefinition.FullName))
                 .Select(DomainEvent.FromType)
                 .ToArray();
+
+        private IEnumerable<DomainEvent> GetDomainEventInstanciatedByCommandHandler(IEnumerable<TypeDefinition> domainEventTypes)
+        {
+            if (CommandHandlerTypeDefinition is null) {
+                return Enumerable.Empty<DomainEvent>();
+            }
+
+            return domainEventTypes
+                .Where(domainEvent => domainEvent.IsInstanciatedBy(CommandHandlerTypeDefinition.FullName))
+                .Select(DomainEvent.FromType)
+                .ToArray();
+        }
     }
 }

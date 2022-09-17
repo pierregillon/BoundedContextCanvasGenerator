@@ -20,7 +20,7 @@ public record InboundCommunicationDto
         var analyser = new PredicateAnalyser();
 
         return new InboundCommunicationSettings(
-            TypeDefinitionPredicates.From(analyser.Analyse(CommandSelector)),
+            new CommandDefinition(TypeDefinitionPredicates.From(analyser.Analyse(CommandSelector)), HandlerDefinition.Empty),
             Collaborators?
                 .Where(x => x.IsNotEmpty)
                 .Select(x => new CollaboratorDefinition(x.Name, TypeDefinitionPredicates.From(analyser.Analyse(x.Selector))))

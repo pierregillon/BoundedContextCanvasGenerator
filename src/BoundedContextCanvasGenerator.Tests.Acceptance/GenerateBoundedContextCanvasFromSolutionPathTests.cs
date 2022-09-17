@@ -125,7 +125,9 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
         _canvasSettings
             .InboundCommunicationSettings
             .Returns(An.InboundCommunicationSettings
-                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithCommandDefinition(
+                    A.CommandDefinition.WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                )
             );
 
         _typeDefinitionRepository
@@ -155,8 +157,11 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
     {
         _canvasSettings
             .InboundCommunicationSettings
-            .Returns(An.InboundCommunicationSettings
-                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+            .Returns(
+                An.InboundCommunicationSettings
+                    .WithCommandDefinition(
+                        A.CommandDefinition.WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                    )
             );
 
         _typeDefinitionRepository
@@ -188,7 +193,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
         _canvasSettings
             .InboundCommunicationSettings
             .Returns(An.InboundCommunicationSettings
-                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithCommandDefinition(A.CommandDefinition.WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$"))))
                 .WithCollaboratorDefinition(new CollaboratorDefinition("Web app", TypeDefinitionPredicates.From(new NamedLike(".*Controller$"))))
             );
 
@@ -222,7 +227,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
         _canvasSettings
             .InboundCommunicationSettings
             .Returns(An.InboundCommunicationSettings
-                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithCommandDefinition(A.CommandDefinition.WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$"))))
                 .WithPolicyDefinition(new PolicyDefinition(new MethodAttributeMatch("Fact"))
             ));
 
@@ -262,7 +267,7 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
         _canvasSettings
             .InboundCommunicationSettings
             .Returns(An.InboundCommunicationSettings
-                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                .WithCommandDefinition(A.CommandDefinition.WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$"))))
             );
 
         _typeDefinitionRepository
@@ -294,22 +299,32 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
     }
 
     [Fact]
-    public async Task Generates_domain_event_instanciated_by_command()
+    public async Task Generates_domain_event_instanciated_by_command_handler()
     {
         _canvasSettings
             .InboundCommunicationSettings
-            .Returns(An.InboundCommunicationSettings
-                .WithCommandMatching(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
-                .WithDomainEventDefinition(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IDomainEvent")))
+            .Returns(
+                An.InboundCommunicationSettings
+                    .WithCommandDefinition(
+                        A.CommandDefinition
+                            .WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                            .HandledBy(new HandlerDefinition(
+                                TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommandHandler<.*>$")),
+                                TypeDefinitionLink.From("T -> .*ICommandHandler<T>$"))
+                            )
+                    )
+                    .WithDomainEventDefinition(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IDomainEvent")))
             );
 
         _typeDefinitionRepository
             .GetAll(SolutionPath)
             .Returns(CollectionFrom(
-                A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"),
                 A.Class("Some.Namespace.Catalog.CatalogRegistered")
                     .Implementing("IDomainEvent")
-                    .InstanciatedBy(A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"))
+                    .InstanciatedBy(A.Class("Some.Namespace.Catalog.RegisterCatalogCommandHandler")),
+                A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"),
+                A.Class("Some.Namespace.Catalog.RegisterCatalogCommandHandler")
+                    .Implementing("ICommandHandler<Some.Namespace.Catalog.RegisterCatalogCommand>")
             ));
 
         var boundedContextCanvas = await Generate();

@@ -9,6 +9,7 @@ internal class A
     public static DomainFlowBuilder DomainFlow => new();
     public static TypeDefinitionBuilder Class(string fullName) => TypeDefinitionBuilder.Class(fullName);
     public static MethodInfoBuilder Method => new();
+    public static CommandDefinitionBuilder CommandDefinition => new();
 }
 
 internal class An

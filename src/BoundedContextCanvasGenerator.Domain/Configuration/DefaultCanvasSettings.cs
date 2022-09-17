@@ -8,7 +8,7 @@ public class DefaultCanvasSettings : ICanvasSettings
     public CanvasName Name => CanvasName.Default;
     public CanvasDefinition Definition => CanvasDefinition.Empty;
     public InboundCommunicationSettings InboundCommunicationSettings =>
-        new(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommand$")),
+        new(CommandDefinition.Empty, 
             Enumerable.Empty<CollaboratorDefinition>(),
             Enumerable.Empty<PolicyDefinition>(),
             TypeDefinitionPredicates.Empty

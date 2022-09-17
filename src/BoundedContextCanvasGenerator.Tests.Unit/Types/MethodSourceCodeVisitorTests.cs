@@ -376,6 +376,50 @@ public class MethodSourceCodeVisitorTests
             );
     }
 
+    [Fact]
+    public void Extract_instanciating_types_from()
+    {
+        const string sourceCode = @"
+    public record CreateUserCommand;
+
+    public record CreateUserCommandHandler
+    {
+        public void Handle(CreateUserCommand command)
+        {
+            var user = new User();
+        }
+    }
+
+    public class User
+    {
+        public User()
+        {
+            this.StoreEvent(new UserCreated());
+        }
+
+        private void StoreEvent(object @event) { }
+    }
+
+    public record UserCreated;
+";
+        var methodDefinitions = Parse(sourceCode);
+
+        methodDefinitions
+            .Should()
+            .Be(
+                A.MethodDefinitions
+                    .With(A.Type
+                        .Named("CreateUserCommandHandler")
+                        .WithMethod(A.MethodDefinition
+                            .WithInfo(A.Method.Named("Handle"))
+                            .Instanciating("User")
+                            .Instanciating("UserCreated")
+                        )
+                    )
+                    .Build()
+            );
+    }
+
     // ----- Private
 
     public static MethodDefinitions Parse(params string[] sources)

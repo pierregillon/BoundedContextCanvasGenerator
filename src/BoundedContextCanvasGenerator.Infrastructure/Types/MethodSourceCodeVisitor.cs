@@ -17,7 +17,7 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
 
     public override void VisitMethodDeclaration(MethodDeclarationSyntax methodNode)
     {
-        if (methodNode.Parent is null || methodNode.Body is null) {
+        if (methodNode.Parent is null) {
             base.VisitMethodDeclaration(methodNode);
             return;
         }
@@ -38,9 +38,15 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
     }
 
     private IEnumerable<ISymbol> FindSymbolsInMethodDeclarationSyntax(BaseMethodDeclarationSyntax syntax)
-        => syntax.Parent is null || syntax.Body is null
+    {
+        if (syntax.ExpressionBody is not null) {
+            return FindSymbolsInExpression(syntax.ExpressionBody.Expression);
+        }
+
+        return syntax.Parent is null || syntax.Body is null
             ? Enumerable.Empty<ISymbol>()
             : syntax.Body.Statements.SelectMany(FindSymbolsInStatement);
+    }
 
     private IEnumerable<ISymbol> FindSymbolsInStatement(StatementSyntax statement) =>
         statement switch {
@@ -53,7 +59,7 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
                 .Select(syntax => syntax!)
                 .SelectMany(FindSymbolsInExpression),
             ExpressionStatementSyntax expressionStatementSyntax => FindSymbolsInExpression(expressionStatementSyntax.Expression),
-            ReturnStatementSyntax { Expression: ObjectCreationExpressionSyntax objectCreationExpressionSyntax } => GetSymbols(objectCreationExpressionSyntax),
+            ReturnStatementSyntax { Expression: { } expression } => FindSymbolsInExpression(expression),
             _ => Enumerable.Empty<ISymbol>()
         };
 
@@ -62,6 +68,7 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
             ObjectCreationExpressionSyntax objectCreationExpressionSyntax => GetSymbols(objectCreationExpressionSyntax),
             InvocationExpressionSyntax invocationExpressionSyntax => GetSymbols(invocationExpressionSyntax),
             AwaitExpressionSyntax awaitExpressionSyntax => FindSymbolsInExpression(awaitExpressionSyntax.Expression),
+            AssignmentExpressionSyntax assignmentExpressionSyntax => FindSymbolsInExpression(assignmentExpressionSyntax.Right),
             _ => Enumerable.Empty<ISymbol>()
         };
 

@@ -64,6 +64,8 @@ flowchart LR
     CatalogApplicationItemsAddItemToCatalogCommand["Add item to catalog"]
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator frontCollaborators;
+    CatalogDomainItemsEventsCatalogItemAdded["Catalog item added"]
+    class CatalogDomainItemsEventsCatalogItemAdded domainEvents;
     CatalogApplicationItemsAdjustItemPriceCommand["Adjust item price"]
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator frontCollaborators;
@@ -85,6 +87,7 @@ flowchart LR
     CatalogDomainItemsEventsCatalogItemRemoved["Catalog item removed"]
     class CatalogDomainItemsEventsCatalogItemRemoved domainEvents;
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator --> CatalogApplicationItemsAddItemToCatalogCommand
+    CatalogApplicationItemsAddItemToCatalogCommand -.-> CatalogDomainItemsEventsCatalogItemAdded
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator --> CatalogApplicationItemsAdjustItemPriceCommand
     CatalogApplicationItemsAdjustItemPriceCommand -.-> CatalogDomainItemsEventsCatalogItemPriceAdjusted
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator --> CatalogApplicationItemsEntitleItemCommand

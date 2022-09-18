@@ -43,13 +43,14 @@ public class MethodDefinitions
             return false;
         }
         
-        if (!_methods.Keys.SequenceEqual(other._methods.Keys)) {
+        if (!_methods.Keys.OrderBy(x => x.Value).SequenceEqual(other._methods.Keys.OrderBy(x => x.Value))) {
             return false;
         }
 
         for (int i = 0; i < _methods.Count; i++) {
-            var methodValues = _methods.Values.ElementAt(i);
-            var otherMethodValues = other._methods.Values.ElementAt(i);
+            var key = _methods.Keys.ElementAt(i);
+            var methodValues = _methods[key];
+            var otherMethodValues = other._methods[key];
 
             if (!methodValues.SequenceEqual(otherMethodValues)) {
                 return false;

@@ -242,7 +242,7 @@ public class MethodSourceCodeVisitorTests
     }
 
     [Fact]
-    public void Extract_declared_types_instanciated_by_method_by_traversing_method_invocation2()
+    public void Extract_declared_types_instanciated_by_method_by_traversing_method_async_invocation()
     {
         const string sourceCode = @"
     public record CreateUserCommand;
@@ -377,7 +377,7 @@ public class MethodSourceCodeVisitorTests
     }
 
     [Fact]
-    public void Extract_instanciating_types_from()
+    public void Extract_instanciating_types_from_constructor()
     {
         const string sourceCode = @"
     public record CreateUserCommand;
@@ -420,11 +420,84 @@ public class MethodSourceCodeVisitorTests
             );
     }
 
+    [Fact]
+    public void Extract_declared_types_instanciated_by_method_by_traversing_method_invocation2()
+    {
+        const string sourceCode = @"
+
+    using System;
+
+    public record AddItemToCatalogCommand(Guid CatalogId);
+
+    public class AddItemToCatalogCommandHandler
+    {
+        public void Handle(AddItemToCatalogCommand command)
+        {
+            var catalog = new ItemCatalog();
+
+            var catalogItem = catalog.Add();
+        }
+    }
+
+    public record ItemCatalog()
+    {
+        public CatalogItem Add() => CatalogItem.Add();
+    }
+
+    public class CatalogItem
+    {
+        public static CatalogItem Add()
+        {
+            _ = new CatalogItemAdded();
+            return new CatalogItem();
+        }
+    }
+    
+    public record CatalogItemAdded;
+";
+        var methodDefinitions = Parse(sourceCode);
+
+        methodDefinitions
+            .Should()
+            .Be(
+                A.MethodDefinitions
+                    .With(A.Type
+                        .Named("CatalogItem")
+                        .WithMethod(A.MethodDefinition
+                            .WithInfo(A.Method.Named("Add"))
+                            .Instanciating("CatalogItemAdded")
+                            .Instanciating("CatalogItem")
+                        )
+                    )
+                    .With(A.Type
+                        .Named("ItemCatalog")
+                        .WithMethod(A.MethodDefinition
+                            .WithInfo(A.Method.Named("Add"))
+                            .Instanciating("CatalogItemAdded")
+                            .Instanciating("CatalogItem")
+                        )
+                    )
+                    .With(A.Type
+                        .Named("AddItemToCatalogCommandHandler")
+                        .WithMethod(A.MethodDefinition
+                            .WithInfo(A.Method.Named("Handle"))
+                            .Instanciating("ItemCatalog")
+                            .Instanciating("CatalogItemAdded")
+                            .Instanciating("CatalogItem")
+                        )
+                    )
+                    .Build()
+            );
+    }
+
     // ----- Private
 
     public static MethodDefinitions Parse(params string[] sources)
     {
         var compilation = new SourceCodeCompiler().Compile(sources);
+
+        //var diagnostics = compilation.GetDiagnostics();
+        //diagnostics.Should().HaveCount(0, "there shoudn't be any compile errors");
 
         var semanticModels = compilation.SyntaxTrees.Select(x => compilation.GetSemanticModel(x, true)).ToArray();
 

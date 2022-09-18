@@ -64,6 +64,7 @@ flowchart LR
 ```");
 
     }
+    
     [Fact]
     public void Renders_other_bounded_context_as_collaborator()
     {

@@ -218,6 +218,7 @@ flowchart LR
     CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator frontCollaborators;
+    CatalogApplicationItemsReduceItemQuantityCommand[""Reduce item quantity""]
     CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator frontCollaborators;
@@ -277,17 +278,24 @@ flowchart LR
 flowchart LR
     classDef domainEvents fill:#FFA431;
     CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
+    CatalogDomainItemsEventsCatalogItemAdded[""Catalog item added""]
+    class CatalogDomainItemsEventsCatalogItemAdded domainEvents;
     CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
     CatalogDomainItemsEventsCatalogItemPriceAdjusted[""Catalog item price adjusted""]
     class CatalogDomainItemsEventsCatalogItemPriceAdjusted domainEvents;
     CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
     CatalogDomainItemsEventsCatalogItemEntitled[""Catalog item entitled""]
     class CatalogDomainItemsEventsCatalogItemEntitled domainEvents;
+    CatalogApplicationItemsReduceItemQuantityCommand[""Reduce item quantity""]
+    CatalogDomainItemsEventsCatalogItemQuantityAdjusted[""Catalog item quantity adjusted""]
+    class CatalogDomainItemsEventsCatalogItemQuantityAdjusted domainEvents;
     CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
     CatalogDomainItemsEventsCatalogItemRemoved[""Catalog item removed""]
     class CatalogDomainItemsEventsCatalogItemRemoved domainEvents;
+    CatalogApplicationItemsAddItemToCatalogCommand -.-> CatalogDomainItemsEventsCatalogItemAdded
     CatalogApplicationItemsAdjustItemPriceCommand -.-> CatalogDomainItemsEventsCatalogItemPriceAdjusted
     CatalogApplicationItemsEntitleItemCommand -.-> CatalogDomainItemsEventsCatalogItemEntitled
+    CatalogApplicationItemsReduceItemQuantityCommand -.-> CatalogDomainItemsEventsCatalogItemQuantityAdjusted
     CatalogApplicationItemsRemoveFromCatalogCommand -.-> CatalogDomainItemsEventsCatalogItemRemoved
 ```";
         plainText

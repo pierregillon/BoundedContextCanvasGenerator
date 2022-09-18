@@ -11,6 +11,7 @@ public record InboundCommunicationDto
     public IEnumerable<CollaboratorDefinitionDto>? Collaborators { get; set; }
     public IEnumerable<PolicyDto>? Policies { get; set; }
     public DomainEventDefinitionDto? DomainEvents { get; set; }
+    public IntegrationEventDefinitionDto? IntegrationEvents { get; set; }
 
     public InboundCommunicationSettings Build()
     {
@@ -22,7 +23,8 @@ public record InboundCommunicationDto
             ParseCommandDefinition(),
             ParseCollaboratorDefinitions(),
             ParsePolicyDefinitions(),
-            ParseDomainEventDefinitions()
+            ParseDomainEventDefinition(),
+            ParseIntegrationEventDefinition()
         );
     }
 
@@ -33,13 +35,7 @@ public record InboundCommunicationDto
         }
         return new CommandDefinition(
             Commands.BuildPredicates(),
-            Commands.Handler?
-                .Pipe(handler =>
-                    new HandlerDefinition(
-                        handler.BuildPredicates(),
-                        TypeDefinitionLink.Parse(handler.Link)
-                    )
-                ) ?? HandlerDefinition.Empty
+            Commands.Handler.BuildHandler()
         );
     }
 
@@ -62,5 +58,13 @@ public record InboundCommunicationDto
             .ToArray() ?? Enumerable.Empty<PolicyDefinition>();
     }
 
-    private TypeDefinitionPredicates ParseDomainEventDefinitions() => DomainEvents?.BuildPredicates() ?? TypeDefinitionPredicates.Empty;
+    private DomainEventDefinition ParseDomainEventDefinition() 
+        => DomainEvents is null 
+            ? DomainEventDefinition.Empty 
+            : new DomainEventDefinition(DomainEvents.BuildPredicates(), DomainEvents.Handler.BuildHandler());
+
+    private IntegrationEventDefinition ParseIntegrationEventDefinition() 
+        => IntegrationEvents is null 
+            ? IntegrationEventDefinition.Empty 
+            : new IntegrationEventDefinition(IntegrationEvents.BuildPredicates());
 }

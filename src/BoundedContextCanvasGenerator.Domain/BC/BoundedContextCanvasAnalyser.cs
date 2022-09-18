@@ -27,17 +27,18 @@ public class BoundedContextCanvasAnalyser
     private static InboundCommunication GenerateInboundCommunication(TypeDefinitionExtract typeDefinitionExtract, ICanvasSettings canvasSettings)
     {
         var commandsGroupedByModule = typeDefinitionExtract.Commands.Values
-            .Select(command => new CommandWrapper(command, typeDefinitionExtract.CommandHandlers
-                .Where(handler => handler.Match(command))
-                .Select(x => x.TypeDefinition)
-                .FirstOrDefault()
-            ))
+            .Select(command => new CommandWrapper(
+                command, 
+                typeDefinitionExtract.Handlers.FirstOrDefault(handler => handler.Match(command))?.TypeDefinition,
+                typeDefinitionExtract.Handlers.Where(handler => typeDefinitionExtract.DomainEvents.Values.Any(handler.Match)).ToArray())
+            )
             .GroupBy(x => x.ModuleName)
             .ToArray();
 
         var modules = GenerateDomainModules(
             commandsGroupedByModule,
             typeDefinitionExtract.DomainEvents.Values,
+            typeDefinitionExtract.IntegrationEvents,
             canvasSettings.InboundCommunicationSettings
         );
 
@@ -47,29 +48,49 @@ public class BoundedContextCanvasAnalyser
     private static IEnumerable<DomainModule> GenerateDomainModules(
         IEnumerable<IGrouping<Namespace, CommandWrapper>> commandsGroupedByModule,
         IReadOnlyCollection<TypeDefinition> domainEventTypes,
+        IEnumerable<TypeDefinition> integrationEventTypes,
         InboundCommunicationSettings inboundCommunicationSettings
     )
         => commandsGroupedByModule.Select(commandsFromSameModule =>
             new DomainModule(
                 commandsFromSameModule.Key.Name.ToReadableSentence(),
-                GetDomainFlows(commandsFromSameModule, domainEventTypes, inboundCommunicationSettings)
+                GetDomainFlows(commandsFromSameModule, domainEventTypes, integrationEventTypes, inboundCommunicationSettings)
             )
         );
 
-    private static IEnumerable<DomainFlow> GetDomainFlows(IEnumerable<CommandWrapper> commands, IReadOnlyCollection<TypeDefinition> domainEventTypes, InboundCommunicationSettings inboundCommunicationSettings)
-        => commands.Select(command => command.BuildDomainFlow(domainEventTypes, inboundCommunicationSettings));
+    private static IEnumerable<DomainFlow> GetDomainFlows(
+        IEnumerable<CommandWrapper> commands, 
+        IReadOnlyCollection<TypeDefinition> domainEventTypes,
+        IEnumerable<TypeDefinition> integrationEventTypes,
+        InboundCommunicationSettings inboundCommunicationSettings
+    )
+        => commands.Select(command 
+            => command.BuildDomainFlow(
+                domainEventTypes, 
+                integrationEventTypes, 
+                inboundCommunicationSettings
+            )
+        );
 
-    private record CommandWrapper(TypeDefinition CommandTypeDefinition, TypeDefinition? CommandHandlerTypeDefinition)
+    private record CommandWrapper(
+        TypeDefinition CommandTypeDefinition, 
+        TypeDefinition? CommandHandlerTypeDefinition, 
+        IReadOnlyCollection<LinkedTypeDefinition> DomainEventHandlers
+    )
     {
         private Namespace ParentNamespace { get; } = CommandTypeDefinition.FullName.Namespace;
         public Namespace ModuleName => ParentNamespace.TrimStart(CommandTypeDefinition.AssemblyDefinition.Namespace);
 
-        public DomainFlow BuildDomainFlow(IEnumerable<TypeDefinition> domainEventTypes, InboundCommunicationSettings inboundCommunicationSettings)
+        public DomainFlow BuildDomainFlow(
+            IEnumerable<TypeDefinition> domainEventTypes, 
+            IEnumerable<TypeDefinition> integrationEventTypes, 
+            InboundCommunicationSettings inboundCommunicationSettings
+        )
             => new(
                 GetCollaborators(inboundCommunicationSettings.CollaboratorDefinitions),
                 Command.FromType(CommandTypeDefinition),
                 GetPolicies(inboundCommunicationSettings.PolicyDefinitions),
-                GetDomainEvents(domainEventTypes)
+                GetDomainEvents(domainEventTypes, integrationEventTypes)
             );
 
         private IEnumerable<Collaborator> GetCollaborators(IEnumerable<CollaboratorDefinition> collaboratorDefinitions)
@@ -84,10 +105,30 @@ public class BoundedContextCanvasAnalyser
                 .Select(Policy.FromMethod)
                 .ToArray();
 
-        private IEnumerable<DomainEvent> GetDomainEvents(IEnumerable<TypeDefinition> domainEventTypes)
-            => GetDomainEventInstanciatedByCommand(domainEventTypes)
+        private IEnumerable<DomainEvent> GetDomainEvents(IEnumerable<TypeDefinition> domainEventTypes, IEnumerable<TypeDefinition> integrationEventTypes)
+        {
+            var domainEvents = GetDomainEventInstanciatedByCommand(domainEventTypes)
                 .Concat(GetDomainEventInstanciatedByCommandHandler(domainEventTypes))
-                .Distinct();
+                .Distinct()
+                .ToArray();
+
+            if (!DomainEventHandlers.Any()) {
+                return domainEvents;
+            }
+
+            foreach (var domainEvent in domainEvents) {
+                var domainEventType = domainEventTypes.First(x => x.FullName == domainEvent.TypeFullName);
+                var specificDomainEventHandlers = DomainEventHandlers.Where(x => x.Match(domainEventType)).ToArray();
+                var instanciatedIntegrationEvents = integrationEventTypes
+                    .Where(integrationEvent => specificDomainEventHandlers.Any(listener => integrationEvent.IsInstanciatedBy(listener.TypeDefinition.FullName)))
+                    .Select(IntegrationEvent.FromType)
+                    .ToArray();
+
+                domainEvent.AddIntegrationEvents(instanciatedIntegrationEvents);
+            }
+
+            return domainEvents;
+        }
 
         private IEnumerable<DomainEvent> GetDomainEventInstanciatedByCommand(IEnumerable<TypeDefinition> domainEventTypes) 
             => domainEventTypes

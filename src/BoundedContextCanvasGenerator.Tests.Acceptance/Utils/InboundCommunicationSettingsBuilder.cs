@@ -7,7 +7,8 @@ internal class InboundCommunicationSettingsBuilder
     private CommandDefinition _commandDefinition = CommandDefinition.Empty;
     private readonly List<CollaboratorDefinition> _collaboratorDefinitions = new();
     private readonly List<PolicyDefinition> _policyDefinitions = new();
-    private TypeDefinitionPredicates _domainEventDefinition = TypeDefinitionPredicates.Empty;
+    private DomainEventDefinition _domainEventDefinition = DomainEventDefinition.Empty;
+    private IntegrationEventDefinition _integrationEventDefinition = IntegrationEventDefinition.Empty;
 
     public InboundCommunicationSettingsBuilder WithCommandDefinition(CommandDefinition commandDefinition)
     {
@@ -27,9 +28,15 @@ internal class InboundCommunicationSettingsBuilder
         return this;
     }
 
-    public InboundCommunicationSettingsBuilder WithDomainEventDefinition(TypeDefinitionPredicates typeDefinitionPredicates)
+    public InboundCommunicationSettingsBuilder WithDomainEventDefinition(DomainEventDefinition domainEventDefinition)
     {
-        this._domainEventDefinition = typeDefinitionPredicates;
+        this._domainEventDefinition = domainEventDefinition;
+        return this;
+    }
+
+    public InboundCommunicationSettingsBuilder WithIntegrationEventDefinition(IntegrationEventDefinition integrationEventDefinition)
+    {
+        this._integrationEventDefinition = integrationEventDefinition;
         return this;
     }
 
@@ -38,7 +45,8 @@ internal class InboundCommunicationSettingsBuilder
             _commandDefinition,
             _collaboratorDefinitions,
             _policyDefinitions,
-            _domainEventDefinition
+            _domainEventDefinition,
+            _integrationEventDefinition
         );
 
     public static implicit operator InboundCommunicationSettings(InboundCommunicationSettingsBuilder builder) => builder.Build();

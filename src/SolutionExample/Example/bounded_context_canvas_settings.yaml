@@ -27,3 +27,8 @@ inbound_communication:
         - method_attribute_pattern: 'Fact'
     domain_events:
         selector: class implementing 'IDomainEvent'
+        handler: 
+            selector: class implementing '.*IDomainEventListener<.*>$'
+            link: T -> .*IDomainEventListener<T>$
+    integration_events:
+        selector: class implementing 'IIntegrationEvent'

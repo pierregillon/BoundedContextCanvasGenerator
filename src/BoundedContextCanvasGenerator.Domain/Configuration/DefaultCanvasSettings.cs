@@ -11,7 +11,8 @@ public class DefaultCanvasSettings : ICanvasSettings
         new(CommandDefinition.Empty, 
             Enumerable.Empty<CollaboratorDefinition>(),
             Enumerable.Empty<PolicyDefinition>(),
-            TypeDefinitionPredicates.Empty
+            DomainEventDefinition.Empty,
+            IntegrationEventDefinition.Empty
         );
     public TypeDefinitionPredicates DomainEvents => new(new[] { new ImplementsInterfaceMatching(".*IDomainEvent$") });
     public TypeDefinitionPredicates UbiquitousLanguage => TypeDefinitionPredicates.Empty;

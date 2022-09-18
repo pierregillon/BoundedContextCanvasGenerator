@@ -313,7 +313,11 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
                                 TypeDefinitionLink.From("T -> .*ICommandHandler<T>$"))
                             )
                     )
-                    .WithDomainEventDefinition(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IDomainEvent")))
+                    .WithDomainEventDefinition(
+                        A.DomainEventDefinition.WithPredicates(
+                            TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IDomainEvent"))
+                        )    
+                    )
             );
 
         _typeDefinitionRepository
@@ -339,7 +343,76 @@ public class GenerateBoundedContextCanvasFromSolutionPathTests
                     .WithFlow(
                         A.DomainFlow
                             .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.Catalog.RegisterCatalogCommand")))
-                            .WithDomainEvent(new DomainEvent("Catalog registered", new TypeFullName("Some.Namespace.Catalog.CatalogRegistered")))
+                            .WithDomainEvent(new DomainEvent("Catalog registered", new TypeFullName("Some.Namespace.Catalog.CatalogRegistered"), Enumerable.Empty<IntegrationEvent>()))
+                    )
+            });
+    }
+
+    [Fact]
+    public async Task Generate_integration_event_instanciated_by_event_handlers()
+    {
+        _canvasSettings
+            .InboundCommunicationSettings
+            .Returns(
+                An.InboundCommunicationSettings
+                    .WithCommandDefinition(
+                        A.CommandDefinition
+                            .WithPredicates(TypeDefinitionPredicates.From(new NamedLike(".*Command$")))
+                            .HandledBy(new HandlerDefinition(
+                                TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*ICommandHandler<.*>$")),
+                                TypeDefinitionLink.From("T -> .*ICommandHandler<T>$"))
+                            )
+                    )
+                    .WithDomainEventDefinition(
+                        A.DomainEventDefinition
+                            .WithPredicates(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IDomainEvent")))
+                            .HandledBy(new HandlerDefinition(
+                                TypeDefinitionPredicates.From(new ImplementsInterfaceMatching(".*IDomainEventListener<.*>$")),
+                                TypeDefinitionLink.From("T -> .*IDomainEventListener<T>$"))
+                            )
+                    )
+                    .WithIntegrationEventDefinition(
+                        An.IntegrationEventDefinition
+                            .WithPredicates(TypeDefinitionPredicates.From(new ImplementsInterfaceMatching("IIntegrationEvent")))
+                    )
+
+            );
+
+        _typeDefinitionRepository
+            .GetAll(SolutionPath)
+            .Returns(CollectionFrom(
+                A.Class("Some.Namespace.Catalog.RegisterCatalogCommand"),
+                A.Class("Some.Namespace.Catalog.RegisterCatalogCommandHandler")
+                    .Implementing("ICommandHandler<Some.Namespace.Catalog.RegisterCatalogCommand>"),
+                A.Class("Some.Namespace.Catalog.CatalogRegistered")
+                    .Implementing("IDomainEvent")
+                    .InstanciatedBy(A.Class("Some.Namespace.Catalog.RegisterCatalogCommandHandler")),
+                A.Class("Some.Namespace.Catalog.PublishIntegrationEventOnCatalogRegistered")
+                    .Implementing("IDomainEventListener<Some.Namespace.Catalog.CatalogRegistered>"),
+                A.Class("Some.Namespace.Catalog.CatalogCreated")
+                    .Implementing("IIntegrationEvent")
+                    .InstanciatedBy(A.Class("Some.Namespace.Catalog.PublishIntegrationEventOnCatalogRegistered"))
+            ));
+
+        var boundedContextCanvas = await Generate();
+
+        boundedContextCanvas
+            .InboundCommunication
+            .Modules
+            .Should()
+            .BeEquivalentTo(new DomainModule[] {
+                A.DomainModule
+                    .Named("Catalog")
+                    .WithFlow(
+                        A.DomainFlow
+                            .WithCommand(new Command("Register catalog", new TypeFullName("Some.Namespace.Catalog.RegisterCatalogCommand")))
+                            .WithDomainEvent(new DomainEvent(
+                                "Catalog registered", 
+                                new TypeFullName("Some.Namespace.Catalog.CatalogRegistered"),
+                                new[] {
+                                    new IntegrationEvent("Catalog created", new TypeFullName("Some.Namespace.Catalog.CatalogCreated"))
+                                }
+                            ))
                     )
             });
     }

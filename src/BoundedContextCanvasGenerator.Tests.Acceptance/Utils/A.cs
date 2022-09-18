@@ -1,4 +1,5 @@
-﻿namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
+﻿
+namespace BoundedContextCanvasGenerator.Tests.Acceptance.Utils;
 
 internal class A
 {
@@ -10,11 +11,12 @@ internal class A
     public static TypeDefinitionBuilder Class(string fullName) => TypeDefinitionBuilder.Class(fullName);
     public static MethodInfoBuilder Method => new();
     public static CommandDefinitionBuilder CommandDefinition => new();
+    public static DomainEventDefinitionBuilder DomainEventDefinition => new();
 }
 
 internal class An
 {
     public static UbiquitousLanguageBuilder UbiquitousLanguage => new();
-
-    public static InboundCommunicationSettingsBuilder InboundCommunicationSettings = new();
+    public static InboundCommunicationSettingsBuilder InboundCommunicationSettings => new();
+    public static IntegrationEventDefinitionBuilder IntegrationEventDefinition => new();
 }

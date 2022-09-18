@@ -1,8 +1,9 @@
-﻿namespace BoundedContextCanvasGenerator.Domain.Types;
+﻿using BoundedContextCanvasGenerator.Domain.Types.Definition;
 
-public record TypeDefinitionExtract(
-    ExtractedElements Commands,
+namespace BoundedContextCanvasGenerator.Domain.Types;
+
+public record TypeDefinitionExtract(ExtractedElements Commands,
     ExtractedElements DomainEvents,
     ExtractedElements Aggregates,
-    IReadOnlyCollection<LinkedTypeDefinition> CommandHandlers
-);
+    IReadOnlyCollection<LinkedTypeDefinition> Handlers, 
+    IReadOnlyCollection<TypeDefinition> IntegrationEvents);

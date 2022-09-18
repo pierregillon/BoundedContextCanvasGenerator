@@ -12,3 +12,13 @@ public record HandlerDefinition(TypeDefinitionPredicates Predicates, TypeDefinit
     public static HandlerDefinition Empty => new(TypeDefinitionPredicates.Empty, TypeDefinitionLink.Empty);
 
 }
+
+public record DomainEventDefinition(TypeDefinitionPredicates Predicates, HandlerDefinition Handler)
+{
+    public static DomainEventDefinition Empty =>new(TypeDefinitionPredicates.Empty, HandlerDefinition.Empty);
+}
+
+public record IntegrationEventDefinition(TypeDefinitionPredicates Predicates)
+{
+    public static IntegrationEventDefinition Empty => new(TypeDefinitionPredicates.Empty);
+}

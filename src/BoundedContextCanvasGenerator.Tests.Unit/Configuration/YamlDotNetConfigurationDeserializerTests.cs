@@ -1,5 +1,4 @@
 ﻿using BoundedContextCanvasGenerator.Infrastructure.Configuration;
-using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing;
 using BoundedContextCanvasGenerator.Infrastructure.Configuration.Parsing.Models;
 using FluentAssertions;
 using Xunit;
@@ -38,23 +37,15 @@ public class YamlDotNetConfigurationDeserializerTests
     }
 
     [Fact]
-    public void Deserializes_inbound_communication()
+    public void Deserializes_commands()
     {
         const string yaml =
-            @"inbound_communication:
+@"inbound_communication:
     commands: 
         selector: class implementing '.*ICommand$'
         handler: 
             selector: class implementing '.*ICommandHandler<.*>$'
             link: T -> .*ICommandHandler<T>$
-    collaborators:
-        - name: WebApp
-          type: front
-          selector: class named '.*Controller$'
-    policies:
-        - method_attribute_pattern: 'Fact'
-    domain_events:
-        selector: class implementing 'IDomainEvent'
     ";
 
         var configuration = _deserializer.Deserialize(yaml);
@@ -68,23 +59,87 @@ public class YamlDotNetConfigurationDeserializerTests
                     Link = "T -> .*ICommandHandler<T>$"
                 }
             });
+    }
 
-        configuration.InboundCommunication.Collaborators!
+    [Fact]
+    public void Deserializes_collaborators()
+    {
+        const string yaml =
+@"inbound_communication:
+    collaborators:
+        - name: WebApp
+          type: front
+          selector: class named '.*Controller$'
+    ";
+
+        var configuration = _deserializer.Deserialize(yaml);
+
+        configuration.InboundCommunication!.Collaborators!
             .Should()
             .BeEquivalentTo(new[] {
                 new CollaboratorDefinitionDto { Name = "WebApp", Type = "front", Selector = "class named '.*Controller$'" }
             });
+    }
 
-        configuration.InboundCommunication.Policies!
+    [Fact]
+    public void Deserializes_policies()
+    {
+        const string yaml =
+@"inbound_communication:
+    policies:
+        - method_attribute_pattern: 'Fact'
+    ";
+
+        var configuration = _deserializer.Deserialize(yaml);
+
+        configuration.InboundCommunication!.Policies
             .Should()
             .BeEquivalentTo(new[] {
                 new PolicyDto { MethodAttributePattern = "Fact" }
             });
+    }
 
-        configuration.InboundCommunication.DomainEvents!
+    [Fact]
+    public void Deserializes_domain_events()
+    {
+        const string yaml =
+@"inbound_communication:
+    domain_events:
+        selector: class implementing 'IDomainEvent'
+        handler: 
+            selector: class implementing '.*IDomainEventListener<.*>$'
+            link: T -> .*IDomainEventListener<T>$
+    ";
+
+        var configuration = _deserializer.Deserialize(yaml);
+
+        configuration.InboundCommunication!.DomainEvents
             .Should()
             .Be(new DomainEventDefinitionDto {
-                Selector = "class implementing 'IDomainEvent'"
+                Selector = "class implementing 'IDomainEvent'",
+                Handler = new HandlerDefinitionDto
+                {
+                    Selector = "class implementing '.*IDomainEventListener<.*>$'",
+                    Link = "T -> .*IDomainEventListener<T>$"
+                }
+            });
+    }
+
+    [Fact]
+    public void Deserializes_integration_events()
+    {
+        const string yaml =
+@"inbound_communication:
+    integration_events:
+        selector: class implementing 'IIntegrationEvent'
+    ";
+
+        var configuration = _deserializer.Deserialize(yaml);
+
+        configuration.InboundCommunication!.IntegrationEvents!
+            .Should()
+            .Be(new IntegrationEventDefinitionDto {
+                Selector = "class implementing 'IIntegrationEvent'"
             });
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BoundedContextCanvasGenerator.Domain.BC;
@@ -16,6 +17,7 @@ namespace BoundedContextCanvasGenerator.Tests.Unit.BC;
 public class BoundedContextCanvasAnalyserTests
 {
     private readonly ICanvasSettings _canvasSettings;
+    private readonly BoundedContextCanvasAnalyser analyser = new();
 
     public BoundedContextCanvasAnalyserTests()
     {
@@ -26,16 +28,14 @@ public class BoundedContextCanvasAnalyserTests
     [Fact]
     public async Task Link_command_and_domain_event_when_handler_of_a_command_instanciates_domain_event()
     {
-        var analyser = new BoundedContextCanvasAnalyser();
-
-        var typeExtract = new TypeDefinitionExtract(
-            new ExtractedElements(true, new TypeDefinition[] {
+        var canvas = await Analyse(
+            new TypeDefinition[] {
                 A.Class("OrderItemCommand")
-            }),
-            new ExtractedElements(true, new TypeDefinition[] {
+            },
+            new TypeDefinition[] {
                 A.Class("ItemOrdered").InstanciatedBy(A.Class("OrderItemCommandHandler"))
-            }),
-            new ExtractedElements(false, Array.Empty<TypeDefinition>()),
+            },
+            Array.Empty<TypeDefinition>(),
             new[] {
                 new LinkedTypeDefinition(
                     A.Class("OrderItemCommandHandler").Implementing("ICommandHandler<OrderItemCommand>"),
@@ -44,31 +44,27 @@ public class BoundedContextCanvasAnalyserTests
             }
         );
 
-        var canvas = await analyser.Analyse(typeExtract, _canvasSettings);
-
         var uniqueDomainFlow = canvas.InboundCommunication.Modules.Single().Flows.Single();
 
         uniqueDomainFlow
             .DomainEvents
             .Should()
             .BeEquivalentTo(new[] {
-                new DomainEvent("Item ordered", new TypeFullName("ItemOrdered"))
+                new DomainEvent("Item ordered", new TypeFullName("ItemOrdered"), Enumerable.Empty<IntegrationEvent>())
             });
     }
 
     [Fact]
     public async Task Do_no_link_command_and_domain_event_when_handler_is_not_linked_to_the_command()
     {
-        var analyser = new BoundedContextCanvasAnalyser();
-
-        var typeExtract = new TypeDefinitionExtract(
-            new ExtractedElements(true, new TypeDefinition[] {
+        var canvas = await Analyse(
+            new TypeDefinition[] {
                 A.Class("OrderItemCommand")
-            }),
-            new ExtractedElements(true, new TypeDefinition[] {
+            }, 
+            new TypeDefinition[] {
                 A.Class("ItemCreated").InstanciatedBy(A.Class("CreateItemCommandHandler"))
-            }),
-            new ExtractedElements(false, Array.Empty<TypeDefinition>()),
+            },
+            Array.Empty<TypeDefinition>(),
             new[] {
                 new LinkedTypeDefinition(
                     A.Class("CreateItemCommandHandler").Implementing("ICommandHandler<CreateItemCommand>"),
@@ -77,13 +73,75 @@ public class BoundedContextCanvasAnalyserTests
             }
         );
 
-        var canvas = await analyser.Analyse(typeExtract, _canvasSettings);
-
         var uniqueDomainFlow = canvas.InboundCommunication.Modules.Single().Flows.Single();
 
         uniqueDomainFlow
             .DomainEvents
             .Should()
             .BeEmpty();
+    }
+
+    [Fact]
+    public async Task Link_event_and_integration_event()
+    {
+        var canvas = await Analyse(
+            new TypeDefinition[] {
+                A.Class("OrderItemCommand")
+            }, 
+            new TypeDefinition[] {
+                A.Class("ItemRegistered").InstanciatedBy(A.Class("OrderItemCommandHandler"))
+            },
+            new TypeDefinition[] {
+                A.Class("ItemCreated").InstanciatedBy(A.Class("PublishItemCreatedOnItemRegistered"))
+            },
+            new[] {
+                new LinkedTypeDefinition(
+                    A.Class("OrderItemCommandHandler").Implementing("ICommandHandler<OrderItemCommand>"),
+                    TypeDefinitionLink.From("T -> .*ICommandHandler<T>$")
+                ),
+                new LinkedTypeDefinition(
+                    A.Class("PublishItemCreatedOnItemRegistered").Implementing("IDomainEventListener<ItemRegistered>"),
+                    TypeDefinitionLink.From("T -> .*IDomainEventListener<T>$")
+                )
+            }
+        );
+
+        var uniqueDomainFlow = canvas.InboundCommunication.Modules.Single().Flows.Single();
+
+        uniqueDomainFlow
+            .DomainEvents
+            .Should()
+            .BeEquivalentTo(new[] {
+                new DomainEvent(
+                    "Item registered", 
+                    new TypeFullName("ItemRegistered"), 
+                    new [] {
+                        new IntegrationEvent("Item created", new TypeFullName("ItemCreated"))
+                    }
+                )
+            });
+    }
+
+    private async Task<BoundedContextCanvas> Analyse(
+        IReadOnlyCollection<TypeDefinition> commands,
+        IReadOnlyCollection<TypeDefinition> domainEvents,
+        IReadOnlyCollection<TypeDefinition> integrationEvents,
+        IReadOnlyCollection<LinkedTypeDefinition> commandHandlers
+    )
+    {
+        ExtractedElements ToExtractedElements(IReadOnlyCollection<TypeDefinition> types)
+        {
+            return new ExtractedElements(types.Any(), types);
+        }
+
+        var typeExtract = new TypeDefinitionExtract(
+            ToExtractedElements(commands),
+            ToExtractedElements(domainEvents),
+            ToExtractedElements(Array.Empty<TypeDefinition>()),
+            commandHandlers,
+            integrationEvents
+        );
+
+        return await analyser.Analyse(typeExtract, _canvasSettings);
     }
 }

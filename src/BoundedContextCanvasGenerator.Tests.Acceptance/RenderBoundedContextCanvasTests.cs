@@ -163,7 +163,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
                                 .WithCommand(new Command("Register new transaction", new TypeFullName("Some.Namespace.RegisterNewTransactionCommand")))
                                 .WithCollaborator(new Collaborator("Web app", CollaboratorType.Front))
                                 .WithPolicy(new Policy("Transaction registration must contain a not paid transaction"))
-                                .WithDomainEvent(new DomainEvent("Transaction registered", new TypeFullName("Some.Namespace.TransactionRegistered")))
+                                .WithDomainEvent(new DomainEvent("Transaction registered", new TypeFullName("Some.Namespace.TransactionRegistered"), Enumerable.Empty<IntegrationEvent>()))
                             )
                         .WithFlow(
                             A.DomainFlow

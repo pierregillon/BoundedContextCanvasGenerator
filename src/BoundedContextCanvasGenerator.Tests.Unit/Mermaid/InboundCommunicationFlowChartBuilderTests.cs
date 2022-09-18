@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using BoundedContextCanvasGenerator.Domain.BC.Inbound;
 using BoundedContextCanvasGenerator.Domain.Types.Definition;
 using BoundedContextCanvasGenerator.Infrastructure.Markdown;
@@ -218,7 +219,7 @@ flowchart LR
                 .Named("Order")
                 .WithFlow(A.DomainFlow
                     .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.Order.OrderNewProductCommand")))
-                    .WithDomainEvent(new DomainEvent("Product ordered", new TypeFullName("Test.Namespace.Order.ProductOrdered")))
+                    .WithDomainEvent(new DomainEvent("Product ordered", new TypeFullName("Test.Namespace.Order.ProductOrdered"), Enumerable.Empty<IntegrationEvent>()))
                 )
             );
 
@@ -246,7 +247,7 @@ flowchart LR
                 .WithFlow(A.DomainFlow
                     .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.Order.OrderNewProductCommand")))
                     .WithPolicy(new Policy("Must contains at least one item to order"))
-                    .WithDomainEvent(new DomainEvent("Product ordered", new TypeFullName("Test.Namespace.Order.ProductOrdered")))
+                    .WithDomainEvent(new DomainEvent("Product ordered", new TypeFullName("Test.Namespace.Order.ProductOrdered"), Enumerable.Empty<IntegrationEvent>()))
                 )
             );
 

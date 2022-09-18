@@ -8,6 +8,7 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
 {
     private readonly MethodDefinitions _visitedData;
     private readonly Dictionary<SyntaxTree, SemanticModel> _semanticModels;
+    private readonly IDictionary<ISymbol, IEnumerable<ISymbol>> _alreadyParsedSymbols = new Dictionary<ISymbol, IEnumerable<ISymbol>>();
 
     public MethodSourceCodeVisitor(IEnumerable<SemanticModel> semanticModels, MethodDefinitions visitedData)
     {
@@ -101,6 +102,16 @@ public class MethodSourceCodeVisitor : CSharpSyntaxWalker
     }
 
     private IEnumerable<ISymbol> GetSymbolsFromDeclaration(ISymbol symbol)
+    {
+        if (!_alreadyParsedSymbols.TryGetValue(symbol, out var instanciatedSymbols)) {
+            instanciatedSymbols = TraverseDeclaringReferences(symbol).ToArray();
+            _alreadyParsedSymbols.Add(symbol, instanciatedSymbols);
+        }
+
+        return instanciatedSymbols;
+    }
+
+    private IEnumerable<ISymbol> TraverseDeclaringReferences(ISymbol symbol)
     {
         foreach (var syntax in symbol.DeclaringSyntaxReferences.Select(reference => reference.GetSyntax())) {
             if (syntax is ClassDeclarationSyntax classDeclarationSyntax)

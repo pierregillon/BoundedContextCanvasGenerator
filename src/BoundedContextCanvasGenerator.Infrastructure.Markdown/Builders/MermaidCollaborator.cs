@@ -26,8 +26,8 @@ public record MermaidCollaborator(Collaborator Collaborator)
     {
         return Collaborator.Type switch
         {
-            CollaboratorType.Front => new NodeStyleClass("frontCollaborators", new NodeStyle("fill:#FFE5FF")),
-            CollaboratorType.BoundedContext => new NodeStyleClass("boundedContextCollaborators", new NodeStyle("fill:#FF5C5C")),
+            CollaboratorType.Front => new NodeStyleClass("frontCollaborators", MermaidStyleSheet.FrontCollaborator),
+            CollaboratorType.BoundedContext => new NodeStyleClass("boundedContextCollaborators", MermaidStyleSheet.BoundedContextCollaborator),
             _ => throw new InvalidOperationException("Unknown collaborator: enable to choose node style")
         };
     }

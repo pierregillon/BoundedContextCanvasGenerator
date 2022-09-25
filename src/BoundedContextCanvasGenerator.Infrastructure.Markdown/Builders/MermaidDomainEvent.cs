@@ -12,7 +12,7 @@ public record MermaidDomainEvent(DomainEvent DomainEvent)
         var domainEventNode = Node
             .Named(MermaidName)
             .Shaped(NodeShape.Square)
-            .Styled(new NodeStyleClass("domainEvents", new NodeStyle("fill:#FFA431")));
+            .Styled(new NodeStyleClass("domainEvents", MermaidStyleSheet.DomainEvent));
 
         yield return domainEventNode;
         yield return Link

@@ -187,12 +187,15 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    classDef frontCollaborators fill:#FFE5FF;
-    classDef policies fill:#FFFFAD, font-style:italic;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef frontCollaborators fill:#f72ef022, stroke:#f72ef0;
+    classDef policies fill:#E9E70522, stroke:#E9E705, font-style:italic;
     CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
+    class CatalogApplicationCatalogDeleteCatalogCommand commands;
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
+    class CatalogApplicationCatalogRegisterNewCatalogCommand commands;
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/""A catalog name is unique<br/>Registering a catalog raises registered event""/]
@@ -208,18 +211,24 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    classDef frontCollaborators fill:#FFE5FF;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef frontCollaborators fill:#f72ef022, stroke:#f72ef0;
     CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
+    class CatalogApplicationItemsAddItemToCatalogCommand commands;
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
+    class CatalogApplicationItemsAdjustItemPriceCommand commands;
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
+    class CatalogApplicationItemsEntitleItemCommand commands;
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsReduceItemQuantityCommand[""Reduce item quantity""]
+    class CatalogApplicationItemsReduceItemQuantityCommand commands;
     CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
+    class CatalogApplicationItemsRemoveFromCatalogCommand commands;
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>""Web app""]
     class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator --> CatalogApplicationItemsAddItemToCatalogCommand
@@ -264,12 +273,15 @@ flowchart LR
 
 ```mermaid
 flowchart LR
+    classDef commands fill:#ECECFF, stroke:#9370DB;
     classDef domainEvents fill:#FFA431;
     classDef integrationEvents fill:#FFDC5C;
     CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
+    class CatalogApplicationCatalogDeleteCatalogCommand commands;
     CatalogDomainCatalogEventsCatalogDeleted[""Catalog deleted""]
     class CatalogDomainCatalogEventsCatalogDeleted domainEvents;
     CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
+    class CatalogApplicationCatalogRegisterNewCatalogCommand commands;
     CatalogDomainCatalogEventsCatalogRegistered[""Catalog registered""]
     class CatalogDomainCatalogEventsCatalogRegistered domainEvents;
     CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent[""Catalog created integration event""]
@@ -285,20 +297,26 @@ flowchart LR
 
 ```mermaid
 flowchart LR
+    classDef commands fill:#ECECFF, stroke:#9370DB;
     classDef domainEvents fill:#FFA431;
     CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
+    class CatalogApplicationItemsAddItemToCatalogCommand commands;
     CatalogDomainItemsEventsCatalogItemAdded[""Catalog item added""]
     class CatalogDomainItemsEventsCatalogItemAdded domainEvents;
     CatalogApplicationItemsAdjustItemPriceCommand[""Adjust item price""]
+    class CatalogApplicationItemsAdjustItemPriceCommand commands;
     CatalogDomainItemsEventsCatalogItemPriceAdjusted[""Catalog item price adjusted""]
     class CatalogDomainItemsEventsCatalogItemPriceAdjusted domainEvents;
     CatalogApplicationItemsEntitleItemCommand[""Entitle item""]
+    class CatalogApplicationItemsEntitleItemCommand commands;
     CatalogDomainItemsEventsCatalogItemEntitled[""Catalog item entitled""]
     class CatalogDomainItemsEventsCatalogItemEntitled domainEvents;
     CatalogApplicationItemsReduceItemQuantityCommand[""Reduce item quantity""]
+    class CatalogApplicationItemsReduceItemQuantityCommand commands;
     CatalogDomainItemsEventsCatalogItemQuantityAdjusted[""Catalog item quantity adjusted""]
     class CatalogDomainItemsEventsCatalogItemQuantityAdjusted domainEvents;
     CatalogApplicationItemsRemoveFromCatalogCommand[""Remove from catalog""]
+    class CatalogApplicationItemsRemoveFromCatalogCommand commands;
     CatalogDomainItemsEventsCatalogItemRemoved[""Catalog item removed""]
     class CatalogDomainItemsEventsCatalogItemRemoved domainEvents;
     CatalogApplicationItemsAddItemToCatalogCommand -.-> CatalogDomainItemsEventsCatalogItemAdded

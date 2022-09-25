@@ -188,12 +188,14 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    classDef frontCollaborators fill:#FFE5FF;
-    classDef policies fill:#FFFFAD, font-style:italic;
-    classDef domainEvents fill:#FFA431;
-    classDef integrationEvents fill:#FFDC5C;
-    classDef boundedContextCollaborators fill:#FF5C5C;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef frontCollaborators fill:#f72ef022, stroke:#f72ef0;
+    classDef policies fill:#E9E70522, stroke:#E9E705, font-style:italic;
+    classDef domainEvents fill:#f7962e22, stroke:#f7962e;
+    classDef integrationEvents fill:#f7962e22, stroke:#f7962e;
+    classDef boundedContextCollaborators fill:#f72ef022, stroke:#f72ef0;
     SomeNamespaceRegisterNewTransactionCommand[""Register new transaction""]
+    class SomeNamespaceRegisterNewTransactionCommand commands;
     SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator>""Web app""]
     class SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator frontCollaborators;
     SomeNamespaceRegisterNewTransactionCommandPolicies[/""Transaction registration must contain a not paid transaction""/]
@@ -203,6 +205,7 @@ flowchart LR
     SomeNamespaceTransactionCreatedIntegrationEvent[""Transaction created""]
     class SomeNamespaceTransactionCreatedIntegrationEvent integrationEvents;
     SomeNamespaceRescheduleTransactionCommand[""Reschedule transaction""]
+    class SomeNamespaceRescheduleTransactionCommand commands;
     SomeNamespaceRescheduleTransactionCommandOrderCollaborator>""Order""]
     class SomeNamespaceRescheduleTransactionCommandOrderCollaborator boundedContextCollaborators;
     SomeNamespaceRescheduleTransactionCommandPolicies[/""Transaction reschedule must be in the future""/]

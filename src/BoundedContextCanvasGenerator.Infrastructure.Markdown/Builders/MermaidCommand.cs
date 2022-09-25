@@ -9,5 +9,5 @@ public record MermaidCommand(Command Command)
     private MermaidName MermaidName => new(FullName, Command.FriendlyName);
 
     public Node BuildCommandNode()
-        => Node.Named(MermaidName);
+        => Node.Named(MermaidName).Styled(new NodeStyleClass("commands", MermaidStyleSheet.Command));
 }

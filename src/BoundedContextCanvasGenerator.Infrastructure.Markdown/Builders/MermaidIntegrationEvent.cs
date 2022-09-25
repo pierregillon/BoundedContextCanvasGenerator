@@ -12,7 +12,7 @@ public record MermaidIntegrationEvent(IntegrationEvent IntegrationEvent)
         var node = Node
             .Named(MermaidName)
             .Shaped(NodeShape.Square)
-            .Styled(new NodeStyleClass("integrationEvents", new NodeStyle("fill:#FFDC5C")));
+            .Styled(new NodeStyleClass("integrationEvents", MermaidStyleSheet.IntegrationEvent));
 
         yield return node;
 

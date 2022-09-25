@@ -35,9 +35,11 @@ public class InboundCommunicationFlowChartBuilderTests
         GenerateMermaid(inboundCommunication)
             .Should()
             .Be(
-@"```mermaid
+$@"```mermaid
 flowchart LR
+    classDef commands {MermaidStyleSheet.Command.Css};
     TestNamespaceOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderNewProductCommand commands;
 ```");
     }
 
@@ -55,10 +57,12 @@ flowchart LR
         GenerateMermaid(inboundCommunication)
             .Should()
             .Be(
-@"```mermaid
+$@"```mermaid
 flowchart LR
+    classDef commands {MermaidStyleSheet.Command.Css};
     classDef frontCollaborators fill:#FFE5FF;
     TestNamespaceOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
     class TestNamespaceOrderNewProductCommandWebAppCollaborator frontCollaborators;
     TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
@@ -80,10 +84,12 @@ flowchart LR
         GenerateMermaid(inboundCommunication)
             .Should()
             .Be(
-@"```mermaid
+$@"```mermaid
 flowchart LR
+    classDef commands {MermaidStyleSheet.Command.Css};
     classDef boundedContextCollaborators fill:#FF5C5C;
     TestNamespaceOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
     class TestNamespaceOrderNewProductCommandWebAppCollaborator boundedContextCollaborators;
     TestNamespaceOrderNewProductCommandWebAppCollaborator --> TestNamespaceOrderNewProductCommand
@@ -105,10 +111,12 @@ flowchart LR
         GenerateMermaid(inboundCommunication)
             .Should()
             .Be(
-                @"```mermaid
+$@"```mermaid
 flowchart LR
+    classDef commands {MermaidStyleSheet.Command.Css};
     classDef frontCollaborators fill:#FFE5FF;
     TestNamespaceOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
     class TestNamespaceOrderNewProductCommandWebAppCollaborator frontCollaborators;
     TestNamespaceOrderNewProductCommandMobileAppCollaborator>""Mobile app""]
@@ -134,10 +142,12 @@ flowchart LR
         mermaid
             .Should()
             .Be(
-                @"```mermaid
+$@"```mermaid
 flowchart LR
-    classDef policies fill:#FFFFAD, font-style:italic;
+    classDef commands {MermaidStyleSheet.Command.Css};
+    classDef policies {MermaidStyleSheet.Policy.Css};
     TestNamespaceOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandPolicies[/""Must contains at least one item to order""/]
     class TestNamespaceOrderNewProductCommandPolicies policies;
     TestNamespaceOrderNewProductCommand --- TestNamespaceOrderNewProductCommandPolicies
@@ -161,10 +171,12 @@ flowchart LR
         mermaid
             .Should()
             .Be(
-                @"```mermaid
+$@"```mermaid
 flowchart LR
-    classDef policies fill:#FFFFAD, font-style:italic;
+    classDef commands {MermaidStyleSheet.Command.Css};
+    classDef policies {MermaidStyleSheet.Policy.Css};
     TestNamespaceOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandPolicies[/""Must contains at least one item to order<br/>Cannot be altered""/]
     class TestNamespaceOrderNewProductCommandPolicies policies;
     TestNamespaceOrderNewProductCommand --- TestNamespaceOrderNewProductCommandPolicies
@@ -192,13 +204,15 @@ flowchart LR
         mermaid
             .Should()
             .Be(
-@"### Order
+$@"### Order
 
 ---
 
 ```mermaid
 flowchart LR
+    classDef commands {MermaidStyleSheet.Command.Css};
     TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderOrderNewProductCommand commands;
 ```
 
 ### Contact
@@ -207,7 +221,9 @@ flowchart LR
 
 ```mermaid
 flowchart LR
+    classDef commands {MermaidStyleSheet.Command.Css};
     TestNamespaceContactEditContactDetailsCommand[""Edit contact details""]
+    class TestNamespaceContactEditContactDetailsCommand commands;
 ```");
     }
 
@@ -228,10 +244,12 @@ flowchart LR
         mermaid
             .Should()
             .Be(
-@"```mermaid
+$@"```mermaid
 flowchart LR
-    classDef domainEvents fill:#FFA431;
+    classDef commands {MermaidStyleSheet.Command.Css};
+    classDef domainEvents {MermaidStyleSheet.DomainEvent.Css};
     TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderOrderNewProductCommand commands;
     TestNamespaceOrderProductOrdered[""Product ordered""]
     class TestNamespaceOrderProductOrdered domainEvents;
     TestNamespaceOrderOrderNewProductCommand -.-> TestNamespaceOrderProductOrdered
@@ -256,11 +274,13 @@ flowchart LR
         mermaid
             .Should()
             .Be(
-@"```mermaid
+$@"```mermaid
 flowchart LR
-    classDef policies fill:#FFFFAD, font-style:italic;
-    classDef domainEvents fill:#FFA431;
+    classDef commands {MermaidStyleSheet.Command.Css};
+    classDef policies {MermaidStyleSheet.Policy.Css};
+    classDef domainEvents {MermaidStyleSheet.DomainEvent.Css};
     TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderOrderNewProductCommand commands;
     TestNamespaceOrderOrderNewProductCommandPolicies[/""Must contains at least one item to order""/]
     class TestNamespaceOrderOrderNewProductCommandPolicies policies;
     TestNamespaceOrderProductOrdered[""Product ordered""]
@@ -295,11 +315,13 @@ flowchart LR
         mermaid
             .Should()
             .Be(
-@"```mermaid
+$@"```mermaid
 flowchart LR
-    classDef domainEvents fill:#FFA431;
-    classDef integrationEvents fill:#FFDC5C;
+    classDef commands {MermaidStyleSheet.Command.Css};
+    classDef domainEvents {MermaidStyleSheet.DomainEvent.Css};
+    classDef integrationEvents {MermaidStyleSheet.IntegrationEvent.Css};
     TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    class TestNamespaceOrderOrderNewProductCommand commands;
     TestNamespaceOrderProductOrdered[""Product ordered""]
     class TestNamespaceOrderProductOrdered domainEvents;
     TestNamespaceOrderProductCreatedIntegrationEvent[""Product created""]

@@ -15,7 +15,7 @@ public record MermaidPolicies(IEnumerable<Policy> Policies)
         var node = Node
             .Named(MermaidNameFor(mermaidCommand))
             .Shaped(NodeShape.Parallelogram)
-            .Styled(new NodeStyleClass("policies", new NodeStyle("fill:#FFFFAD, font-style:italic")));
+            .Styled(new NodeStyleClass("policies", MermaidStyleSheet.Policy));
 
         yield return node;
 

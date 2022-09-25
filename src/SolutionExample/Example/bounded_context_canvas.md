@@ -30,16 +30,19 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 
 ```mermaid
 flowchart LR
-    classDef frontCollaborators fill:#FFE5FF;
-    classDef domainEvents fill:#FFA431;
-    classDef policies fill:#FFFFAD, font-style:italic;
-    classDef integrationEvents fill:#FFDC5C;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef frontCollaborators fill:#f72ef022, stroke:#f72ef0;
+    classDef domainEvents fill:#f7962e22, stroke:#f7962e;
+    classDef policies fill:#E9E70522, stroke:#E9E705, font-style:italic;
+    classDef integrationEvents fill:#f7962e22, stroke:#f7962e;
     CatalogApplicationCatalogDeleteCatalogCommand["Delete catalog"]
+    class CatalogApplicationCatalogDeleteCatalogCommand commands;
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogDomainCatalogEventsCatalogDeleted["Catalog deleted"]
     class CatalogDomainCatalogEventsCatalogDeleted domainEvents;
     CatalogApplicationCatalogRegisterNewCatalogCommand["Register new catalog"]
+    class CatalogApplicationCatalogRegisterNewCatalogCommand commands;
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogApplicationCatalogRegisterNewCatalogCommandPolicies[/"A catalog name is unique<br/>Registering a catalog raises registered event"/]
@@ -62,30 +65,36 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    classDef frontCollaborators fill:#FFE5FF;
-    classDef domainEvents fill:#FFA431;
-    classDef boundedContextCollaborators fill:#FF5C5C;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef frontCollaborators fill:#f72ef022, stroke:#f72ef0;
+    classDef domainEvents fill:#f7962e22, stroke:#f7962e;
+    classDef boundedContextCollaborators fill:#f72ef022, stroke:#f72ef0;
     CatalogApplicationItemsAddItemToCatalogCommand["Add item to catalog"]
+    class CatalogApplicationItemsAddItemToCatalogCommand commands;
     CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationItemsAddItemToCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemAdded["Catalog item added"]
     class CatalogDomainItemsEventsCatalogItemAdded domainEvents;
     CatalogApplicationItemsAdjustItemPriceCommand["Adjust item price"]
+    class CatalogApplicationItemsAdjustItemPriceCommand commands;
     CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationItemsAdjustItemPriceCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemPriceAdjusted["Catalog item price adjusted"]
     class CatalogDomainItemsEventsCatalogItemPriceAdjusted domainEvents;
     CatalogApplicationItemsEntitleItemCommand["Entitle item"]
+    class CatalogApplicationItemsEntitleItemCommand commands;
     CatalogApplicationItemsEntitleItemCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationItemsEntitleItemCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemEntitled["Catalog item entitled"]
     class CatalogDomainItemsEventsCatalogItemEntitled domainEvents;
     CatalogApplicationItemsReduceItemQuantityCommand["Reduce item quantity"]
+    class CatalogApplicationItemsReduceItemQuantityCommand commands;
     CatalogApplicationItemsReduceItemQuantityCommandOrderCollaborator>"Order"]
     class CatalogApplicationItemsReduceItemQuantityCommandOrderCollaborator boundedContextCollaborators;
     CatalogDomainItemsEventsCatalogItemQuantityAdjusted["Catalog item quantity adjusted"]
     class CatalogDomainItemsEventsCatalogItemQuantityAdjusted domainEvents;
     CatalogApplicationItemsRemoveFromCatalogCommand["Remove from catalog"]
+    class CatalogApplicationItemsRemoveFromCatalogCommand commands;
     CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationItemsRemoveFromCatalogCommandWebAppCollaborator frontCollaborators;
     CatalogDomainItemsEventsCatalogItemRemoved["Catalog item removed"]

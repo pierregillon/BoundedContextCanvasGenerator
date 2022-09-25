@@ -270,6 +270,45 @@ flowchart LR
 ```");
     }
 
+    [Fact]
+    public void Renders_integration_events()
+    {
+        InboundCommunication inboundCommunication = A.InboundCommunication
+            .WithModule(A.DomainModule
+                .Named("Order")
+                .WithFlow(A.DomainFlow
+                    .WithCommand(new Command("Order new product", new TypeFullName("Test.Namespace.Order.OrderNewProductCommand")))
+                    .WithDomainEvent(
+                        new DomainEvent(
+                            "Product ordered", 
+                            new TypeFullName("Test.Namespace.Order.ProductOrdered"), 
+                            new [] {
+                                new IntegrationEvent("Product created", new TypeFullName("Test.Namespace.Order.ProductCreatedIntegrationEvent"))
+                            }
+                        )
+                    )
+                )
+            );
+
+        var mermaid = GenerateMermaid(inboundCommunication);
+
+        mermaid
+            .Should()
+            .Be(
+@"```mermaid
+flowchart LR
+    classDef domainEvents fill:#FFA431;
+    classDef integrationEvents fill:#FFDC5C;
+    TestNamespaceOrderOrderNewProductCommand[""Order new product""]
+    TestNamespaceOrderProductOrdered[""Product ordered""]
+    class TestNamespaceOrderProductOrdered domainEvents;
+    TestNamespaceOrderProductCreatedIntegrationEvent[""Product created""]
+    class TestNamespaceOrderProductCreatedIntegrationEvent integrationEvents;
+    TestNamespaceOrderOrderNewProductCommand -.-> TestNamespaceOrderProductOrdered
+    TestNamespaceOrderProductOrdered -.-> TestNamespaceOrderProductCreatedIntegrationEvent
+```");
+    }
+
     private static string GenerateMermaid(InboundCommunication inboundCommunication)
     {
         var builder = new InboundCommunicationFlowChartBuilder(inboundCommunication);

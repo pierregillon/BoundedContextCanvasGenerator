@@ -163,7 +163,15 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
                                 .WithCommand(new Command("Register new transaction", new TypeFullName("Some.Namespace.RegisterNewTransactionCommand")))
                                 .WithCollaborator(new Collaborator("Web app", CollaboratorType.Front))
                                 .WithPolicy(new Policy("Transaction registration must contain a not paid transaction"))
-                                .WithDomainEvent(new DomainEvent("Transaction registered", new TypeFullName("Some.Namespace.TransactionRegistered"), Enumerable.Empty<IntegrationEvent>()))
+                                .WithDomainEvent(
+                                    new DomainEvent(
+                                        "Transaction registered", 
+                                        new TypeFullName("Some.Namespace.TransactionRegistered"), 
+                                        new [] {
+                                            new IntegrationEvent("Transaction created", new TypeFullName("Some.Namespace.TransactionCreatedIntegrationEvent"))
+                                        }
+                                    )
+                                )
                             )
                         .WithFlow(
                             A.DomainFlow
@@ -183,6 +191,7 @@ flowchart LR
     classDef frontCollaborators fill:#FFE5FF;
     classDef policies fill:#FFFFAD, font-style:italic;
     classDef domainEvents fill:#FFA431;
+    classDef integrationEvents fill:#FFDC5C;
     classDef boundedContextCollaborators fill:#FF5C5C;
     SomeNamespaceRegisterNewTransactionCommand[""Register new transaction""]
     SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator>""Web app""]
@@ -191,6 +200,8 @@ flowchart LR
     class SomeNamespaceRegisterNewTransactionCommandPolicies policies;
     SomeNamespaceTransactionRegistered[""Transaction registered""]
     class SomeNamespaceTransactionRegistered domainEvents;
+    SomeNamespaceTransactionCreatedIntegrationEvent[""Transaction created""]
+    class SomeNamespaceTransactionCreatedIntegrationEvent integrationEvents;
     SomeNamespaceRescheduleTransactionCommand[""Reschedule transaction""]
     SomeNamespaceRescheduleTransactionCommandOrderCollaborator>""Order""]
     class SomeNamespaceRescheduleTransactionCommandOrderCollaborator boundedContextCollaborators;
@@ -199,6 +210,7 @@ flowchart LR
     SomeNamespaceRegisterNewTransactionCommandWebAppCollaborator --> SomeNamespaceRegisterNewTransactionCommand
     SomeNamespaceRegisterNewTransactionCommand --- SomeNamespaceRegisterNewTransactionCommandPolicies
     SomeNamespaceRegisterNewTransactionCommandPolicies -.-> SomeNamespaceTransactionRegistered
+    SomeNamespaceTransactionRegistered -.-> SomeNamespaceTransactionCreatedIntegrationEvent
     SomeNamespaceRescheduleTransactionCommandOrderCollaborator --> SomeNamespaceRescheduleTransactionCommand
     SomeNamespaceRescheduleTransactionCommand --- SomeNamespaceRescheduleTransactionCommandPolicies
 ```

@@ -8,11 +8,6 @@ public record DomainEvent(string FriendlyName, TypeFullName TypeFullName, IEnume
 
     public static DomainEvent FromType(TypeDefinition typeDefinition) 
         => new(typeDefinition.FullName.Name.ToReadableSentence(), typeDefinition.FullName, Enumerable.Empty<IntegrationEvent>());
-
-    public void AddIntegrationEvents(IReadOnlyCollection<IntegrationEvent> integrationEvents)
-    {
-        IntegrationEvents = IntegrationEvents.Concat(integrationEvents);
-    }
 }
 
 public record IntegrationEvent(string FriendlyName, TypeFullName TypeFullName)

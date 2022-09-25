@@ -33,6 +33,7 @@ flowchart LR
     classDef frontCollaborators fill:#FFE5FF;
     classDef domainEvents fill:#FFA431;
     classDef policies fill:#FFFFAD, font-style:italic;
+    classDef integrationEvents fill:#FFDC5C;
     CatalogApplicationCatalogDeleteCatalogCommand["Delete catalog"]
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator>"Web app"]
     class CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator frontCollaborators;
@@ -45,11 +46,14 @@ flowchart LR
     class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
     CatalogDomainCatalogEventsCatalogRegistered["Catalog registered"]
     class CatalogDomainCatalogEventsCatalogRegistered domainEvents;
+    CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent["Catalog created integration event"]
+    class CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent integrationEvents;
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogDeleteCatalogCommand
     CatalogApplicationCatalogDeleteCatalogCommand -.-> CatalogDomainCatalogEventsCatalogDeleted
     CatalogApplicationCatalogRegisterNewCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogRegisterNewCatalogCommand
     CatalogApplicationCatalogRegisterNewCatalogCommand --- CatalogApplicationCatalogRegisterNewCatalogCommandPolicies
     CatalogApplicationCatalogRegisterNewCatalogCommandPolicies -.-> CatalogDomainCatalogEventsCatalogRegistered
+    CatalogDomainCatalogEventsCatalogRegistered -.-> CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent
 ```
 
 ### Items

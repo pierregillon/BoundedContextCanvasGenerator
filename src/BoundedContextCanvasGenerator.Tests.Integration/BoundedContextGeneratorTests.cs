@@ -86,11 +86,11 @@ public class BoundedContextGeneratorTests
             .WithEmptyConfiguration()
             .Execute();
 
-        string commandsSection = $"## {sectionName}";
+        string expected = $"## {sectionName}";
 
         plainText
             .Should()
-            .NotContain(commandsSection);
+            .NotContain(expected);
     }
 
     [Fact]
@@ -113,7 +113,7 @@ definition:
     ")
             .Execute();
 
-        const string definitionSection =
+        const string expected =
 @"# Catalog
 
 ## Definition
@@ -133,7 +133,7 @@ definition:
 Provide catalog item allowing Basket, Ordering and Payment contexts to properly work.";
         plainText
             .Should()
-            .Contain(definitionSection);
+            .Contain(expected);
     }
 
     [Fact]
@@ -148,7 +148,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 ")
             .Execute();
 
-        const string commandsSection =
+        const string expected =
 @"## Ubiquitous language (Context\-specific domain terminology)
 
 | Catalog                                                                                             | Catalog item                                                                               |
@@ -156,7 +156,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 | An enumeration of items to purchase. It is systematically described and target a specific audience. | An item of a catalog. It is the minimum unit to purchase. The price includes the currency. |";
         plainText
             .Should()
-            .Contain(commandsSection);
+            .Contain(expected);
     }
 
     [Fact]
@@ -178,7 +178,7 @@ Provide catalog item allowing Basket, Ordering and Payment contexts to properly 
 ")
             .Execute();
 
-        const string commandsSection =
+        const string expected =
 @"## Inbound communication
 
 ### Catalog
@@ -229,11 +229,11 @@ flowchart LR
 ```";
         plainText
             .Should()
-            .Contain(commandsSection);
+            .Contain(expected);
     }
 
     [Fact]
-    public async Task Generating_BCC_with_inbound_communication_configuration_lists_commands_and_domain_event_through_command_handler()
+    public async Task Generating_BCC_with_inbound_communication_configuration_lists_commands_and_events_through_handler()
     {
         var plainText = await A
             .Generator()
@@ -247,10 +247,15 @@ flowchart LR
             link: T -> .*ICommandHandler<T>$
     domain_events:
         selector: class implementing 'IDomainEvent'
+        handler: 
+            selector: class implementing '.*IDomainEventListener<.*>$'
+            link: T -> .*IDomainEventListener<T>$
+    integration_events:
+        selector: class implementing 'IIntegrationEvent'
 ")
             .Execute();
 
-        const string commandsSection =
+        const string expected =
 @"## Inbound communication
 
 ### Catalog
@@ -260,14 +265,18 @@ flowchart LR
 ```mermaid
 flowchart LR
     classDef domainEvents fill:#FFA431;
+    classDef integrationEvents fill:#FFDC5C;
     CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
     CatalogDomainCatalogEventsCatalogDeleted[""Catalog deleted""]
     class CatalogDomainCatalogEventsCatalogDeleted domainEvents;
     CatalogApplicationCatalogRegisterNewCatalogCommand[""Register new catalog""]
     CatalogDomainCatalogEventsCatalogRegistered[""Catalog registered""]
     class CatalogDomainCatalogEventsCatalogRegistered domainEvents;
+    CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent[""Catalog created integration event""]
+    class CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent integrationEvents;
     CatalogApplicationCatalogDeleteCatalogCommand -.-> CatalogDomainCatalogEventsCatalogDeleted
     CatalogApplicationCatalogRegisterNewCatalogCommand -.-> CatalogDomainCatalogEventsCatalogRegistered
+    CatalogDomainCatalogEventsCatalogRegistered -.-> CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent
 ```
 
 ### Items
@@ -300,6 +309,6 @@ flowchart LR
 ```";
         plainText
             .Should()
-            .Contain(commandsSection);
+            .Contain(expected);
     }
 }

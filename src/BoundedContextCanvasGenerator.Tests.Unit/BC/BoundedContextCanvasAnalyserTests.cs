@@ -122,6 +122,46 @@ public class BoundedContextCanvasAnalyserTests
             });
     }
 
+    [Fact]
+    public async Task Do_no_link_domain_event_and_handler_when_not_handled()
+    {
+        var canvas = await Analyse(
+            new TypeDefinition[] {
+                A.Class("OrderItemCommand")
+            }, 
+            new TypeDefinition[] {
+                A.Class("ItemRegistered").InstanciatedBy(A.Class("OrderItemCommandHandler")),
+                A.Class("UserCreated")
+            },
+            new TypeDefinition[] {
+                A.Class("ItemCreated").InstanciatedBy(A.Class("PublishItemCreatedOnItemRegistered"))
+            },
+            new[] {
+                new LinkedTypeDefinition(
+                    A.Class("OrderItemCommandHandler").Implementing("ICommandHandler<OrderItemCommand>"),
+                    TypeDefinitionLink.From("T -> .*ICommandHandler<T>$")
+                ),
+                new LinkedTypeDefinition(
+                    A.Class("PublishItemCreatedOnUserCreated").Implementing("IDomainEventListener<UserCreated>"),
+                    TypeDefinitionLink.From("T -> .*IDomainEventListener<T>$")
+                )
+            }
+        );
+
+        var uniqueDomainFlow = canvas.InboundCommunication.Modules.Single().Flows.Single();
+
+        uniqueDomainFlow
+            .DomainEvents
+            .Should()
+            .BeEquivalentTo(new[] {
+                new DomainEvent(
+                    "Item registered", 
+                    new TypeFullName("ItemRegistered"), 
+                    new IntegrationEvent[]  { }
+                )
+            });
+    }
+
     private async Task<BoundedContextCanvas> Analyse(
         IReadOnlyCollection<TypeDefinition> commands,
         IReadOnlyCollection<TypeDefinition> domainEvents,

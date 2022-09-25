@@ -82,7 +82,7 @@ public class BoundedContextCanvasAnalyser
         public Namespace ModuleName => ParentNamespace.TrimStart(CommandTypeDefinition.AssemblyDefinition.Namespace);
 
         public DomainFlow BuildDomainFlow(
-            IEnumerable<TypeDefinition> domainEventTypes, 
+            IReadOnlyCollection<TypeDefinition> domainEventTypes, 
             IEnumerable<TypeDefinition> integrationEventTypes, 
             InboundCommunicationSettings inboundCommunicationSettings
         )
@@ -105,7 +105,7 @@ public class BoundedContextCanvasAnalyser
                 .Select(Policy.FromMethod)
                 .ToArray();
 
-        private IEnumerable<DomainEvent> GetDomainEvents(IEnumerable<TypeDefinition> domainEventTypes, IEnumerable<TypeDefinition> integrationEventTypes)
+        private IEnumerable<DomainEvent> GetDomainEvents(IReadOnlyCollection<TypeDefinition> domainEventTypes, IEnumerable<TypeDefinition> integrationEventTypes)
         {
             var domainEvents = GetDomainEventInstanciatedByCommand(domainEventTypes)
                 .Concat(GetDomainEventInstanciatedByCommandHandler(domainEventTypes))
@@ -116,6 +116,14 @@ public class BoundedContextCanvasAnalyser
                 return domainEvents;
             }
 
+            return AddIntegrationEventsToDomainEvents(domainEvents, domainEventTypes, integrationEventTypes.ToArray());
+        }
+
+        private IEnumerable<DomainEvent> AddIntegrationEventsToDomainEvents(
+            IEnumerable<DomainEvent> domainEvents, 
+            IReadOnlyCollection<TypeDefinition> domainEventTypes,
+            IReadOnlyCollection<TypeDefinition> integrationEventTypes)
+        {
             foreach (var domainEvent in domainEvents) {
                 var domainEventType = domainEventTypes.First(x => x.FullName == domainEvent.TypeFullName);
                 var specificDomainEventHandlers = DomainEventHandlers.Where(x => x.Match(domainEventType)).ToArray();
@@ -124,10 +132,13 @@ public class BoundedContextCanvasAnalyser
                     .Select(IntegrationEvent.FromType)
                     .ToArray();
 
-                domainEvent.AddIntegrationEvents(instanciatedIntegrationEvents);
+                if (instanciatedIntegrationEvents.Any()) {
+                    yield return domainEvent with { IntegrationEvents = instanciatedIntegrationEvents };
+                }
+                else {
+                    yield return domainEvent;
+                }
             }
-
-            return domainEvents;
         }
 
         private IEnumerable<DomainEvent> GetDomainEventInstanciatedByCommand(IEnumerable<TypeDefinition> domainEventTypes) 

@@ -44,7 +44,7 @@ public class InboundCommunicationFlowChartBuilder
     }
 
     private static IEnumerable<IMermaidGeneratable> GenerateNodes(DomainFlow domainFlow)
-        => new NodeBuilder(domainFlow).BuildAll();
+        => new NodeBuilder(domainFlow).Build();
 
     private static Flowchart Merge(Flowchart flowchart, IMermaidGeneratable element)
     {

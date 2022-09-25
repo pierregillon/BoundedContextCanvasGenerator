@@ -49,7 +49,7 @@ flowchart LR
     class CatalogApplicationCatalogRegisterNewCatalogCommandPolicies policies;
     CatalogDomainCatalogEventsCatalogRegistered["Catalog registered"]
     class CatalogDomainCatalogEventsCatalogRegistered domainEvents;
-    CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent["Catalog created integration event"]
+    CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent["Catalog created"]
     class CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent integrationEvents;
     CatalogApplicationCatalogDeleteCatalogCommandWebAppCollaborator --> CatalogApplicationCatalogDeleteCatalogCommand
     CatalogApplicationCatalogDeleteCatalogCommand -.-> CatalogDomainCatalogEventsCatalogDeleted

@@ -273,9 +273,9 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    classDef commands fill:#ECECFF, stroke:#9370DB;
-    classDef domainEvents fill:#FFA431;
-    classDef integrationEvents fill:#FFDC5C;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef domainEvents fill:#f7962e22, stroke:#f7962e;
+    classDef integrationEvents fill:#f7962e22, stroke:#f7962e;
     CatalogApplicationCatalogDeleteCatalogCommand[""Delete catalog""]
     class CatalogApplicationCatalogDeleteCatalogCommand commands;
     CatalogDomainCatalogEventsCatalogDeleted[""Catalog deleted""]
@@ -284,7 +284,7 @@ flowchart LR
     class CatalogApplicationCatalogRegisterNewCatalogCommand commands;
     CatalogDomainCatalogEventsCatalogRegistered[""Catalog registered""]
     class CatalogDomainCatalogEventsCatalogRegistered domainEvents;
-    CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent[""Catalog created integration event""]
+    CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent[""Catalog created""]
     class CatalogInfrastructureCatalogCatalogCreatedIntegrationEvent integrationEvents;
     CatalogApplicationCatalogDeleteCatalogCommand -.-> CatalogDomainCatalogEventsCatalogDeleted
     CatalogApplicationCatalogRegisterNewCatalogCommand -.-> CatalogDomainCatalogEventsCatalogRegistered
@@ -297,8 +297,8 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    classDef commands fill:#ECECFF, stroke:#9370DB;
-    classDef domainEvents fill:#FFA431;
+    classDef commands fill:#352ef722, stroke:#352ef7;
+    classDef domainEvents fill:#f7962e22, stroke:#f7962e;
     CatalogApplicationItemsAddItemToCatalogCommand[""Add item to catalog""]
     class CatalogApplicationItemsAddItemToCatalogCommand commands;
     CatalogDomainItemsEventsCatalogItemAdded[""Catalog item added""]

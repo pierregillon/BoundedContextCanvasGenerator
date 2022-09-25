@@ -60,7 +60,7 @@ flowchart LR
 $@"```mermaid
 flowchart LR
     classDef commands {MermaidStyleSheet.Command.Css};
-    classDef frontCollaborators fill:#FFE5FF;
+    classDef frontCollaborators {MermaidStyleSheet.FrontCollaborator.Css};
     TestNamespaceOrderNewProductCommand[""Order new product""]
     class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
@@ -87,7 +87,7 @@ flowchart LR
 $@"```mermaid
 flowchart LR
     classDef commands {MermaidStyleSheet.Command.Css};
-    classDef boundedContextCollaborators fill:#FF5C5C;
+    classDef boundedContextCollaborators {MermaidStyleSheet.BoundedContextCollaborator.Css};
     TestNamespaceOrderNewProductCommand[""Order new product""]
     class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
@@ -114,7 +114,7 @@ flowchart LR
 $@"```mermaid
 flowchart LR
     classDef commands {MermaidStyleSheet.Command.Css};
-    classDef frontCollaborators fill:#FFE5FF;
+    classDef frontCollaborators {MermaidStyleSheet.FrontCollaborator.Css};
     TestNamespaceOrderNewProductCommand[""Order new product""]
     class TestNamespaceOrderNewProductCommand commands;
     TestNamespaceOrderNewProductCommandWebAppCollaborator>""Web app""]
